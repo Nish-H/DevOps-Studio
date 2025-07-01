@@ -21,12 +21,6 @@
   --burnt-orange-dark: #994000;
   --burnt-orange-glow: rgba(204, 85, 0, 0.5);
   
-  /* Neon Green Accents */
-  --neon-green: #00ff41;
-  --neon-green-bright: #39ff14;
-  --neon-green-dark: #00cc33;
-  --neon-green-glow: rgba(0, 255, 65, 0.5);
-  
   /* UI Colors */
   --border-color: #2a2a2a;
   --hover-bg: #1a1a1a;
@@ -78,28 +72,6 @@ body {
 
 .neon-glow-orange {
   box-shadow: 0 0 10px var(--burnt-orange-glow), 0 0 20px var(--burnt-orange-glow);
-}
-
-.neon-glow-green {
-  box-shadow: 0 0 10px var(--neon-green-glow), 0 0 20px var(--neon-green-glow);
-}
-
-.neon-text-green {
-  color: var(--neon-green);
-  text-shadow: 0 0 5px var(--neon-green-glow);
-}
-
-.neon-pulse {
-  animation: neon-pulse 2s ease-in-out infinite alternate;
-}
-
-@keyframes neon-pulse {
-  0% {
-    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-  }
-  100% {
-    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;
-  }
 }
 
 /* Selection */

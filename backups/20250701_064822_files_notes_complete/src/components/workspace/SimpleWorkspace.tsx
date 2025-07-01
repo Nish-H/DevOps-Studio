@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import Terminal from './Terminal'
 import Files from './Files'
 import Notes from './Notes'
-import Tools from './Tools'
-import Settings from './Settings'
 
 export default function SimpleWorkspace() {
   const [activeSection, setActiveSection] = useState('claude-ai')
@@ -150,10 +148,6 @@ export default function SimpleWorkspace() {
           <Files />
         ) : activeSection === 'notes' ? (
           <Notes />
-        ) : activeSection === 'tools' ? (
-          <Tools />
-        ) : activeSection === 'settings' ? (
-          <Settings />
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
