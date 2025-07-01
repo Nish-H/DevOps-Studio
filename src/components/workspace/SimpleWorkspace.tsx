@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Terminal from './Terminal'
+import Files from './Files'
+import Notes from './Notes'
 
 export default function SimpleWorkspace() {
   const [activeSection, setActiveSection] = useState('claude-ai')
@@ -19,6 +22,17 @@ export default function SimpleWorkspace() {
     setMessages(prev => prev.map(msg => 
       msg.id === 1 ? { ...msg, timestamp: new Date().toLocaleTimeString() } : msg
     ))
+
+    // Listen for terminal -> Claude AI switching
+    const handleSwitchToClaudeAI = () => {
+      setActiveSection('claude-ai')
+    }
+
+    window.addEventListener('switchToClaudeAI', handleSwitchToClaudeAI)
+    
+    return () => {
+      window.removeEventListener('switchToClaudeAI', handleSwitchToClaudeAI)
+    }
   }, [])
 
   const handleSendMessage = () => {
@@ -128,6 +142,12 @@ export default function SimpleWorkspace() {
               </div>
             </div>
           </>
+        ) : activeSection === 'terminal' ? (
+          <Terminal />
+        ) : activeSection === 'files' ? (
+          <Files />
+        ) : activeSection === 'notes' ? (
+          <Notes />
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
