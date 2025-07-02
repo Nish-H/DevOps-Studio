@@ -30,10 +30,23 @@ export default function SimpleWorkspace() {
       setActiveSection('claude-ai')
     }
 
+    // Listen for Electron menu navigation
+    const handleElectronNavigation = (section: string) => {
+      setActiveSection(section)
+    }
+
     window.addEventListener('switchToClaudeAI', handleSwitchToClaudeAI)
+    
+    // Electron API integration
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      (window as any).electronAPI.onNavigate(handleElectronNavigation)
+    }
     
     return () => {
       window.removeEventListener('switchToClaudeAI', handleSwitchToClaudeAI)
+      if (typeof window !== 'undefined' && (window as any).electronAPI) {
+        (window as any).electronAPI.removeAllListeners('navigate-to-section')
+      }
     }
   }, [])
 
