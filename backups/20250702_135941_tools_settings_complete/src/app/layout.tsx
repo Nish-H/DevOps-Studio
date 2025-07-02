@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { SettingsProvider } from "../contexts/SettingsContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,11 +29,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-black text-white min-h-screen`}
       >
-        <SettingsProvider>
-          <div className="h-screen overflow-hidden">
-            {children}
-          </div>
-        </SettingsProvider>
+        <div className="h-screen overflow-hidden">
+          {children}
+        </div>
       </body>
     </html>
   );

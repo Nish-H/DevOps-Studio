@@ -357,11 +357,10 @@ export default function Files() {
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--primary-accent)' }}>Project Files</h2>
+            <h2 className="text-lg font-semibold text-neon-red">Project Files</h2>
             <button
               onClick={() => setShowNewProjectModal(true)}
-              className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
-              style={{ backgroundColor: 'var(--primary-accent)' }}
+              className="bg-neon-red hover:bg-neon-red-bright px-3 py-1 rounded text-sm font-medium transition-colors"
             >
               <Plus className="w-4 h-4 inline mr-1" />
               Project

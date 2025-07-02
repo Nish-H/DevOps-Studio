@@ -15,27 +15,17 @@
   --neon-red-dark: #cc052e;
   --neon-red-glow: rgba(255, 7, 58, 0.5);
   
-  /* Dynamic Accent Colors - Updated by Settings */
-  --accent-primary: #ff073a;
-  --accent-secondary: #ff1744;
-  --accent-tertiary: #B8B8B8;
+  /* Burnt Orange Accents */
+  --burnt-orange: #cc5500;
+  --burnt-orange-bright: #ff6a00;
+  --burnt-orange-dark: #994000;
+  --burnt-orange-glow: rgba(204, 85, 0, 0.5);
   
-  /* Primary Colors for Components */
-  --primary-accent: var(--accent-primary);
-  --secondary-accent: var(--british-silver);
-  --success-accent: var(--neon-green);
-  
-  /* British Silver Accents - Toned Down */
-  --british-silver: #8B9499;
-  --british-silver-bright: #A5ACB1;
-  --british-silver-dark: #6B7176;
-  --british-silver-glow: rgba(139, 148, 153, 0.5);
-  
-  /* Neon Green Accents - Toned Down */
-  --neon-green: #00CC33;
-  --neon-green-bright: #00E639;
-  --neon-green-dark: #00A829;
-  --neon-green-glow: rgba(0, 204, 51, 0.5);
+  /* Neon Green Accents */
+  --neon-green: #00ff41;
+  --neon-green-bright: #39ff14;
+  --neon-green-dark: #00cc33;
+  --neon-green-glow: rgba(0, 255, 65, 0.5);
   
   /* UI Colors */
   --border-color: #2a2a2a;
@@ -86,8 +76,8 @@ body {
   box-shadow: 0 0 10px var(--neon-red-glow), 0 0 20px var(--neon-red-glow);
 }
 
-.neon-glow-silver {
-  box-shadow: 0 0 10px var(--british-silver-glow), 0 0 20px var(--british-silver-glow);
+.neon-glow-orange {
+  box-shadow: 0 0 10px var(--burnt-orange-glow), 0 0 20px var(--burnt-orange-glow);
 }
 
 .neon-glow-green {
@@ -116,13 +106,4 @@ body {
 ::selection {
   background: var(--neon-red-glow);
   color: white;
-}
-
-/* Animation Controls */
-.no-animations *,
-.no-animations *::before,
-.no-animations *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
 }

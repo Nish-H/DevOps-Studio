@@ -76,7 +76,7 @@ export default function SimpleWorkspace() {
       {/* Sidebar */}
       <div className="w-64 bg-gray-900 border-r border-gray-800">
         <div className="p-4 border-b border-gray-800">
-          <h1 className="text-xl font-bold" style={{ color: 'var(--primary-accent)' }}>Nishen's AI</h1>
+          <h1 className="text-xl font-bold text-red-500">Nishen's AI</h1>
           <p className="text-sm text-gray-400">Workspace</p>
         </div>
         
@@ -87,13 +87,9 @@ export default function SimpleWorkspace() {
               onClick={() => setActiveSection(item.id)}
               className={`w-full flex items-center space-x-3 p-3 rounded-lg mb-2 transition-colors ${
                 activeSection === item.id 
-                  ? 'text-white font-semibold' 
+                  ? 'bg-red-600 text-white' 
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
-              style={{
-                backgroundColor: activeSection === item.id ? 'var(--primary-accent)' : undefined,
-                color: activeSection === item.id ? '#ffffff' : undefined
-              }}
             >
               <span className="text-xl">{item.icon}</span>
               <span>{item.name}</span>
@@ -137,17 +133,11 @@ export default function SimpleWorkspace() {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Ask Claude about system engineering, automation, or coding..."
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none"
-                  style={{ 
-                    '--focus-color': 'var(--primary-accent)'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
-                  onBlur={(e) => e.target.style.borderColor = '#374151'}
+                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-red-500"
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-6 py-2 rounded-lg font-medium transition-colors hover:opacity-80"
-                  style={{ backgroundColor: 'var(--primary-accent)' }}
+                  className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg font-medium transition-colors"
                 >
                   Send
                 </button>

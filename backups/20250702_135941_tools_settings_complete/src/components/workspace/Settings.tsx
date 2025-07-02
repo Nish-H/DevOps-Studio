@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSettings } from '../../contexts/SettingsContext'
 import { 
   Settings as SettingsIcon, 
   Palette, 
@@ -38,44 +37,167 @@ import {
   Info
 } from 'lucide-react'
 
+interface WorkspaceSettings {
+  // Appearance
+  theme: 'dark' | 'light' | 'auto'
+  accentColor: 'red' | 'orange' | 'green' | 'custom'
+  fontSize: 'small' | 'medium' | 'large'
+  animations: boolean
+  compactMode: boolean
+  
+  // Notifications
+  enableNotifications: boolean
+  soundEnabled: boolean
+  notificationTypes: {
+    system: boolean
+    security: boolean
+    tools: boolean
+    files: boolean
+  }
+  
+  // Performance
+  autoSave: boolean
+  autoSaveInterval: number // minutes
+  maxHistoryItems: number
+  enableSystemMonitoring: boolean
+  monitoringInterval: number // seconds
+  
+  // Privacy & Security
+  encryptData: boolean
+  autoLock: boolean
+  autoLockTime: number // minutes
+  clearDataOnExit: boolean
+  anonymousUsage: boolean
+  
+  // Advanced
+  debugMode: boolean
+  developerTools: boolean
+  experimentalFeatures: boolean
+  customCSS: string
+  backupLocation: string
+}
+
 export default function Settings() {
-  const { 
-    settings, 
-    updateSetting, 
-    resetSettings, 
-    exportSettings, 
-    importSettings,
-    showNotification 
-  } = useSettings()
+  const [settings, setSettings] = useState<WorkspaceSettings>({
+    // Appearance defaults
+    theme: 'dark',
+    accentColor: 'red',
+    fontSize: 'medium',
+    animations: true,
+    compactMode: false,
+    
+    // Notifications defaults
+    enableNotifications: true,
+    soundEnabled: true,
+    notificationTypes: {
+      system: true,
+      security: true,
+      tools: true,
+      files: false
+    },
+    
+    // Performance defaults
+    autoSave: true,
+    autoSaveInterval: 5,
+    maxHistoryItems: 100,
+    enableSystemMonitoring: true,
+    monitoringInterval: 3,
+    
+    // Privacy defaults
+    encryptData: false,
+    autoLock: false,
+    autoLockTime: 30,
+    clearDataOnExit: false,
+    anonymousUsage: false,
+    
+    // Advanced defaults
+    debugMode: false,
+    developerTools: false,
+    experimentalFeatures: false,
+    customCSS: '',
+    backupLocation: './backups'
+  })
   
   const [activeTab, setActiveTab] = useState('appearance')
+  const [hasChanges, setHasChanges] = useState(false)
   const [showResetModal, setShowResetModal] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
 
-  const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Load settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('nishen-workspace-settings')
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings))
+      } catch (error) {
+        console.error('Error loading settings:', error)
+      }
+    }
+  }, [])
+
+  // Save settings to localStorage
+  const saveSettings = () => {
+    try {
+      localStorage.setItem('nishen-workspace-settings', JSON.stringify(settings))
+      setHasChanges(false)
+      // Show success notification
+      setTimeout(() => {
+        // Could integrate with a toast system here
+      }, 100)
+    } catch (error) {
+      console.error('Error saving settings:', error)
+    }
+  }
+
+  const updateSetting = (key: string, value: any) => {
+    setSettings(prev => {
+      const newSettings = { ...prev }
+      if (key.includes('.')) {
+        const [parent, child] = key.split('.')
+        newSettings[parent as keyof WorkspaceSettings] = {
+          ...newSettings[parent as keyof WorkspaceSettings],
+          [child]: value
+        }
+      } else {
+        newSettings[key as keyof WorkspaceSettings] = value
+      }
+      return newSettings
+    })
+    setHasChanges(true)
+  }
+
+  const resetSettings = () => {
+    localStorage.removeItem('nishen-workspace-settings')
+    window.location.reload()
+  }
+
+  const exportSettings = () => {
+    const dataStr = JSON.stringify(settings, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `nishen-workspace-settings-${new Date().toISOString().split('T')[0]}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setShowExportModal(false)
+  }
+
+  const importSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onload = (e) => {
         try {
           const importedSettings = JSON.parse(e.target?.result as string)
-          importSettings(importedSettings)
+          setSettings(importedSettings)
+          setHasChanges(true)
         } catch (error) {
-          showNotification('Invalid settings file format', 'error')
+          alert('Invalid settings file')
         }
       }
       reader.readAsText(file)
     }
-  }
-
-  const handleExportSettings = () => {
-    exportSettings()
-    setShowExportModal(false)
-  }
-
-  const handleResetSettings = () => {
-    resetSettings()
-    setShowResetModal(false)
   }
 
   const tabs = [
@@ -151,8 +273,8 @@ export default function Settings() {
             <div className="grid grid-cols-4 gap-2">
               {[
                 { value: 'red', label: 'Neon Red', color: '#ff073a' },
-                { value: 'silver', label: 'British Silver', color: '#8B9499' },
-                { value: 'green', label: 'Neon Green', color: '#00CC33' },
+                { value: 'orange', label: 'Burnt Orange', color: '#cc5500' },
+                { value: 'green', label: 'Neon Green', color: '#00ff41' },
                 { value: 'custom', label: 'Custom', color: '#6366f1' }
               ].map(option => (
                 <button
@@ -420,7 +542,7 @@ export default function Settings() {
             <input
               type="file"
               accept=".json"
-              onChange={handleImportSettings}
+              onChange={importSettings}
               className="hidden"
             />
           </label>
@@ -522,8 +644,8 @@ export default function Settings() {
       {/* Sidebar - Settings Categories */}
       <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800">
-          <h2 className="text-lg font-semibold flex items-center" style={{ color: 'var(--accent-primary)' }}>
-            <SettingsIcon className="w-5 h-5 mr-2 neon-pulse" style={{ color: 'var(--neon-green)' }} />
+          <h2 className="text-lg font-semibold text-neon-red flex items-center">
+            <SettingsIcon className="w-5 h-5 mr-2 text-neon-green neon-pulse" />
             Settings
           </h2>
           <p className="text-xs text-gray-400 mt-1">Customize your workspace</p>
@@ -548,16 +670,18 @@ export default function Settings() {
           </div>
         </nav>
         
-        {/* Auto-Save Status */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="text-center">
-            <div className="flex items-center justify-center text-neon-green text-sm">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Settings auto-saved
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Changes are applied immediately</p>
+        {/* Save Button */}
+        {hasChanges && (
+          <div className="p-4 border-t border-gray-800">
+            <button
+              onClick={saveSettings}
+              className="w-full bg-neon-green text-black px-4 py-2 rounded-lg font-medium hover:bg-neon-green-bright transition-colors flex items-center justify-center neon-glow-green"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Main Content */}
@@ -574,10 +698,12 @@ export default function Settings() {
               </p>
             </div>
             
-            <div className="flex items-center space-x-2 text-sm bg-neon-green/10 border border-neon-green/30 rounded-lg px-3 py-2">
-              <CheckCircle className="w-4 h-4 text-neon-green" />
-              <span className="text-neon-green">Auto-save enabled</span>
-            </div>
+            {hasChanges && (
+              <div className="flex items-center space-x-2 text-sm bg-neon-green/10 border border-neon-green/30 rounded-lg px-3 py-2">
+                <AlertCircle className="w-4 h-4 text-neon-green" />
+                <span className="text-neon-green">Unsaved changes</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -606,7 +732,7 @@ export default function Settings() {
                 Cancel
               </button>
               <button
-                onClick={handleResetSettings}
+                onClick={resetSettings}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
               >
                 Reset Settings
@@ -635,7 +761,7 @@ export default function Settings() {
                 Cancel
               </button>
               <button
-                onClick={handleExportSettings}
+                onClick={exportSettings}
                 className="px-4 py-2 bg-neon-green text-black rounded transition-colors hover:bg-neon-green-bright"
               >
                 Download
