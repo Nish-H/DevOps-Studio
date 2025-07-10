@@ -543,7 +543,7 @@ Start writing your note here...`
         <div className="p-4 border-b border-gray-800">
           {/* Version Info */}
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>Nishen's AI Workspace v0.1.1</span>
+            <span>Nishen's AI Workspace v0.1.0</span>
             <span>Notes Module</span>
           </div>
           

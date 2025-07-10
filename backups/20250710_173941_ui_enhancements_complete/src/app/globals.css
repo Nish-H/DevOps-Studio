@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark Theme - Black Background with Neon Accents */
+  --background: #000000;
+  --foreground: #ffffff;
+  --background-secondary: #0a0a0a;
+  --background-tertiary: #1a1a1a;
+  
+  /* Neon Red Accents */
+  --neon-red: #ff073a;
+  --neon-red-bright: #ff1744;
+  --neon-red-dark: #cc052e;
+  --neon-red-glow: rgba(255, 7, 58, 0.5);
+  
+  /* Dynamic Accent Colors - Updated by Settings */
+  --accent-primary: #ff073a;
+  --accent-secondary: #ff1744;
+  --accent-tertiary: #B8B8B8;
+  
+  /* Primary Colors for Components */
+  --primary-accent: var(--accent-primary);
+  --secondary-accent: var(--british-silver);
+  --success-accent: var(--neon-green);
+  
+  /* British Silver Accents - Toned Down */
+  --british-silver: #8B9499;
+  --british-silver-bright: #A5ACB1;
+  --british-silver-dark: #6B7176;
+  --british-silver-glow: rgba(139, 148, 153, 0.5);
+  
+  /* Neon Green Accents - Toned Down */
+  --neon-green: #00CC33;
+  --neon-green-bright: #00E639;
+  --neon-green-dark: #00A829;
+  --neon-green-glow: rgba(0, 204, 51, 0.5);
+  
+  /* UI Colors */
+  --border-color: #2a2a2a;
+  --hover-bg: #1a1a1a;
+  --text-muted: #a0a0a0;
+  --text-secondary: #e0e0e0;
+}
+
+/* Remove @theme inline - not compatible with Tailwind 4 */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-red-bright);
+}
+
+/* Neon Glow Effects */
+.neon-glow-red {
+  box-shadow: 0 0 10px var(--neon-red-glow), 0 0 20px var(--neon-red-glow);
+}
+
+.neon-glow-silver {
+  box-shadow: 0 0 10px var(--british-silver-glow), 0 0 20px var(--british-silver-glow);
+}
+
+.neon-glow-green {
+  box-shadow: 0 0 10px var(--neon-green-glow), 0 0 20px var(--neon-green-glow);
+}
+
+.neon-text-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green-glow);
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neon-pulse {
+  0% {
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  100% {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor;
+  }
+}
+
+/* Selection */
+::selection {
+  background: var(--neon-red-glow);
+  color: white;
+}
+
+/* Animation Controls */
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

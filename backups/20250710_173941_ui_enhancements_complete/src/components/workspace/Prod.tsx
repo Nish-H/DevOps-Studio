@@ -21,11 +21,7 @@ import {
   ExternalLink,
   Monitor,
   Trash2,
-  BookOpen,
-  Download,
-  FileDown,
-  Upload,
-  HardDrive
+  BookOpen
 } from 'lucide-react'
 
 interface FileVersion {
@@ -64,7 +60,7 @@ interface TimerState {
   currentTime: number
 }
 
-export default function Files() {
+export default function Prod() {
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
@@ -73,7 +69,6 @@ export default function Files() {
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
   const [timer, setTimer] = useState<TimerState>({ activeProject: null, startTime: null, currentTime: 0 })
   const [isPreviewMode, setIsPreviewMode] = useState(false)
-  const [showExportMenu, setShowExportMenu] = useState(false)
   
   // Modals
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
@@ -113,20 +108,7 @@ export default function Files() {
 
   // Load data from localStorage or demo data
   useEffect(() => {
-    // Try new key first, then fallback to old key for existing users
-    let savedData = localStorage.getItem('nishen-workspace-dev')
-    if (!savedData) {
-      savedData = localStorage.getItem('nishen-workspace-files')
-      // If we found old data, migrate it to new key
-      if (savedData) {
-        localStorage.setItem('nishen-workspace-dev', savedData)
-        console.log('✅ Migrated existing files to Dev section')
-        console.log('📁 Found projects:', JSON.parse(savedData).length)
-        // Show user-friendly notification
-        alert('✅ Your existing files have been migrated to the Dev section!')
-      }
-    }
-    
+    const savedData = localStorage.getItem('nishen-workspace-prod')
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData)
@@ -157,55 +139,34 @@ export default function Files() {
     const demoProjects: Project[] = [
       {
         id: 'proj-1',
-        name: 'RMS Tools Collection',
-        description: 'Professional system administration tools and scripts',
+        name: 'Production RMS Tools',
+        description: 'Live production system administration tools and scripts',
         files: [
           {
             id: 'file-1',
-            name: 'password-audit.ps1',
+            name: 'live-monitor.ps1',
             type: 'script',
-            category: 'Security',
-            content: '# PowerShell Password Audit Script\n# Author: Nishen Harichunder\n\nParam(\n    [string]$Domain = $env:USERDNSDOMAIN\n)\n\nWrite-Host "Starting password audit for domain: $Domain" -ForegroundColor Green\n\n# Add your audit logic here',
+            category: 'Monitoring',
+            content: '# Production Live Monitor Script\n# Author: Nishen Harichunder\n# WARNING: This script runs in production environment\n\nParam(\n    [string]$Environment = "PRODUCTION",\n    [switch]$AlertMode = $true\n)\n\nWrite-Host "Starting production monitor for environment: $Environment" -ForegroundColor Red\n\n# Production monitoring logic here\nif ($AlertMode) {\n    Write-Host "ALERT MODE ENABLED - Will send notifications on issues" -ForegroundColor Yellow\n}\n\n# Add your production monitoring logic here',
             versions: [],
-            created: new Date('2025-06-01'),
-            modified: new Date('2025-06-25'),
-            timeSpent: 7200 // 2 hours
+            created: new Date('2025-05-01'),
+            modified: new Date('2025-07-08'),
+            timeSpent: 14400 // 4 hours
           },
           {
             id: 'file-2',
-            name: 'incident-report.html',
+            name: 'prod-status-dashboard.html',
             type: 'html',
-            category: 'Reporting',
-            content: '<!DOCTYPE html>\n<html>\n<head>\n    <title>RMS Incident Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; }\n        .header { background: #003366; color: white; padding: 20px; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>RMS Incident Report</h1>\n    </div>\n</body>\n</html>',
+            category: 'Dashboard',
+            content: '<!DOCTYPE html>\n<html>\n<head>\n    <title>Production Status Dashboard</title>\n    <style>\n        body { font-family: Arial, sans-serif; background: #000; color: #fff; }\n        .header { background: #ff073a; color: white; padding: 20px; text-align: center; }\n        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }\n        .status-card { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; }\n        .status-green { border-left: 4px solid #00ff00; }\n        .status-red { border-left: 4px solid #ff0000; }\n        .status-yellow { border-left: 4px solid #ffff00; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>🚀 Production Status Dashboard</h1>\n        <p>Live system monitoring for RMS Production Environment</p>\n    </div>\n    <div class="status-grid">\n        <div class="status-card status-green">\n            <h3>✅ Web Services</h3>\n            <p>All services operational</p>\n            <small>Last check: 2 minutes ago</small>\n        </div>\n        <div class="status-card status-green">\n            <h3>✅ Database</h3>\n            <p>Performance optimal</p>\n            <small>Response time: 45ms</small>\n        </div>\n        <div class="status-card status-yellow">\n            <h3>⚠️ Storage</h3>\n            <p>85% capacity used</p>\n            <small>Monitoring closely</small>\n        </div>\n        <div class="status-card status-green">\n            <h3>✅ Security</h3>\n            <p>No threats detected</p>\n            <small>Last scan: 1 hour ago</small>\n        </div>\n    </div>\n</body>\n</html>',
             versions: [],
-            created: new Date('2025-06-10'),
-            modified: new Date('2025-06-28'),
-            timeSpent: 5400 // 1.5 hours
+            created: new Date('2025-05-15'),
+            modified: new Date('2025-07-08'),
+            timeSpent: 7200 // 2 hours
           }
         ],
-        totalTimeSpent: 12600,
-        created: new Date('2025-06-01'),
-        isTimerRunning: false
-      },
-      {
-        id: 'proj-2',
-        name: 'AI Workspace Development',
-        description: 'Next.js workspace development project',
-        files: [
-          {
-            id: 'file-3',
-            name: 'workspace-component.tsx',
-            type: 'code',
-            category: 'Frontend',
-            content: "import React from 'react'\n\ninterface WorkspaceProps {\n  theme: 'dark' | 'light'\n}\n\nexport default function Workspace({ theme }: WorkspaceProps) {\n  return (\n    <div className={`workspace ${theme}`}>\n      <h1>Nishen's AI Workspace</h1>\n    </div>\n  )\n}",
-            versions: [],
-            created: new Date('2025-06-30'),
-            modified: new Date('2025-06-30'),
-            timeSpent: 3600 // 1 hour
-          }
-        ],
-        totalTimeSpent: 3600,
-        created: new Date('2025-06-30'),
+        totalTimeSpent: 21600,
+        created: new Date('2025-05-01'),
         isTimerRunning: false
       }
     ]
@@ -216,7 +177,7 @@ export default function Files() {
   // Save data to localStorage
   const saveToLocalStorage = (projectsData: Project[]) => {
     try {
-      localStorage.setItem('nishen-workspace-dev', JSON.stringify(projectsData))
+      localStorage.setItem('nishen-workspace-prod', JSON.stringify(projectsData))
     } catch (error) {
       console.error('Error saving data:', error)
     }
@@ -345,7 +306,7 @@ export default function Files() {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff073a 0%, #000000 100%);
             color: white;
             min-height: 100vh;
         }
@@ -363,8 +324,8 @@ export default function Files() {
             text-align: center;
             margin-bottom: 30px;
         }
-        .feature {
-            background: rgba(255, 255, 255, 0.1);
+        .prod-warning {
+            background: rgba(255, 7, 58, 0.2);
             padding: 20px;
             margin: 15px 0;
             border-radius: 10px;
@@ -375,99 +336,134 @@ export default function Files() {
 <body>
     <div class="container">
         <h1>🚀 ${newFileName.replace(/\.(html|htm)$/i, '')}</h1>
-        <div class="feature">
-            <h3>✨ Welcome to your new HTML file!</h3>
-            <p>This HTML file was created in Nishen's AI Workspace. You can:</p>
+        <div class="prod-warning">
+            <h3>🔴 PRODUCTION ENVIRONMENT</h3>
+            <p>This file is created in the production workspace. Exercise caution:</p>
             <ul>
-                <li>Edit the content using the editor</li>
-                <li>Preview it live using the Preview button</li>
-                <li>Save versions for backup</li>
-                <li>Track time spent working on it</li>
+                <li>Test changes in development first</li>
+                <li>Review code before deployment</li>
+                <li>Monitor system after changes</li>
+                <li>Have rollback plan ready</li>
             </ul>
-        </div>
-        <div class="feature">
-            <h3>🎨 Styling</h3>
-            <p>This template includes some modern CSS with glassmorphism effects, gradients, and responsive design.</p>
-        </div>
-        <div class="feature">
-            <h3>🔧 Ready to customize</h3>
-            <p>Start building your tool, report, or application!</p>
         </div>
     </div>
     
     <script>
-        console.log('HTML file loaded in Nishen\\'s AI Workspace!');
-        // Add your JavaScript here
+        console.log('Production HTML file loaded in Nishen\\'s AI Workspace!');
+        // Add your production JavaScript here
     </script>
 </body>
 </html>`
         break
       case 'script':
-        defaultContent = `# PowerShell Script
-# Created in Nishen's AI Workspace
+        defaultContent = `# Production PowerShell Script
+# Created in Nishen's AI Workspace - PRODUCTION ENVIRONMENT
 # File: ${newFileName}
+# WARNING: This script will run in production - use extreme caution
 
 param(
-    [string]$InputPath = ".",
-    [switch]$Verbose
+    [string]$Environment = "PRODUCTION",
+    [switch]$DryRun = $false
 )
 
-# Script description and usage
-Write-Host "Starting ${newFileName}..." -ForegroundColor Green
+# Production safety check
+if ($Environment -eq "PRODUCTION" -and -not $DryRun) {
+    Write-Host "⚠️  PRODUCTION MODE ENABLED - This will affect live systems!" -ForegroundColor Red
+    $confirm = Read-Host "Are you sure you want to continue? (yes/no)"
+    if ($confirm -ne "yes") {
+        Write-Host "Operation cancelled." -ForegroundColor Yellow
+        exit 0
+    }
+}
+
+Write-Host "Starting production script: ${newFileName}" -ForegroundColor Green
 
 try {
-    # Add your script logic here
-    Write-Host "Script execution completed successfully!" -ForegroundColor Green
+    # Add your production script logic here
+    Write-Host "Production script execution completed successfully!" -ForegroundColor Green
 }
 catch {
-    Write-Error "An error occurred: $_"
+    Write-Error "Production script failed: $_"
+    # Add production error handling/alerting here
     exit 1
 }`
         break
       case 'code':
         const fileExt = newFileName.split('.').pop()?.toLowerCase()
         if (fileExt === 'js' || fileExt === 'jsx') {
-          defaultContent = `// JavaScript/React Component
-// Created in Nishen's AI Workspace
+          defaultContent = `// Production JavaScript/React Component
+// Created in Nishen's AI Workspace - PRODUCTION ENVIRONMENT
 
 /**
- * ${newFileName} - Description of your component/function
+ * ${newFileName} - Production component
+ * WARNING: This code will run in production environment
  */
 
+const ENVIRONMENT = 'PRODUCTION';
+
 export default function ${newFileName.replace(/\.(js|jsx)$/i, '').replace(/[^a-zA-Z0-9]/g, '')}() {
+  // Production safety checks
+  if (ENVIRONMENT === 'PRODUCTION') {
+    console.warn('🔴 Running in production environment');
+  }
+
   return (
-    <div>
-      <h1>Hello from ${newFileName}!</h1>
-      <p>Created in Nishen's AI Workspace</p>
+    <div className="production-component">
+      <h1>🚀 Production: ${newFileName}</h1>
+      <p>Created in Nishen's AI Workspace (Production Environment)</p>
+      <div className="prod-warning">
+        ⚠️ Production Environment - Monitor carefully
+      </div>
     </div>
   );
 }`
         } else if (fileExt === 'ts' || fileExt === 'tsx') {
-          defaultContent = `// TypeScript Component
-// Created in Nishen's AI Workspace
+          defaultContent = `// Production TypeScript Component
+// Created in Nishen's AI Workspace - PRODUCTION ENVIRONMENT
 
 interface Props {
   title?: string;
+  environment?: 'development' | 'production';
 }
 
 /**
- * ${newFileName} - Description of your component
+ * ${newFileName} - Production component
+ * WARNING: This code will run in production environment
  */
-export default function ${newFileName.replace(/\.(ts|tsx)$/i, '').replace(/[^a-zA-Z0-9]/g, '')}({ title = "Hello World" }: Props) {
+export default function ${newFileName.replace(/\.(ts|tsx)$/i, '').replace(/[^a-zA-Z0-9]/g, '')}({ 
+  title = "Production Component",
+  environment = "production"
+}: Props) {
+  
+  // Production safety checks
+  if (environment === 'production') {
+    console.warn('🔴 Running in production environment');
+  }
+
   return (
-    <div>
-      <h1>{title}</h1>
-      <p>Created in Nishen's AI Workspace</p>
+    <div className="production-component">
+      <h1>🚀 {title}</h1>
+      <p>Created in Nishen's AI Workspace (Production Environment)</p>
+      <div className="prod-warning">
+        ⚠️ Production Environment - Monitor carefully
+      </div>
     </div>
   );
 }`
         } else {
-          defaultContent = `// ${newFileName}
-// Created in Nishen's AI Workspace
+          defaultContent = `// Production ${newFileName}
+// Created in Nishen's AI Workspace - PRODUCTION ENVIRONMENT
+// WARNING: This code will run in production
+
+const ENVIRONMENT = 'PRODUCTION';
 
 function main() {
-    console.log("Hello from ${newFileName}!");
-    // Add your code here
+    if (ENVIRONMENT === 'PRODUCTION') {
+        console.warn('🔴 Running in production environment');
+    }
+    
+    console.log("Production system: ${newFileName}");
+    // Add your production code here
 }
 
 main();`
@@ -476,134 +472,106 @@ main();`
       case 'markdown':
         defaultContent = `# ${newFileName.replace(/\.(md|markdown)$/i, '')}
 
-> **Created in Nishen's AI Workspace** | ${new Date().toLocaleDateString()}
+> **⚠️ PRODUCTION ENVIRONMENT** | Created in Nishen's AI Workspace | ${new Date().toLocaleDateString()}
 
-## 📋 Overview
+## 🚀 Production Overview
 
-This is a comprehensive markdown document with support for diagrams, code blocks, and rich formatting.
+This document is part of the production environment. All changes should be:
+- **Tested thoroughly** before implementation
+- **Reviewed** by team members
+- **Monitored** after deployment
+- **Documented** for audit trails
 
-## 🚀 Features Showcase
+## 📋 Production Checklist
 
-### Code Blocks
-\`\`\`javascript
-function greetUser(name) {
-    console.log(\`Hello, \${name}! Welcome to Nishen's AI Workspace.\`);
-}
+- [ ] Code reviewed and approved
+- [ ] Security scan completed
+- [ ] Performance tested
+- [ ] Backup plan prepared
+- [ ] Monitoring alerts configured
+- [ ] Documentation updated
 
-greetUser('Developer');
-\`\`\`
+## 🔧 Production Features
 
-### Mermaid Diagrams
-\`\`\`mermaid
-graph TD
-    A[Start Project] --> B{Choose File Type}
-    B -->|HTML| C[Create HTML File]
-    B -->|Markdown| D[Create MD File]
-    B -->|Script| E[Create PS1 File]
-    C --> F[Edit & Preview]
-    D --> G[Edit & Render]
-    E --> H[Edit & Execute]
-    F --> I[Save Version]
-    G --> I
-    H --> I
-\`\`\`
+### System Requirements
+- Production-ready infrastructure
+- Scalable architecture
+- High availability setup
+- Security compliance
 
-### System Architecture
-\`\`\`mermaid
-flowchart LR
-    UI[User Interface] --> WS[Workspace]
-    WS --> FM[File Manager]
-    WS --> TE[Terminal]
-    WS --> AI[Claude AI]
-    FM --> PV[Preview Engine]
-    FM --> VH[Version History]
-\`\`\`
+### Monitoring
+- Real-time alerts
+- Performance metrics
+- Error tracking
+- Audit logging
 
-### Task Management
-\`\`\`mermaid
-gantt
-    title Project Timeline
-    dateFormat  YYYY-MM-DD
-    section Development
-    Planning     :done, des1, 2025-01-01, 2025-01-07
-    Implementation :active, des2, 2025-01-08, 2025-01-21
-    Testing      :des3, after des2, 7d
-    Deployment   :des4, after des3, 3d
-\`\`\`
+## 📊 Production Metrics
 
-## 📊 Data Tables
+| Metric | Target | Current | Status |
+|--------|--------|---------|---------|
+| Uptime | 99.9% | 99.95% | ✅ |
+| Response Time | <200ms | 45ms | ✅ |
+| Error Rate | <0.1% | 0.05% | ✅ |
 
-| Feature | Status | Priority | Notes |
-|---------|--------|----------|-------|
-| File Management | ✅ Complete | High | Full CRUD operations |
-| HTML Preview | ✅ Complete | High | Live rendering |
-| Markdown Rendering | 🚧 In Progress | High | With diagram support |
-| Terminal Integration | ✅ Complete | Medium | Command simulation |
+## 🔒 Security Notes
 
-## 🎨 Rich Formatting
-
-### Alerts & Callouts
-> ⚠️ **Warning**: Always include file extensions for proper type detection
-> 
-> 💡 **Tip**: Use the preview feature to see your markdown rendered
-> 
-> ✅ **Success**: Your workspace supports real-time collaboration
-
-### Lists & Checkboxes
-- [x] Create markdown file type
-- [x] Add syntax highlighting  
-- [x] Support mermaid diagrams
-- [ ] Add plantuml support
-- [ ] Implement live collaboration
-
-### Math Expressions (if supported)
-\`\`\`
-E = mc²
-∑(x) = x₁ + x₂ + ... + xₙ
-\`\`\`
-
-## 🔗 Links & References
-
-- [Mermaid Documentation](https://mermaid.js.org/)
-- [Markdown Guide](https://www.markdownguide.org/)
-- [Nishen's AI Workspace](https://github.com/nishen/workspace)
+- All access logged and monitored
+- Regular security scans performed
+- Compliance requirements met
+- Incident response plan active
 
 ---
 
-*Generated by Nishen's AI Workspace - Professional Development Environment*`
+*Production Environment - Nishen's AI Workspace | Handle with Care*`
         break
       case 'document':
-        defaultContent = `# ${newFileName.replace(/\.(txt|doc)$/i, '')}
+        defaultContent = `${newFileName.replace(/\.(txt|doc)$/i, '')}
+${'='.repeat(newFileName.length)}
 
+⚠️ PRODUCTION ENVIRONMENT DOCUMENT
 Created in Nishen's AI Workspace on ${new Date().toLocaleDateString()}
 
-## Overview
+IMPORTANT: This document relates to production systems.
 
-Document description here.
+Overview:
+---------
+Production document description here.
 
-## Contents
+Production Requirements:
+-----------------------
+- Change control process followed
+- Approval from authorized personnel
+- Testing completed in staging environment
+- Rollback plan documented
 
-- Section 1
-- Section 2
-- Section 3
+Contents:
+---------
+- Production procedures
+- Emergency contacts
+- Escalation procedures
+- Monitoring guidelines
 
-## Notes
+Notes:
+------
+Add your production documentation content here.
 
-Add your documentation content here.`
+Remember: All production changes must be properly documented and approved.`
         break
       default:
-        defaultContent = `// ${newFileName}
-// Created in Nishen's AI Workspace
+        defaultContent = `// Production ${newFileName}
+// Created in Nishen's AI Workspace - PRODUCTION ENVIRONMENT
 // File type: ${newFileType}
 
-Add your content here...`
+⚠️ PRODUCTION ENVIRONMENT - Handle with care
+
+Add your production content here...`
     }
     
     const newFile: ProjectFile = {
       id: `file-${Date.now()}`,
       name: newFileName,
       type: actualFileType,
-      category: newFileCategory || 'General',
+      category: newFileCategory || 'Production',
       content: defaultContent,
       versions: [],
       created: new Date(),
@@ -656,7 +624,7 @@ Add your content here...`
   }
 
   const deleteFile = (fileId: string) => {
-    if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+    if (confirm('⚠️ PRODUCTION WARNING: Are you sure you want to delete this production file? This action cannot be undone and may affect live systems.')) {
       setProjects(prev => prev.map(p => 
         p.id === selectedProject
           ? { ...p, files: p.files.filter(f => f.id !== fileId) }
@@ -725,125 +693,6 @@ Add your content here...`
     return html
   }
 
-  // Export functionality
-  const exportFile = (format: 'ps1' | 'docx' | 'html' | 'txt' | 'pdf') => {
-    if (!selectedFileData) return
-    
-    let content = selectedFileData.content
-    let filename = selectedFileData.name
-    let mimeType = 'text/plain'
-    
-    // Remove file extension and add new one based on format
-    const nameWithoutExt = filename.replace(/\.[^/.]+$/, '')
-    
-    switch (format) {
-      case 'ps1':
-        filename = `${nameWithoutExt}.ps1`
-        mimeType = 'text/plain'
-        if (selectedFileData.type !== 'script') {
-          content = `# Exported from Nishen's AI Workspace\n# Original file: ${selectedFileData.name}\n# Type: ${selectedFileData.type}\n\n${content}`
-        }
-        break
-      case 'html':
-        filename = `${nameWithoutExt}.html`
-        mimeType = 'text/html'
-        if (selectedFileData.type !== 'html') {
-          content = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${selectedFileData.name}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; border-left: 4px solid #007bff; }
-        .header { color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>${selectedFileData.name}</h1>
-            <p>Exported from Nishen's AI Workspace | ${selectedFileData.category} | ${new Date().toLocaleDateString()}</p>
-        </div>
-        <pre>${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
-    </div>
-</body>
-</html>`
-        }
-        break
-      case 'txt':
-        filename = `${nameWithoutExt}.txt`
-        mimeType = 'text/plain'
-        content = `${selectedFileData.name}
-${'='.repeat(selectedFileData.name.length)}
-Exported from Nishen's AI Workspace
-Category: ${selectedFileData.category}
-Type: ${selectedFileData.type}
-Created: ${selectedFileData.created.toLocaleDateString()}
-Modified: ${selectedFileData.modified.toLocaleDateString()}
-Export Date: ${new Date().toLocaleDateString()}
-
-${'='.repeat(50)}
-
-${content}`
-        break
-      case 'docx':
-        // For DOCX, we'll create a simple text version with formatting hints
-        filename = `${nameWithoutExt}.docx`
-        mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        content = `TITLE: ${selectedFileData.name}
-DOCUMENT TYPE: ${selectedFileData.type.toUpperCase()}
-CATEGORY: ${selectedFileData.category}
-CREATED: ${selectedFileData.created.toLocaleDateString()}
-MODIFIED: ${selectedFileData.modified.toLocaleDateString()}
-EXPORTED: ${new Date().toLocaleDateString()}
-
----
-
-${content}`
-        break
-      case 'pdf':
-        // For PDF, we'll create a text version (actual PDF generation would require a library)
-        filename = `${nameWithoutExt}.pdf`
-        mimeType = 'application/pdf'
-        content = `PDF Export from Nishen's AI Workspace
-
-Title: ${selectedFileData.name}
-Type: ${selectedFileData.type}
-Category: ${selectedFileData.category}
-Created: ${selectedFileData.created.toLocaleDateString()}
-Modified: ${selectedFileData.modified.toLocaleDateString()}
-Exported: ${new Date().toLocaleDateString()}
-
-${'='.repeat(80)}
-
-${content}
-
-${'='.repeat(80)}
-
-Note: This is a simple text export. For full PDF formatting, 
-use a dedicated PDF generation tool.`
-        break
-    }
-    
-    const blob = new Blob([content], { type: mimeType })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
-
-
-  
-  
-  
-
   const selectedProjectData = projects.find(p => p.id === selectedProject)
   const selectedFileData = selectedProjectData?.files.find(f => f.id === selectedFile)
 
@@ -853,24 +702,24 @@ use a dedicated PDF generation tool.`
       <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
-          {/* Version Info */}
-          <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>Nishen's AI Workspace v0.1.1</span>
-            <span>Files Module</span>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--primary-accent)' }}>
+              🚀 Production Files
+            </h2>
+            <button
+              onClick={() => setShowNewProjectModal(true)}
+              className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
+              style={{ backgroundColor: 'var(--primary-accent)' }}
+            >
+              <Plus className="w-4 h-4 inline mr-1" />
+              Project
+            </button>
           </div>
           
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--primary-accent)' }}>🛠️ Dev Files</h2>
-            <div className="flex gap-2">
-              
-              <button
-                onClick={() => setShowNewProjectModal(true)}
-                className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
-                style={{ backgroundColor: 'var(--primary-accent)' }}
-              >
-                <Plus className="w-4 h-4 inline mr-1" />
-                Project
-              </button>
+          {/* Production Warning */}
+          <div className="bg-red-900/30 border border-red-600/50 rounded p-2 mb-4">
+            <div className="text-xs text-red-300">
+              ⚠️ PRODUCTION ENVIRONMENT - Exercise extreme caution
             </div>
           </div>
           
@@ -891,7 +740,7 @@ use a dedicated PDF generation tool.`
         </div>
 
         {/* Projects List */}
-        <div className="flex-1 overflow-y-auto p-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="flex-1 overflow-y-auto p-4">
           {projects.map(project => (
             <div key={project.id} className="mb-4">
               <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
@@ -913,7 +762,7 @@ use a dedicated PDF generation tool.`
                     <ChevronDown className="w-4 h-4 mr-2" /> : 
                     <ChevronRight className="w-4 h-4 mr-2" />
                   }
-                  <FolderOpen className="w-4 h-4 mr-2 text-british-silver" />
+                  <FolderOpen className="w-4 h-4 mr-2 text-red-400" />
                   <div className="flex-1">
                     <div className="font-medium">{project.name}</div>
                     <div className="text-xs text-gray-400">
@@ -1005,7 +854,7 @@ use a dedicated PDF generation tool.`
                               deleteFile(file.id)
                             }}
                             className="p-1 hover:bg-red-600/20 rounded text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Delete file"
+                            title="Delete production file"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -1030,19 +879,22 @@ use a dedicated PDF generation tool.`
                 <div className="flex items-center space-x-3">
                   {getFileIcon(selectedFileData.type)}
                   <div>
-                    <h3 className="font-semibold">{selectedFileData.name}</h3>
+                    <h3 className="font-semibold flex items-center">
+                      {selectedFileData.name}
+                      <span className="ml-2 text-xs bg-red-600 text-white px-2 py-1 rounded">PROD</span>
+                    </h3>
                     <div className="text-sm text-gray-400">
                       {selectedFileData.category} • Modified: {selectedFileData.modified.toLocaleString()}
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap items-center justify-center gap-2">
+                <div className="flex items-center space-x-2">
                   {/* HTML/Markdown Preview Button */}
                   {(selectedFileData.type === 'html' || selectedFileData.type === 'markdown') && !isEditing && (
                     <button
                       onClick={() => setIsPreviewMode(!isPreviewMode)}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors whitespace-nowrap ${
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                         isPreviewMode 
                           ? 'bg-green-600 hover:bg-green-700' 
                           : selectedFileData.type === 'html' 
@@ -1059,64 +911,11 @@ use a dedicated PDF generation tool.`
                     </button>
                   )}
                   
-                  {/* Export Dropdown */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowExportMenu(!showExportMenu)}
-                      className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded text-sm font-medium transition-colors whitespace-nowrap"
-                      title="Export file"
-                    >
-                      <Download className="w-4 h-4 inline mr-1" />
-                      Export
-                    </button>
-                    {showExportMenu && (
-                      <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10">
-                        <div className="py-1">
-                          <button
-                            onClick={() => { exportFile('ps1'); setShowExportMenu(false) }}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                          >
-                            <FileDown className="w-4 h-4 inline mr-2" />
-                            Export as PowerShell (.ps1)
-                          </button>
-                          <button
-                            onClick={() => { exportFile('html'); setShowExportMenu(false) }}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                          >
-                            <FileDown className="w-4 h-4 inline mr-2" />
-                            Export as HTML (.html)
-                          </button>
-                          <button
-                            onClick={() => { exportFile('txt'); setShowExportMenu(false) }}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                          >
-                            <FileDown className="w-4 h-4 inline mr-2" />
-                            Export as Text (.txt)
-                          </button>
-                          <button
-                            onClick={() => { exportFile('docx'); setShowExportMenu(false) }}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                          >
-                            <FileDown className="w-4 h-4 inline mr-2" />
-                            Export as Word (.docx)
-                          </button>
-                          <button
-                            onClick={() => { exportFile('pdf'); setShowExportMenu(false) }}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
-                          >
-                            <FileDown className="w-4 h-4 inline mr-2" />
-                            Export as PDF (.pdf)
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
                   {isEditing ? (
                     <>
                       <button
                         onClick={() => setShowVersionModal(true)}
-                        className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm font-medium transition-colors whitespace-nowrap"
+                        className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm font-medium transition-colors"
                       >
                         <Save className="w-4 h-4 inline mr-1" />
                         Save Version
@@ -1126,7 +925,7 @@ use a dedicated PDF generation tool.`
                           setIsEditing(false)
                           setEditContent(selectedFileData.content)
                         }}
-                        className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded text-sm font-medium transition-colors whitespace-nowrap"
+                        className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded text-sm font-medium transition-colors"
                       >
                         Cancel
                       </button>
@@ -1134,7 +933,7 @@ use a dedicated PDF generation tool.`
                   ) : (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80 whitespace-nowrap"
+                      className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
                       style={{ backgroundColor: 'var(--primary-accent)' }}
                     >
                       <Edit3 className="w-4 h-4 inline mr-1" />
@@ -1142,7 +941,7 @@ use a dedicated PDF generation tool.`
                     </button>
                   )}
                   
-                  <div className="text-sm text-gray-400 whitespace-nowrap">
+                  <div className="text-sm text-gray-400">
                     <Clock className="w-4 h-4 inline mr-1" />
                     {formatTime(selectedFileData.timeSpent)}
                   </div>
@@ -1150,17 +949,26 @@ use a dedicated PDF generation tool.`
               </div>
             </div>
 
+            {/* Production Warning Banner */}
+            {isEditing && (
+              <div className="bg-red-900/50 border-b border-red-600/50 p-2">
+                <div className="text-center text-red-200 text-sm">
+                  ⚠️ EDITING PRODUCTION FILE - Changes will affect live systems
+                </div>
+              </div>
+            )}
+
             {/* File Content */}
-            <div className="flex-1 p-4 overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+            <div className="flex-1 p-4">
               {isEditing ? (
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  className="w-full h-full bg-gray-800 border border-gray-700 rounded-lg p-4 text-white font-mono text-sm resize-none focus:outline-none"
+                  className="w-full h-full bg-gray-800 border border-red-600 rounded-lg p-4 text-white font-mono text-sm resize-none focus:outline-none"
                   style={{ borderColor: 'var(--primary-accent)' }}
                   onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
-                  onBlur={(e) => e.target.style.borderColor = '#374151'}
-                  placeholder="Enter your code/content here..."
+                  onBlur={(e) => e.target.style.borderColor = '#dc2626'}
+                  placeholder="Enter your production code/content here..."
                 />
               ) : selectedFileData.type === 'html' && isPreviewMode ? (
                 <div className="w-full h-full bg-white border border-gray-700 rounded-lg overflow-hidden">
@@ -1180,10 +988,10 @@ use a dedicated PDF generation tool.`
                       __html: renderMarkdown(selectedFileData.content) 
                     }}
                   />
-                  <div className="mt-6 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">
-                    <p className="text-sm text-blue-300">
-                      📘 <strong>Markdown Rendering:</strong> This is a basic markdown renderer. 
-                      For full Mermaid diagram support, consider integrating a complete markdown library.
+                  <div className="mt-6 p-4 bg-red-900/20 border border-red-600/30 rounded-lg">
+                    <p className="text-sm text-red-300">
+                      🚀 <strong>Production Markdown:</strong> This content is rendered in the production environment. 
+                      Ensure all links and references are production-ready.
                     </p>
                   </div>
                 </div>
@@ -1229,8 +1037,13 @@ use a dedicated PDF generation tool.`
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <File className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-gray-400">No File Selected</h3>
+              <h3 className="text-xl font-semibold mb-2 text-gray-400">No Production File Selected</h3>
               <p className="text-gray-500">Select a file from the project list to view and edit</p>
+              <div className="mt-4 p-4 bg-red-900/20 border border-red-600/30 rounded-lg">
+                <p className="text-sm text-red-300">
+                  🚀 <strong>Production Environment:</strong> All files in this section affect live systems.
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -1240,7 +1053,14 @@ use a dedicated PDF generation tool.`
       {showNewProjectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg w-96 border border-gray-700">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>New Project</h3>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>
+              🚀 New Production Project
+            </h3>
+            <div className="bg-red-900/30 border border-red-600/50 rounded p-3 mb-4">
+              <p className="text-sm text-red-300">
+                ⚠️ This project will contain production files that affect live systems.
+              </p>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Project Name</label>
@@ -1251,7 +1071,7 @@ use a dedicated PDF generation tool.`
                   className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none"
                   onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
                   onBlur={(e) => e.target.style.borderColor = '#374151'}
-                  placeholder="Enter project name"
+                  placeholder="Enter production project name"
                 />
               </div>
               <div>
@@ -1263,7 +1083,7 @@ use a dedicated PDF generation tool.`
                   onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
                   onBlur={(e) => e.target.style.borderColor = '#374151'}
                   rows={3}
-                  placeholder="Project description (optional)"
+                  placeholder="Production project description"
                 />
               </div>
             </div>
@@ -1279,7 +1099,7 @@ use a dedicated PDF generation tool.`
                 className="px-4 py-2 rounded transition-colors hover:opacity-80"
                 style={{ backgroundColor: 'var(--primary-accent)' }}
               >
-                Create Project
+                Create Production Project
               </button>
             </div>
           </div>
@@ -1289,7 +1109,14 @@ use a dedicated PDF generation tool.`
       {showNewFileModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg w-96 border border-gray-700">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>New File</h3>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>
+              🚀 New Production File
+            </h3>
+            <div className="bg-red-900/30 border border-red-600/50 rounded p-3 mb-4">
+              <p className="text-sm text-red-300">
+                ⚠️ This file will be deployed to production and affect live systems.
+              </p>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">File Name</label>
@@ -1301,16 +1128,16 @@ use a dedicated PDF generation tool.`
                   onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
                   onBlur={(e) => e.target.style.borderColor = '#374151'}
                   placeholder={
-                    newFileType === 'html' ? 'report.html' :
-                    newFileType === 'markdown' ? 'documentation.md' :
-                    newFileType === 'script' ? 'script.ps1' :
-                    newFileType === 'code' ? 'component.js' :
-                    newFileType === 'document' ? 'notes.txt' :
-                    'filename.ext'
+                    newFileType === 'html' ? 'prod-dashboard.html' :
+                    newFileType === 'markdown' ? 'prod-docs.md' :
+                    newFileType === 'script' ? 'prod-deploy.ps1' :
+                    newFileType === 'code' ? 'prod-component.js' :
+                    newFileType === 'document' ? 'prod-manual.txt' :
+                    'prod-filename.ext'
                   }
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  ⚠️ Include the file extension (e.g., .html, .ps1, .js, .md) for proper preview/editing
+                <p className="text-xs text-red-400 mt-1">
+                  ⚠️ Include file extension for proper preview/editing in production
                 </p>
               </div>
               <div>
@@ -1339,7 +1166,7 @@ use a dedicated PDF generation tool.`
                   className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none"
                   onFocus={(e) => e.target.style.borderColor = 'var(--primary-accent)'}
                   onBlur={(e) => e.target.style.borderColor = '#374151'}
-                  placeholder="Security, Reporting, Development, etc."
+                  placeholder="Production, Deployment, Monitoring, etc."
                 />
               </div>
             </div>
@@ -1355,7 +1182,7 @@ use a dedicated PDF generation tool.`
                 className="px-4 py-2 rounded transition-colors hover:opacity-80"
                 style={{ backgroundColor: 'var(--primary-accent)' }}
               >
-                Create File
+                Create Production File
               </button>
             </div>
           </div>
@@ -1365,7 +1192,12 @@ use a dedicated PDF generation tool.`
       {showVersionModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg w-96 border border-gray-700">
-            <h3 className="text-lg font-semibold mb-4 text-green-400">Save Version</h3>
+            <h3 className="text-lg font-semibold mb-4 text-green-400">Save Production Version</h3>
+            <div className="bg-red-900/30 border border-red-600/50 rounded p-3 mb-4">
+              <p className="text-sm text-red-300">
+                ⚠️ This version will be saved for production rollback purposes.
+              </p>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Version Description</label>
@@ -1374,11 +1206,11 @@ use a dedicated PDF generation tool.`
                   value={versionDescription}
                   onChange={(e) => setVersionDescription(e.target.value)}
                   className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:border-green-500"
-                  placeholder="What changes did you make?"
+                  placeholder="What production changes did you make?"
                 />
               </div>
               <div className="text-sm text-gray-400">
-                This will save the current content as a new version with timestamp: {new Date().toLocaleString()}
+                This will save the current content as a new production version with timestamp: {new Date().toLocaleString()}
               </div>
             </div>
             <div className="flex justify-end space-x-3 mt-6">
@@ -1392,13 +1224,12 @@ use a dedicated PDF generation tool.`
                 onClick={saveFileVersion}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors"
               >
-                Save Version
+                Save Production Version
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   )
 }
