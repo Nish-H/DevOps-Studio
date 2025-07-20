@@ -216,7 +216,7 @@ export default function Files() {
       setProjects(demoProjects)
     } else {
       // Have user data, check if demo projects exist and add them if missing
-      const userProjectIds = new Set(processedProjects.map(p => p.id))
+      const userProjectIds = new Set(processedProjects.map((p: any) => p.id))
       const missingDemoProjects = demoProjects.filter(demo => !userProjectIds.has(demo.id))
       
       if (missingDemoProjects.length > 0) {
