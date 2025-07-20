@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use static export for Electron
-  output: 'export',
-  trailingSlash: true,
+  // Use static export only for production build
+  ...(process.env.NODE_ENV === 'production' && {
+    output: 'export',
+    trailingSlash: true,
+  }),
   images: {
     unoptimized: true
   },
