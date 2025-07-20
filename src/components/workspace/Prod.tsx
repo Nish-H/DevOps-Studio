@@ -174,7 +174,7 @@ export default function Prod() {
       setProjects(demoProjects)
     } else {
       // Have user data, check if demo projects exist and add them if missing
-      const userProjectIds = new Set(processedProjects.map(p => p.id))
+      const userProjectIds = new Set(processedProjects.map((p: any) => p.id))
       const missingDemoProjects = demoProjects.filter(demo => !userProjectIds.has(demo.id))
       
       if (missingDemoProjects.length > 0) {
@@ -234,7 +234,7 @@ export default function Prod() {
       currentTime: 0
     })
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === projectId 
         ? { ...p, isTimerRunning: true, timerStartTime: new Date() }
         : { ...p, isTimerRunning: false }
@@ -245,7 +245,7 @@ export default function Prod() {
     if (timer.activeProject && timer.startTime) {
       const elapsed = Math.floor((Date.now() - timer.startTime.getTime()) / 1000)
       
-      setProjects(prev => prev.map(p => 
+      setProjects(prev => prev.map((p: any) => 
         p.id === timer.activeProject
           ? { 
               ...p, 
@@ -593,7 +593,7 @@ Add your production content here...`
       timeSpent: 0
     }
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === selectedProject
         ? { ...p, files: [...p.files, newFile] }
         : p
@@ -614,11 +614,11 @@ Add your production content here...`
       description: versionDescription || 'Auto-saved version'
     }
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === selectedProject
         ? {
             ...p,
-            files: p.files.map(f => 
+            files: p.files.map((f: any) => 
               f.id === selectedFile
                 ? {
                     ...f,
@@ -639,7 +639,7 @@ Add your production content here...`
 
   const deleteFile = (fileId: string) => {
     if (confirm('⚠️ PRODUCTION WARNING: Are you sure you want to delete this production file? This action cannot be undone and may affect live systems.')) {
-      setProjects(prev => prev.map(p => 
+      setProjects(prev => prev.map((p: any) => 
         p.id === selectedProject
           ? { ...p, files: p.files.filter(f => f.id !== fileId) }
           : p

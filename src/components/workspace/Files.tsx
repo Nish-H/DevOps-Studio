@@ -276,7 +276,7 @@ export default function Files() {
       currentTime: 0
     })
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === projectId 
         ? { ...p, isTimerRunning: true, timerStartTime: new Date() }
         : { ...p, isTimerRunning: false }
@@ -287,7 +287,7 @@ export default function Files() {
     if (timer.activeProject && timer.startTime) {
       const elapsed = Math.floor((Date.now() - timer.startTime.getTime()) / 1000)
       
-      setProjects(prev => prev.map(p => 
+      setProjects(prev => prev.map((p: any) => 
         p.id === timer.activeProject
           ? { 
               ...p, 
@@ -628,7 +628,7 @@ Add your content here...`
       timeSpent: 0
     }
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === selectedProject
         ? { ...p, files: [...p.files, newFile] }
         : p
@@ -649,11 +649,11 @@ Add your content here...`
       description: versionDescription || 'Auto-saved version'
     }
     
-    setProjects(prev => prev.map(p => 
+    setProjects(prev => prev.map((p: any) => 
       p.id === selectedProject
         ? {
             ...p,
-            files: p.files.map(f => 
+            files: p.files.map((f: any) => 
               f.id === selectedFile
                 ? {
                     ...f,
@@ -674,7 +674,7 @@ Add your content here...`
 
   const deleteFile = (fileId: string) => {
     if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-      setProjects(prev => prev.map(p => 
+      setProjects(prev => prev.map((p: any) => 
         p.id === selectedProject
           ? { ...p, files: p.files.filter(f => f.id !== fileId) }
           : p
