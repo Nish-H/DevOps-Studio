@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Migration Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #222; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { background: #ff073a; color: white; border: none; padding: 10px 20px; margin: 10px; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #ff1744; }
+        .output { background: #333; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Nishen's AI Workspace - File Migration Tool</h1>
+        
+        <div class="output" id="output">Click "Check Files" to see your localStorage data...</div>
+        
+        <button onclick="checkFiles()">Check Files</button>
+        <button onclick="migrateFiles()">Migrate Files to Dev</button>
+        <button onclick="clearAll()">Clear All Storage (Danger)</button>
+        
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Click "Check Files" to see what's in your localStorage</li>
+            <li>If you see files under "nishen-workspace-files", click "Migrate Files to Dev"</li>
+            <li>Refresh your main workspace page and check the Dev section</li>
+        </ol>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function checkFiles() {
+            document.getElementById('output').innerHTML = '';
+            log('🔍 Checking localStorage for workspace files...');
+            
+            // Check all possible keys
+            const keys = [
+                'nishen-workspace-files',
+                'nishen-workspace-dev', 
+                'nishen-workspace-prod',
+                'nishen-workspace-notes',
+                'nishen-workspace-categories'
+            ];
+            
+            let found = false;
+            
+            keys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    found = true;
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (key === 'nishen-workspace-files' || key === 'nishen-workspace-dev' || key === 'nishen-workspace-prod') {
+                            log(`✅ Found ${key}: ${parsed.length} projects`, 'success');
+                            parsed.forEach((project, i) => {
+                                log(`   Project ${i+1}: "${project.name}" (${project.files.length} files)`);
+                            });
+                        } else if (key === 'nishen-workspace-notes') {
+                            log(`✅ Found ${key}: ${parsed.length} notes`, 'success');
+                        } else if (key === 'nishen-workspace-categories') {
+                            log(`✅ Found ${key}: ${parsed.length} categories`, 'success');
+                        }
+                    } catch (e) {
+                        log(`❌ Error parsing ${key}: ${e.message}`, 'error');
+                    }
+                } else {
+                    log(`❌ No data found in ${key}`);
+                }
+            });
+            
+            if (!found) {
+                log('⚠️ No workspace data found in localStorage', 'warning');
+            }
+        }
+
+        function migrateFiles() {
+            log('🔄 Starting file migration...');
+            
+            const oldData = localStorage.getItem('nishen-workspace-files');
+            const newData = localStorage.getItem('nishen-workspace-dev');
+            
+            if (!oldData) {
+                log('❌ No files found in old location (nishen-workspace-files)', 'error');
+                return;
+            }
+            
+            if (newData) {
+                log('⚠️ Dev section already has data. Backing up existing dev data...', 'warning');
+                localStorage.setItem('nishen-workspace-dev-backup', newData);
+            }
+            
+            try {
+                // Copy old data to new location
+                localStorage.setItem('nishen-workspace-dev', oldData);
+                log('✅ Successfully migrated files to Dev section!', 'success');
+                
+                // Optionally remove old data (commented out for safety)
+                // localStorage.removeItem('nishen-workspace-files');
+                // log('🗑️ Cleaned up old file location');
+                
+                log('🎉 Migration complete! Refresh your workspace and check the Dev section.', 'success');
+                
+            } catch (e) {
+                log(`❌ Migration failed: ${e.message}`, 'error');
+            }
+        }
+
+        function clearAll() {
+            if (confirm('⚠️ WARNING: This will delete ALL your workspace data. Are you sure?')) {
+                const keys = [
+                    'nishen-workspace-files',
+                    'nishen-workspace-dev', 
+                    'nishen-workspace-prod',
+                    'nishen-workspace-notes',
+                    'nishen-workspace-categories'
+                ];
+                
+                keys.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                
+                log('🗑️ All workspace data cleared!', 'warning');
+            }
+        }
+
+        // Auto-check on page load
+        window.onload = checkFiles;
+    </script>
+</body>
+</html>

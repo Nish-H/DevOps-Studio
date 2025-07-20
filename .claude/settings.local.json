@@ -3,7 +3,25 @@
     "allow": [
       "Bash(npm run dev:*)",
       "Bash(npm install)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(convert:*)",
+      "Bash(python3:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(powershell:*)",
+      "Bash(npm run db:migrate:*)",
+      "Bash(psql:*)",
+      "Bash(docker compose:*)"
     ],
     "deny": []
   }

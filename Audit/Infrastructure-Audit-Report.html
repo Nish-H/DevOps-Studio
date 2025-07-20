@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Audit Report - Ashtons Legal</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 10px; background: #f8f9fa; line-height: 1.4; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { margin-bottom: 15px; padding: 12px; background: linear-gradient(135deg, #003366 0%, #004d99 100%); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; }
+        .header-content { text-align: center; flex: 1; }
+        .header-info { text-align: right; width: 250px; }
+        .logo { max-height: 80px; max-width: 250px; }
+        .risk-banner { text-align: center; padding: 10px; margin: 10px 0; border-radius: 6px; color: white; font-size: 1.3em; font-weight: bold; background: #fd7e14; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 15px 0; }
+        .metric-card { background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metric-number { font-size: 2.0em; font-weight: bold; margin: 5px 0; }
+        .critical { color: #dc3545; }
+        .high { color: #fd7e14; }
+        .medium { color: #ffc107; color: #333; }
+        .low { color: #28a745; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #dee2e6; }
+        th { background: #495057; color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .section { margin: 20px 0; }
+        .section h2 { color: #495057; border-bottom: 2px solid #dee2e6; padding-bottom: 6px; font-size: 1.6em; margin: 10px 0; }
+        
+        /* Detailed Findings Styling */
+        .findings-container { margin: 10px 0; }
+        .finding-group { margin: 15px 0; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .finding-group-title { background: #495057; color: white; margin: 0; padding: 12px; font-size: 1.2em; font-weight: bold; }
+        .critical-section .finding-group-title { background: #dc3545; }
+        .high-section .finding-group-title { background: #fd7e14; }
+        .medium-section .finding-group-title { background: #ffc107; color: #333; }
+        .low-section .finding-group-title { background: #28a745; }
+        .passed-section .finding-group-title { background: #17a2b8; }
+        
+        .finding-item { background: white; border-bottom: 1px solid #dee2e6; padding: 15px; }
+        .finding-item:last-child { border-bottom: none; }
+        
+        /* Collapsible Findings */
+        .finding-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 8px; transition: background-color 0.3s; }
+        .finding-header:hover { background: #e9ecef; }
+        .finding-title { font-weight: bold; color: #495057; margin: 0; }
+        .finding-toggle { font-size: 1.2em; font-weight: bold; color: #6c757d; transition: transform 0.3s; }
+        .finding-content { display: none; padding: 12px; background: white; border-radius: 5px; border: 1px solid #dee2e6; }
+        .finding-content.show { display: block; }
+        .finding-toggle.open { transform: rotate(45deg); }
+        .finding-header { margin-bottom: 10px; }
+        .finding-header h4 { margin: 0 0 6px 0; font-size: 1.2em; color: #333; }
+        .finding-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .finding-id, .finding-category, .finding-type { 
+            background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; color: #666; 
+        }
+        .severity-badge { 
+            padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85em; text-transform: uppercase; 
+        }
+        .severity-badge.critical { background: #dc3545; color: white; }
+        .severity-badge.high { background: #fd7e14; color: white; }
+        .severity-badge.medium { background: #ffc107; color: #333; }
+        .severity-badge.low { background: #28a745; color: white; }
+        
+        .finding-content { margin-top: 10px; }
+        .description-section, .impact-section, .recommendation-section, .evidence-section { 
+            margin: 10px 0; padding: 10px; border-radius: 5px; 
+        }
+        .description-section { background: #f8f9fa; border-left: 4px solid #007bff; }
+        .impact-section { background: #fff5f5; border-left: 4px solid #dc3545; }
+        .recommendation-section { background: #f0f9ff; border-left: 4px solid #10b981; }
+        .evidence-section { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        
+        .finding-content h5 { 
+            margin: 0 0 6px 0; font-size: 1.0em; color: #333; font-weight: 600; 
+        }
+        .finding-content p { margin: 0; color: #555; }
+        .evidence-data { 
+            background: #2d3748; color: #e2e8f0; padding: 10px; border-radius: 4px; 
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85em; margin: 6px 0 0 0;
+            white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; 
+        }
+        .compliance-tag { 
+            background: #3b82f6; color: white; padding: 3px 8px; border-radius: 4px; 
+            font-size: 0.9em; font-weight: 500; 
+        }
+        .finding-footer { 
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb; 
+            font-size: 0.95em; color: #6b7280; 
+        }
+        
+        /* Executive Summary Styling */
+        .executive-summary { background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .summary-card { background: white; padding: 12px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .summary-card h3 { margin: 0 0 8px 0; color: #333; font-size: 1.1em; }
+        .summary-card ul { margin: 0; padding-left: 15px; }
+        .summary-card li { margin: 4px 0; color: #555; }
+        .risk-level { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        .risk-level.critical { background: #dc3545; color: white; }
+        .risk-level.high { background: #fd7e14; color: white; }
+        .risk-level.medium { background: #ffc107; color: #333; }
+        .risk-level.low { background: #28a745; color: white; }
+        .key-findings { margin: 15px 0; }
+        .concern-list { margin: 10px 0; }
+        .concern-item { display: flex; align-items: flex-start; margin: 8px 0; padding: 10px; background: white; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .concern-icon { font-size: 1.1em; margin-right: 10px; flex-shrink: 0; }
+        .concern-content { flex: 1; color: #555; }
+        .concern-content strong { color: #333; }
+        .concern-content small { color: #777; }
+        .compliance-overview { margin: 25px 0; }
+        .compliance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        .compliance-item { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .compliance-item h4 { margin: 0 0 8px 0; color: #333; font-size: 1.1em; }
+        .compliance-item p { margin: 0; color: #666; font-size: 0.95em; }
+        
+        .report-links { text-align: center; margin: 30px 0; }
+        .report-links a { display: inline-block; margin: 10px; padding: 12px 25px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .report-links a:hover { background: #0056b3; }
+        
+        /* Domain Controller Health Dashboard */
+        .dc-dashboard { margin: 25px 0; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .dc-dashboard-header { background: linear-gradient(135deg, #003366 0%, #004d99 100%); color: white; padding: 15px; border-radius: 8px 8px 0 0; }
+        .dc-dashboard-header h2 { margin: 0; font-size: 1.5em; display: flex; align-items: center; }
+        .dc-dashboard-header .dc-count { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 15px; margin-left: 15px; font-size: 0.9em; }
+        .dc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; padding: 20px; }
+        .dc-card { border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; }
+        .dc-card-header { padding: 12px 15px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .dc-card-header.healthy { background: #28a745; }
+        .dc-card-header.warning { background: #ffc107; color: #333; }
+        .dc-card-header.critical { background: #dc3545; }
+        .dc-card-body { padding: 15px; background: #f8f9fa; }
+        .dc-info-row { display: flex; justify-content: space-between; margin: 5px 0; }
+        .dc-info-label { font-weight: 600; color: #495057; }
+        .dc-info-value { color: #28a745; }
+        .dc-info-value.warning { color: #856404; }
+        .dc-info-value.failed { color: #dc3545; }
+        .dc-services { margin-top: 10px; }
+        .dc-service { display: inline-block; margin: 2px; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; }
+        .dc-service.running { background: #d4edda; color: #155724; }
+        .dc-service.stopped { background: #f8d7da; color: #721c24; }
+        .dc-tests { margin-top: 10px; }
+        .dc-test { display: inline-block; margin: 2px; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; }
+        .dc-test.passed { background: #d4edda; color: #155724; }
+        .dc-test.failed { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iOTAwLjAwMDAwMHB0IiBoZWlnaHQ9IjE3NC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDkwMC4wMDAwMDAgMTc0LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgo8bWV0YWRhdGE+CkNyZWF0ZWQgYnkgcG90cmFjZSAxLjEwLCB3cml0dGVuIGJ5IFBldGVyIFNlbGluZ2VyIDIwMDEtMjAxMQo8L21ldGFkYXRhPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjAwMDAwMCwxNzQuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjZmZmZmZmIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNNTgwNiAxNTA4IGMtMTMgLTQ0IC0yNiAtMTI1IC0yNiAtMTU2IDAgLTIwIC03IC02MiAtMTUgLTkyIC04IC0zMAotMTUgLTc2IC0xNSAtMTAxIDAgLTI2IC03IC02MyAtMTUgLTgyIC04IC0yMCAtMTUgLTU2IC0xNSAtNzkgMCAtMjQgLTcgLTY1Ci0xNSAtOTIgLTggLTI3IC0xNSAtNjIgLTE1IC03OCAwIC0yOCAxIC0yOCA2MCAtMjggbDU5IDAgNiAzOCBjMyAyMCAxMCA1NiAxNgo3OSA1IDIzIDkgNjEgOSA4NSAxIDg4IDY1IDE1NSAxMjggMTMyIDI3IC0xMCAyNyAtMTEgMjQgLTg5IC0xIC00NCAtOSAtMTAwCi0xNyAtMTI1IC04IC0yNSAtMTUgLTYxIC0xNyAtODAgbC0zIC0zNSA2MyAtMyA2MiAtMyAwIDM3IGMwIDIwIDcgNjIgMTUgOTQgOAozMiAxNiAxMDEgMTggMTU0IDIgODcgMCA5NyAtMjEgMTE4IC0xOSAxOSAtMzMgMjMgLTg1IDIzIC00MyAwIC03MSAtNiAtOTAKLTE3IC0xNCAtMTAgLTMxIC0xOCAtMzcgLTE4IC0xNSAwIC0xMiA0MiA1IDgzIDggMjAgMTUgNTIgMTUgNzAgMCAxOSA3IDU0IDE1Cjc3IDggMjMgMTUgNTUgMTUgNzEgMCAyOSAtMSAyOSAtNjAgMjkgLTQwIDAgLTYyIC00IC02NCAtMTJ6Ii8+CjxwYXRoIGQ9Ik03MTgwIDE0NTMgYy02IC0zNyAtMTYgLTk5IC0yMCAtMTM4IC00IC0zOCAtMTMgLTg2IC0xOSAtMTA1IC02IC0xOQotMTEgLTU3IC0xMSAtODUgMCAtNDYgLTE1IC0xMzAgLTQxIC0yMzAgLTYgLTIyIC0xMyAtNTMgLTE2IC02OCBsLTUgLTI4IDYzIDMKNjQgMyA4IDQ1IGM0IDI1IDEyIDgxIDE3IDEyNSA5IDgxIDIzIDE1OCA0MSAyMzAgNiAyMiAxNCA2OSAxOSAxMDUgNCAzNiAxMgo3NyAxOCA5MSA2IDE0IDEyIDQ2IDE0IDcwIGwzIDQ0IC02MSAzIC02MSAzIC0xMyAtNjh6Ii8+CjxwYXRoIGQ9Ik0zMjg5IDE0NjcgYy0xNCAtMTIgLTMxIC0zNiAtMzggLTU0IC0xMiAtMjggLTExIC0zNyA2IC02NSAyOCAtNDgKNzQgLTUxIDExOSAtNyAyNyAyNiAzNCA0MSAzNCA3MiAwIDY5IC02OCAxMDAgLTEyMSA1NHoiLz4KPHBhdGggZD0iTTI4NjggMTQzMiBjLTE3IC0zIC0yOCAtNTEgLTI4IC0xMjcgMCAtMjcgLTcgLTcyIC0xNSAtOTkgLTggLTI3Ci0xNSAtNjggLTE1IC05MCAwIC0yMyAtNyAtNjYgLTE1IC05NiAtOCAtMzAgLTE1IC03MyAtMTUgLTk1IDAgLTIyIC03IC01MQotMTUgLTY1IC0zMSAtNTQgLTI0IC02MCA3NSAtNjAgbDkwIDAgMCA0NSBjMCAyNCA0IDY2IDkgOTIgNSAyNiAxMiA2NCAxNiA4NApsNSAzNiA4NyAtMSA4NyAtMSA3IDM1IGM0IDE5IDEwIDUwIDE0IDY4IGw4IDMzIC04NiAtMiBjLTQ4IC0yIC04OSAwIC05MiAzCi0xMSAxMCA3IDEwNyAyMCAxMTIgOCAzIDUxIDEgOTcgLTQgNDYgLTQgODYgLTUgOTAgLTIgMyA0IDggMjcgMTAgNTIgMyAyNSA2CjUyIDkgNjAgMyAxMyAtMjEgMTYgLTE2MiAyMCAtOTIgMyAtMTczIDQgLTE4MSAyeiIvPgo8cGF0aCBkPSJNNDYyNCAxNDI3IGMtOSAtNSAtMTQgLTI0IC0xNCAtNTMgbDAgLTQ1IDY4IDMgYzY2IDMgNjcgMyA2NSAtMjIgLTYKLTY3IC0yMiAtMTU4IC0zMiAtMTgzIC02IC0xNiAtMTEgLTQ3IC0xMSAtNjkgMCAtMjMgLTYgLTY0IC0xNCAtOTIgLTE5IC02NwotMzQgLTE1NSAtMjggLTE2MSAzIC0zIDM0IC01IDY5IC01IGw2MyAwIDAgMzggYzEgMjAgNyA2NCAxNSA5NyA4IDMzIDE1IDc5CjE1IDEwMSAwIDIzIDcgNTggMTUgNzcgOCAyMCAxNSA1NSAxNSA3OCAwIDIyIDcgNjYgMTYgOTYgbDE2IDU1IDU3IC02IGM3NyAtOQoxMDAgMTMgOTIgODkgLTEgMTIgLTM4NSAxNCAtNDA3IDJ6Ii8+CjxwYXRoIGQ9Ik0yNjE0IDEzNjcgYy03MyAtNzUgLTExOCAtMTE0IC0xNjEgLTE0MCAtMTggLTEwIC0zMyAtMjMgLTMzIC0yOCAwCi01IC01IC05IC0xMSAtOSAtNiAwIC0zNyAtMjAgLTY5IC00NSAtMzIgLTI1IC02MSAtNDUgLTY0IC00NSAtNCAwIC0yNSAtMTQKLTQ4IC0zMCAtNDcgLTM0IC03MiAtODIgLTgyIC0xNTcgLTYgLTUxIC02IC01MyAxNyAtNTMgMTQgMCAzMCA3IDM3IDE1IDcgOAoyNCAxNSAzOSAxNSAxNCAxIDM3IDcgNTEgMTUgMTQgOCA0MiAxNCA2MiAxNSAyMCAwIDY3IDcgMTA1IDE2IDM3IDkgODIgMTMgOTkKMTEgMTcgLTMgMzUgLTIgNDEgMSAxMiA5IDIzIDQ5IDMzIDEyNyAxMSA4NiAyOSAxNzAgNTIgMjQ3IDM2IDExOSAxOCAxMzEgLTY4CjQ1eiBtLTE0MiAtMzE5IGMtMTUgLTE1IC0yNiAtNCAtMTggMTggNSAxMyA5IDE1IDE4IDYgOSAtOSA5IC0xNSAwIC0yNHoiLz4KPHBhdGggZD0iTTQxNTYgMTMxMCBjLTcgLTU4IC0xMSAtNjYgLTQ4IC05MyAtOSAtNyAtMjAgLTMzIC0yMyAtNTkgLTcgLTQzIC02Ci00NyAxNiAtNTAgMjcgLTMgMjcgLTYgNiAtMTM4IC04IC00NyAtMTkgLTk4IC0yNiAtMTEzIC0yMiAtNTUgLTE4IC01OCA2NgotNTUgbDc4IDMgNyA0MCBjNSAyMiAxMiA4NCAxOCAxMzkgNSA1NCAxNSAxMDUgMjEgMTEyIDggOSAyMyAxMiA0MyA5IDE3IC0zCjM2IC0yIDQzIDMgMTMgOCAyMSAxMDggOSAxMTkgLTQgNCAtMjMgNiAtNDMgNCAtMzUgLTMgLTM2IC0zIC0yOSAzMSA0IDE4IDEwCjUwIDEzIDcxIGw1IDM3IC03NSAwIC03NCAwIC03IC02MHoiLz4KPHBhdGggZD0iTTM2NjYgMTIzMyBjLTIxIC05IC01MCAtMjcgLTY0IC00MCAtMzMgLTMxIC00MiAtMjkgLTQyIDcgbDAgMzEgLTY3Ci0zIC02OCAtMyAtMTIgLTEwMCBjLTExIC04NyAtMjYgLTE3OSAtNDkgLTI5MiBsLTYgLTMzIDc1IDAgYzg3IDAgODMgLTUgOTQKMTI1IDEwIDEyNyA0NSAxNzcgMTI2IDE4MSAyOSAxIDU1IDMgNTggMyAxMCAyIDMyIDEwOCAyNiAxMjUgLTggMjAgLTIxIDE5Ci03MSAtMXoiLz4KPHBhdGggZD0iTTM4NjQgMTIzNSBjLTEwIC04IC0yNiAtMTUgLTM1IC0xNSAtOSAwIC0yNSAtMTIgLTM1IC0yNyAtMTAgLTE0Ci0yOCAtMzYgLTM5IC00NyAtMTcgLTE3IC0yMCAtMzEgLTE3IC03MyAzIC00NyA4IC01NSAzNyAtNzMgMTggLTExIDQ4IC0yMCA2NwotMjAgNTYgMCA3NyAtNDAgNDAgLTczIC0yNSAtMjMgLTQyIC0yMSAtMTAzIDkgLTUxIDI2IC01MyAyNiAtNjUgOCAtMTkgLTI3Ci0yNiAtMzcgLTQ3IC02MSAtMTggLTIwIC0xNyAtMjEgMTkgLTQ0IDMyIC0yMCA1MSAtMjMgMTMzIC0yMyA4MiAwIDEwMSA0IDEzMwoyMyA2MyAzOCA4OCA4MSA4OCAxNTAgMCA1NyAtMiA2MCAtMzQgODAgLTE4IDEyIC00OSAyMSAtNjggMjEgLTM4IDAgLTU4IDE1Ci01OCA0MiAwIDMxIDQzIDQzIDkyIDI3IDM4IC0xMiA0MiAtMTIgNTIgNiA2IDEwIDIyIDI5IDM0IDQxIGwyNCAyMyAtMzQgMjEKYy00MSAyNSAtMTUzIDI4IC0xODQgNXoiLz4KPHBhdGggZD0iTTMyMjYgMTIxMyBjLTMgLTEwIC0xMCAtNTYgLTE2IC0xMDMgLTYgLTQ3IC0xNiAtMTAwIC0yMSAtMTE4IC05Ci0yOCAtMjEgLTk1IC0zMSAtMTY3IC0zIC0xOCA0IC0yMCA2NiAtMjMgMzggLTIgNzMgMSA3OCA2IDUgNSAxMyA1MSAxOCAxMDMgOAo4MiAyMiAxNjcgNDYgMjg3IGw2IDMyIC03MCAwIGMtNTkgMCAtNzIgLTMgLTc2IC0xN3oiLz4KPHBhdGggZD0iTTUwNjAgMTIyMyBjLTE0IC0yIC0zMiAtMTAgLTQwIC0xNyAtOCAtNyAtMjMgLTE2IC0zMiAtMTkgLTIwIC03Ci03OCAtODQgLTc4IC0xMDIgMCAtNyAtNyAtMjYgLTE1IC00MSAtMzcgLTcxIC01IC0xODQgNjEgLTIyMyA1NCAtMzIgMTgwIC0zMAoyMzMgNCA2NCA0MCA5NCA3NCA4MCA5MSAtMTkgMjMgLTk1IDE4IC0xMTggLTggLTI5IC0zMCAtMTAyIC0zMSAtMTMwIC0xIC0yNQoyNiAtMjggODEgLTUgOTAgOCAzIDc1IDYgMTQ3IDcgbDEzMiAxIDMgNjAgYzQgNjcgLTEyIDEwOCAtNTQgMTM4IC0yNSAxOQotMTM0IDMxIC0xODQgMjB6IG0xMTkgLTEwMCBjMjAgLTI0IDI3IC00MSAyMSAtNDcgLTUgLTUgLTQ2IC0xMSAtOTAgLTEyIC03MgotMiAtODAgLTEgLTgwIDE2IDAgMjQgNjggODAgOTcgODAgMTMgMCAzNCAtMTUgNTIgLTM3eiIvPgo8cGF0aCBkPSJNNTUyMyAxMjIzIGMtMTcgLTIgLTM3IC0xMSAtNDMgLTE5IC03IC04IC0xOCAtMTQgLTI1IC0xNCAtMTUgMCAtOTUKLTg5IC05NSAtMTA2IDAgLTcgLTcgLTI1IC0xNSAtNDAgLTM2IC02OSAtMTAgLTE2NSA2MCAtMjE4IDMwIC0yMyA0MyAtMjYgMTE5Ci0yNiA5NCAwIDk1IDEgMTEyIDY4IDkgMzYgOSA0NSAtMyA0OSAtNyAzIC0yMiAtMiAtMzIgLTExIC0zMCAtMjcgLTg4IC0yMQotMTIyIDEzIC0zNyAzOCAtMzkgODYgLTQgMTQxIDM1IDU2IDY1IDczIDExNyA2NyAxMDIgLTEzIDkzIC0xNyA5NiAzMiAyIDI0Ci0xIDQ4IC02IDUzIC0xMSAxMSAtMTEyIDE4IC0xNTkgMTF6Ii8+CjxwYXRoIGQ9Ik02Mzk1IDEyMjMgYy0xMSAtMyAtMjggLTEyIC0zOCAtMjEgLTE3IC0xNiAtMjAgLTE1IC0zMiAxIC05IDEzIC0yNwoxNyAtNjkgMTcgbC01NiAwIDAgLTQ1IGMwIC0yNCAtNyAtNzAgLTE1IC0xMDIgLTggLTMxIC0xNSAtNzQgLTE1IC05NCAwIC0yMAotNyAtNTMgLTE1IC03MiAtOCAtMjAgLTE1IC01MiAtMTUgLTcyIGwwIC0zNSA1OCAwIDU4IDAgMTMgNzMgYzcgMzkgMTYgOTcgMTkKMTI3IDExIDkyIDUwIDE0MCAxMTIgMTQwIDM5IDAgNTEgLTI3IDQ0IC05OCAtMyAtMzcgLTEyIC04NyAtMTkgLTExMiAtOCAtMjUKLTE2IC02MyAtMTcgLTg1IGwtMyAtNDAgNjMgLTMgNjIgLTMgMCAzOCBjMCAyMSA3IDcxIDE2IDExMiA4IDQxIDE2IDExMCAxNwoxNTIgMiA2OCAtMSA4MSAtMTkgOTkgLTIxIDIyIC0xMDcgMzUgLTE0OSAyM3oiLz4KPHBhdGggZD0iTTY3OTggMTIyMyBjLTIwIC0yIC00MiAtMTEgLTQ4IC0xOSAtNyAtOCAtMTggLTE0IC0yNCAtMTQgLTE0IDAgLTY1Ci01NCAtODUgLTkwIC0yNSAtNDMgLTM3IC0xMzEgLTI2IC0xODAgMTMgLTU3IDE4IC02NiA2NiAtOTUgMzMgLTIxIDUxIC0yNQoxMTggLTI1IDk2IDAgMTQ0IDIxIDE5OCA4NiA2NCA3NiA4NSAxNjkgNTQgMjM2IC0zMCA2NyAtNzcgOTggLTE1MyAxMDIgLTM1IDIKLTgwIDIgLTEwMCAtMXogbTEyNiAtMTI3IGMzMSAtNDIgMzMgLTczIDUgLTEyMCAtNDQgLTc0IC0xMTkgLTEwNiAtMTY1IC02OAotNTUgNDcgLTQ5IDEzMCAxNiAxODkgMjggMjYgNDQgMzMgNzYgMzMgMzYgMCA0NSAtNSA2OCAtMzR6Ii8+CjxwYXRoIGQ9Ik03NDYzIDEyMjMgYy0xNyAtMiAtMzcgLTExIC00MyAtMTkgLTcgLTggLTE4IC0xNCAtMjQgLTE0IC0xOCAwIC04MAotNzAgLTk5IC0xMTMgLTI2IC01OCAtMjMgLTE2OSA1IC0yMDggNDAgLTU0IDc2IC02OSAxNjUgLTY5IDE1NiAwIDI0NyA4NiAyNjAKMjQ2IDYgNzIgLTExIDExMSAtNjYgMTUyIC0zMSAyMyAtMTI5IDM1IC0xOTggMjV6IG0xMjUgLTExNyBjMTcgLTE4IDIyIC0zNgoyMiAtNzQgMCAtNDcgLTQgLTU0IC00NiAtOTYgLTUzIC01MyAtODcgLTU5IC0xMzQgLTI0IC0yOCAyMCAtMzAgMjcgLTMwIDg0IDAKNjEgMSA2MyA0MyA5OCA1MyA0NSAxMDkgNDkgMTQ1IDEyeiIvPgo8cGF0aCBkPSJNNzk0MSAxMjIzIGMtOTMgLTE5IC0xNTkgLTExNiAtMTc2IC0yNTMgLTYgLTQ3IC0zIC02MiAxNSAtOTMgMzEKLTUyIDc2IC03NyAxNDAgLTc3IDM3IDAgNTkgNiA3NyAyMCAzNSAyNyA2MyAyNiA2MyAtMiAwIC0xMyAtNyAtMzIgLTE1IC00MgotOCAtMTEgLTE1IC0yOCAtMTUgLTM3IDAgLTIzIC02MCAtNTkgLTk4IC01OSAtMjMgMCAtMzggOSAtNjQgMzkgLTI4IDMzIC00MQo0MCAtODEgNDQgLTM5IDQgLTQ5IDEgLTU4IC0xNCAtMjEgLTQxIDE5IC0xMDIgOTEgLTEzOSA1MyAtMjcgMTU2IC0yNyAyMDkgMAo0NiAyMyAxMjEgMTA3IDEyMSAxMzUgMSAxMSA3IDMxIDE1IDQ1IDggMTQgMTQgNDYgMTUgNzEgMCAyNSA3IDY4IDE1IDk1IDggMjcKMTUgNzAgMTUgOTUgMCAyNiA3IDY2IDE1IDg5IDI2IDc0IDIzIDgwIC00MCA4MCAtNDAgMCAtNTcgLTQgLTYxIC0xNSAtOCAtMTkKLTIzIC0xOSAtNDQgMCAtMTggMTYgLTk4IDI3IC0xMzkgMTh6IG0xMjkgLTExNCBjMjIgLTE5IDI1IC0yOSAyNSAtODIgLTEgLTU4Ci0yIC02MSAtNDUgLTk4IC01NyAtNDkgLTkyIC01MSAtMTM3IC03IC0yNCAyMyAtMzMgNDEgLTMzIDY1IDAgMzggMzYgMTAxIDcxCjEyNiAzNCAyMyA4OSAyMSAxMTkgLTR6Ii8+CjxwYXRoIGQ9Ik04NjgwIDEyMjMgYy00MyAtNCAtODAgLTI1IC04MCAtNDYgMCAtNSAtMTMgLTI4IC0yOCAtNTEgLTE1IC0yMgotMzcgLTYwIC00OCAtODQgLTE2IC0zNSAtMjMgLTQyIC00NCAtNDAgLTIyIDMgLTI2IDkgLTMxIDU4IC0zIDMxIC0xMSA2NSAtMTcKNzcgLTcgMTIgLTEyIDM1IC0xMiA1MiBsMCAzMSAtNzUgMCBjLTQxIDAgLTc1IC00IC03NSAtOSAwIC01IDYgLTIyIDE0IC0zOAozMSAtNjUgNjUgLTE1MiA3MyAtMTkzIDMgLTE0IDEyIC0zMyAyMCAtNDIgMzIgLTM3IDIxIC03OSAtNDUgLTE2NSAtMzQgLTQ1Ci02MiAtODUgLTYyIC04OSAwIC01IC0xNCAtMjMgLTMxIC00MCAtNDAgLTQxIC0zNCAtNzAgMTIgLTYwIDE4IDMgNDYgNiA2MyA2CjI5IDAgMzkgMTIgMTY2IDIwMSA3NCAxMTAgMTQxIDIxMSAxNDggMjI1IDcgMTMgMTcgMjQgMjMgMjQgNSAwIDkgNiA5IDEzIDAgNgoyNSA0MiA1NSA4MCAzMCAzNyA1NSA3MSA1NSA3NiAwIDkgLTI2IDIyIC0zOCAxOSAtNCAtMSAtMjcgLTMgLTUyIC01eiIvPgo8cGF0aCBkPSJNMjAxOSA5NDMgYy0zMSAtMjMgLTU5IC00MCAtODQgLTUzIC0xMSAtNiAtMzMgLTE5IC01MCAtMzAgLTE2IC0xMQotMzcgLTIyIC00NSAtMjYgLTggLTMgLTIyIC05IC0zMCAtMTQgLTggLTUgLTc2IC0zOSAtMTUwIC03NSAtNzQgLTM3IC0xNDcKLTczIC0xNjIgLTgxIC0xNCAtOCAtMzMgLTE0IC00MSAtMTQgLTggMCAtMjAgLTcgLTI3IC0xNSAtNyAtOCAtMjMgLTE1IC0zNQotMTUgLTEyIDAgLTI4IC03IC0zNSAtMTUgLTcgLTggLTIwIC0xNSAtMjkgLTE1IC0xMCAwIC0yNiAtNyAtMzcgLTE1IC0xMCAtOAotMjcgLTE1IC0zNiAtMTUgLTkgMCAtMzAgLTcgLTQ3IC0xNSAtMTcgLTggLTQ1IC0yMiAtNjIgLTMwIC0xNyAtOCAtMzggLTE1Ci00OCAtMTUgLTkgMCAtMjYgLTcgLTM3IC0xNSAtMTAgLTggLTI3IC0xNSAtMzcgLTE1IC0xMSAwIC0zMSAtNiAtNDUgLTE0IC0zMAotMTUgLTgxIC0zMyAtMTI3IC00NiAtMzkgLTExIC05MSAtMjkgLTEzMyAtNDYgLTE4IC04IC00MyAtMTQgLTU1IC0xNCAtMTIgLTEKLTMzIC03IC00NyAtMTUgLTE0IC04IC0zOCAtMTQgLTUzIC0xNSAtMTYgMCAtMzggLTUgLTUwIC0xMiAtMjEgLTExIC0zOCAtMTUKLTE2MiAtMzggLTMzIC02IC02OSAtMTUgLTgwIC0yMCAtMTEgLTUgLTMzIC0xNCAtNDkgLTIwIC0yMSAtOCAtMjYgLTE0IC0xOQotMjEgOCAtOCA3MyAtOCAyMjUgMSAxOTYgMTEgMTE2MiAxMCAxMjEzIC0xIDI0IC01IDMzIDI2IDEyIDQ5IC01OSA2OSAtMzUKMjM3IDQ4IDMzMCAzMCAzNSAxMjcgMTEzIDE1NSAxMjUgNzggMzYgMTc3IDk4IDE4NyAxMTggNiAxMyAxNCA0OCAxOCA3NyA4IDU4Ci0zIDY2IC00NiAzNXogbS00ODkgLTQwNSBjMzIgLTI0IDQyIC03MSAxNiAtODEgLTE5IC03IC0zMSAtNjYgLTE3IC04MCAxOAotMTggMTMgLTMwIC0xMCAtMjQgLTE1IDQgLTMwIC0zIC01MSAtMjYgLTI2IC0yOCAtMzEgLTMwIC00MSAtMTYgLTEwIDEzIC0zNwoxNSAtMTY0IDE1IC0xNzQgLTEgLTE5OSA3IC0xNDggNDkgMzcgMzAgMTU5IDkwIDIwMiAxMDAgMTggMyA0OCAxNyA2OCAzMSAyMAoxMyA0NCAyNCA1NCAyNCA5IDAgMjYgNyAzNyAxNSAyNCAxOCAyMCAxOSA1NCAtN3oiLz4KPHBhdGggZD0iTTI0NTUgNjYwIGMtMTYgLTQgLTUxIC04IC03NiAtOSAtMjYgMCAtNjMgLTggLTgyIC0xNiAtMjAgLTggLTUwCi0xNSAtNjYgLTE1IC0xNiAwIC0zOSAtOSAtNTIgLTE5IC0yMSAtMTcgLTIyIC0yMiAtMTEgLTQwIDYgLTExIDEyIC0yOSAxMgotNDAgMCAtMTAgNyAtMjQgMTUgLTMxIDggLTcgMTUgLTIwIDE1IC0zMCAwIC0xMCA3IC0yMyAxNSAtMzAgOCAtNyAxNSAtMTcgMTUKLTIyIDAgLTE1IDg1IC0xMjIgMTI1IC0xNTcgMzAgLTI2IDQ0IC0zMSA3MyAtMjkgMzcgMyAzNyAzIDQ0IDU4IDQgMzAgMTEgNjgKMTcgODMgNiAxNiAxMSA0NSAxMSA2NiAwIDIxIDYgNTYgMTQgNzcgNyAyMiAxNyA2NyAyMSAxMDIgbDcgNjIgLTM0IC0xIGMtMTgKLTEgLTQ2IC01IC02MyAtOXogbS02MiAtMTUzIGMzIC03IDMgLTI1IDAgLTQwIC04IC00MCAtNDAgLTM2IC01MSA2IC01IDE3IC03CjM1IC01IDQwIDcgMTIgNTEgOCA1NiAtNnoiLz4KPHBhdGggZD0iTTI3MDcgNTU3IGMtMTUgLTEwIC0xNiAtMTUgLTUgLTMwIDEyIC0xNiA1OCAtMTcgNzUyIC0xNyA1MzkgMCA3NDIKMyA3NTIgMTEgMTkgMTUgMTggMzUgLTIgNDMgLTkgMyAtMzQ1IDYgLTc0OCA2IC01NzQgMCAtNzM2IC0zIC03NDkgLTEzeiIvPgo8cGF0aCBkPSJNMTk5MCA1MTUgYy03IC04IC0xOSAtMTUgLTI3IC0xNSAtNyAwIC0xNiAtNyAtMTkgLTE1IC00IC04IC0xMCAtMTUKLTE1IC0xNSAtNSAwIC0zMSAtMjMgLTU4IC01MSAtNDAgLTQyIC01MCAtNTkgLTU1IC05OSAtNCAtMjYgLTIgLTU5IDMgLTczCmwxMCAtMjYgOTggNSBjNTQgMyAxMzEgMiAxNzEgLTMgODggLTExIDkxIC00IDMyIDczIC0yMiAyOSAtNDAgNTkgLTQwIDY3IDAgNwotNyAyMiAtMTUgMzMgLTggMTAgLTE1IDM1IC0xNSA1NCAtMSA1OCAtMTAgODAgLTM1IDgwIC0xMiAwIC0yOCAtNyAtMzUgLTE1eiIvPgo8cGF0aCBkPSJNNjAzMSA0OTggYy01IC0xOCAtMTEgLTczIC0xMyAtMTIzIGwtMyAtOTAgMjUgMCBjMjMgMCAyNiA1IDMyIDU1IDQKMzAgMTIgODIgMTggMTE0IDExIDY3IDggNzYgLTI1IDc2IC0xOCAwIC0yNiAtOCAtMzQgLTMyeiIvPgo8cGF0aCBkPSJNNzI2MyA1MTggYy02IC03IC0xMyAtNjQgLTE2IC0xMjUgbC03IC0xMTMgMjUgMCBjMjkgMCAzMiAxMSA0NSAxMjEKMTQgMTI0IDE0IDEyOSAtMTQgMTI5IC0xMyAwIC0yOCAtNiAtMzMgLTEyeiIvPgo8cGF0aCBkPSJNNDk1NSA1MDIgYy02IC00IC0xNiAtNDEgLTIzIC04MiAtNiAtNDEgLTE1IC05MCAtMTggLTEwNyAtNiAtMzIgLTUKLTMzIDI1IC0zMyAxNyAwIDMyIDUgMzIgMTMgMSA2IDMgMTkgNCAyNyAxIDggMyAyMSA0IDI5IDIgMTkgNDAgLTE1IDUyIC00NiA2Ci0xNyAxNyAtMjMgMzkgLTIzIDM5IDAgMzkgMjAgLTEgNzAgLTM1IDQ0IC0zNSA0NiAyNCAxMDMgMzEgMzAgMzAgNTcgLTIgNTcKLTIxIDAgLTQ1IC0yMCAtNjEgLTUxIC0xNiAtMjggLTMwIC0yMyAtMzAgMTAgMCAxNyAtNiAzMSAtMTYgMzUgLTE5IDcgLTE3IDcKLTI5IC0yeiIvPgo8cGF0aCBkPSJNNTYzMSA1MDIgYy0xNiAtNSAtMTQgLTM3IDMgLTUxIDcgLTYgMjEgLTkgMzAgLTUgMzYgMTQgMjcgLTI2IC0xOQotODYgLTI1IC0zMyAtNDMgLTY1IC00MCAtNzAgMyAtNiA0NCAtMTAgOTEgLTEwIDgzIDAgODUgMSA4MiAyMyAtMiAxOCAtMTAgMjMKLTQwIDI1IC0yMSAyIC0zOCA0IC0zOCA2IDAgMTQgMzcgNzAgNjkgMTA2IDI0IDI3IDM2IDQ5IDMxIDU0IC05IDkgLTE0OCAxNQotMTY5IDh6Ii8+CjxwYXRoIGQ9Ik02NDcyIDQ5OCBjLTcgLTcgLTEyIC0yNiAtMTIgLTQyIC0xIC0xNyAtNyAtNTggLTE0IC05MSAtMTUgLTc0IC0xMgotODUgMjQgLTg1IDI5IDAgMjkgMSAzMiA2MyAyIDM0IDcgNjEgMTMgNjEgOCAtMSA0NyAtNjMgNzEgLTExMSA5IC0xOSA2MSAtMTYKNjggMyAzIDkgNiAyOSA2IDQ0IDAgMTYgNyA1NSAxNSA4NyAxMyA0OSAxMyA1OSAxIDcxIC04IDkgLTIyIDExIC0zNSA3IC0xOAotNSAtMjEgLTE0IC0yMSAtNjUgMCAtMzIgLTQgLTYxIC04IC02NCAtMTAgLTYgLTQ2IDQwIC01NiA3MCAtOCAyNiAtNDMgNjQKLTU5IDY0IC03IDAgLTE4IC01IC0yNSAtMTJ6Ii8+CjxwYXRoIGQ9Ik03NDU0IDQ5MyBjLTMgLTEwIC0xMyAtMzEgLTIxIC00OCAtMTAgLTIyIC0xMyAtNTYgLTExIC0xMjUgMyAtODcgNQotOTUgMjMgLTk1IDE5IDAgMjAgNyAyMCAxMDAgMCA4MCA0IDEwNSAxOSAxMjcgMTAgMTYgMTYgMzUgMTIgNDMgLTcgMjEgLTM1CjE5IC00MiAtMnoiLz4KPHBhdGggZD0iTTc5OTYgNTAxIGMtMyAtNSAxIC0yNSA5IC00NSAxNyAtNDAgMjAgLTkyIDYgLTEwMCAtNSAtNCAtMTIgLTI0Ci0xNiAtNDUgLTQgLTIyIC0xMyAtNDIgLTIxIC00NSAtMTkgLTcgLTE4IC0zNSAyIC00MyAyMiAtOCA2NCAzNSA2NCA2NyAwIDE0CjUgMzEgMTEgMzcgMTcgMTcgMTMgMTI4IC03IDE1OCAtMTYgMjUgLTM4IDMzIC00OCAxNnoiLz4KPHBhdGggZD0iTTc1MzkgNDczIGMtMTkgLTUwIC0zMSAtMTczIC0xOCAtMTg5IDE2IC0yMCAzOSAwIDM5IDM1IDAgMjEgOCAzMAo0MCA0NCA0NSAxOSA2MiA1MCA0OCA4NiAtMTIgMzIgLTM3IDUwIC03MSA1MSAtMjEgMCAtMzAgLTcgLTM4IC0yN3ogbTYzIC02NQpjLTIwIC0yMCAtMzYgNSAtMjEgMzMgbDEyIDI0IDEwIC0yMyBjNyAtMTYgNyAtMjYgLTEgLTM0eiIvPgo8cGF0aCBkPSJNNzY3NSA0OTAgYy04IC0xMyAzIC0zMCAyMCAtMzAgMTggMCAyOCAtMzUgMTcgLTU3IC0xNSAtMjggLTIzIC0xMDcKLTEzIC0xMjIgMjQgLTM3IDYxIDM4IDYxIDEyMyAwIDQ2IDMzIDgwIDYxIDYzIDEwIC02IDIxIC0yNCAyNCAtMzkgNCAtMTUgMTEKLTMwIDE2IC0zMyAxMyAtOCAxMSAtNTkgLTIgLTcyIC0xOCAtMTggLTIgLTQzIDI2IC00MyAyMiAwIDI1IDQgMjUgMzggMCAzNAozMSAxMTAgNTEgMTIyIDUgMyAxMCAxNyAxMSAzMCA1IDQxIC0yNSAzNCAtNTEgLTEyIGwtMjQgLTQzIC0xMSAyNiBjLTIxIDUxCi0zMSA1NiAtMTIwIDU4IC00OSAxIC04NyAtMyAtOTEgLTl6Ii8+CjxwYXRoIGQ9Ik04MTk2IDQ2OCBjLTggLTE4IC0xNyAtNjUgLTIxIC0xMDQgLTggLTgxIDIgLTk3IDU3IC05MiAyNSAyIDM0IDgKMzYgMjUgMiAxNiAtMyAyMiAtMjAgMjUgLTE4IDIgLTIyIDggLTIwIDI4IDE1IDEyOCAxNCAxNTAgLTIgMTUwIC0xMCAwIC0yMwotMTQgLTMwIC0zMnoiLz4KPHBhdGggZD0iTTgyOTAgNDg1IGMwIC05IDcgLTE4IDE1IC0yMSAxOCAtNyAyMSAtMTA0IDUgLTEzNCAtMTQgLTI2IC0yIC01MgoyNCAtNDggMTkgMyAyMiAxMiAzMCA4NiA3IDc1IDExIDg0IDMyIDkyIDEzIDUgMjQgMTYgMjQgMjUgMCAxMiAtMTMgMTUgLTY1CjE1IC01MiAwIC02NSAtMyAtNjUgLTE1eiIvPgo8cGF0aCBkPSJNODQ0NSA0NjMgYy0zIC0yMSAtMTAgLTU0IC0xNSAtNzQgLTYgLTIwIC0xMCAtNTMgLTEwIC03MyAwIC0zNCAyCi0zNiAzMyAtMzcgODQgLTMgMTA4IDUgMTM1IDQ0IDM0IDUxIDI5IDk2IC0xMyAxNDAgLTMxIDMyIC00MiAzNyAtODAgMzcgLTQzCjAgLTQ0IC0xIC01MCAtMzd6IG05MiAtMjUgYzEzIC0xMiAyMyAtMzMgMjMgLTQ4IDAgLTM0IC0zNSAtNzIgLTYzIC02OCAtMTkgMwotMjIgOCAtMTkgNDggNiA5NSAxNyAxMDggNTkgNjh6Ii8+CjxwYXRoIGQ9Ik02OTM4IDQ1OCBjLTYgLTEzIC0xMyAtNTggLTE0IC0xMDEgbC0zIC03OCAyNyAzIGMyNCAzIDI3IDggMzAgNDMgMgoyMiAxMCA0OCAxOSA1NyAxOSAyMSAxMCA4MyAtMTMgOTIgLTI1IDEwIC0zMyA3IC00NiAtMTZ6Ii8+CjxwYXRoIGQ9Ik01MzEyIDQwMyBjLTIyIC0yOCAtMzIgLTM0IC0zNSAtMjMgLTMgOCAtOCAyMyAtMTEgMzMgLTkgMjkgLTI2IDIyCi02MCAtMjcgLTEzIC0xOSAtMTQgLTE4IC0yNyAxMCAtMTggMzYgLTUyIDQwIC01NyA2IC0yIC0xMyAyIC0zMCA5IC0zOCA2IC04CjE1IC0yOSAxOCAtNDcgOSAtNDMgNDYgLTUxIDYxIC0xMyAxMiAzMyAzMyAzMyA0OCAxIDE0IC0yOSAzMyAtMzIgNTMgLTcgMjcKMzEgNzAgMTIyIDY0IDEzMiAtMTIgMTkgLTMzIDEwIC02MyAtMjd6Ii8+CjxwYXRoIGQ9Ik01NDMzIDQxMyBjLTQwIC0zOCAtNDggLTY1IC0yOCAtMTAzIDE1IC0yOSAxOCAtMzAgODAgLTMwIDc2IDAgODUgOQo4NSA5NCBsMCA1NiAtMzIgLTEgYy0xOCAtMSAtNDIgMiAtNTQgNiAtMTUgNSAtMjkgLTEgLTUxIC0yMnogbTc1IC02MCBjLTMKLTMyIC00NCAtNDYgLTU0IC0xOSAtMTAgMjYgNCA0NiAzMSA0NiAyMyAwIDI2IC00IDIzIC0yN3oiLz4KPHBhdGggZD0iTTYyMzcgNDMzIGMtNCAtMyAtNyAtMTkgLTcgLTM1IDAgLTQwIC0xNyAtNjggLTQxIC02OCAtMTggMCAtMjAgNAotMTMgNDUgNSAzNyAzIDQ2IC0xMSA1MSAtMjUgMTAgLTM3IC05IC00MyAtNjQgLTYgLTcwIDE2IC04OSA5OCAtODIgMzcgMyA0NQoxNCA2MCA3NSAxMSA0NCAxMSA1NyAwIDcwIC0xMyAxNiAtMzIgMjAgLTQzIDh6Ii8+CjxwYXRoIGQ9Ik02NzQxIDQxNCBjLTI2IC0yMiAtMzEgLTMzIC0zMSAtNzAgMCAtMzMgNSAtNDYgMTkgLTU0IDIzIC0xMiAxMjgKLTE0IDEzNCAtMiAzIDQgNyAzNiA5IDcyIGwzIDY1IC0zNyAwIGMtMjAgMCAtNDAgMyAtNDQgOCAtMTIgMTIgLTIxIDkgLTUzCi0xOXogbTg2IC01MCBjNSAtMTQgLTI0IC00NCAtNDIgLTQ0IC0xNiAwIC0yNiAyNSAtMTggNDYgNiAxNyA1NCAxNiA2MCAtMnoiLz4KPHBhdGggZD0iTTcwNzQgNDIwIGMtNDUgLTI5IC01NyAtMTA3IC0yMCAtMTMyIDIwIC0xNCAxMjYgLTkgMTMyIDUgMyA4IDYgNDAKNyA3MyBsMiA1OSAtMzIgLTIgYy0xNyAtMiAtMzUgMiAtMzggNyAtOSAxNCAtMTYgMTMgLTUxIC0xMHogbTcxIC01MCBjOSAtMTQKLTEzIC01MCAtMzEgLTUwIC0xNyAwIC0yOCAyNCAtMjAgNDUgNiAxNyA0MiAyMCA1MSA1eiIvPgo8cGF0aCBkPSJNNTgzMiA0MTcgYy02IC03IC0xNCAtMzEgLTE4IC01NCAtOCAtNTUgMTggLTgzIDc5IC04MyA1NyAwIDY0IDcgNzgKNjggMTMgNjEgOCA4MiAtMjAgODIgLTE5IDAgLTMxIC0yNSAtMzEgLTY3IDAgLTI2IC0zNyAtNTIgLTQ1IC0zMSAtMyA3IC00IDMxCi0zIDUzIDMgNDIgLTE4IDU5IC00MCAzMnoiLz4KPHBhdGggZD0iTTYzMjQgMzg1IGMtMTAgLTI1IDQgLTQ1IDMwIC00NSAzNCAwIDU2IDEwIDU2IDI2IDAgMzAgLTc2IDQ3IC04NgoxOXoiLz4KPC9nPgo8L3N2Zz4K" alt="First Technology Logo" class="logo">
+            </div>
+            <div class="header-content">
+                <h1>AD Domain Security & Compliance Audit Report</h1>
+                <p style="font-size: 1.3em; font-weight: bold;">Customer: Ashtons Legal</p>
+            </div>
+            <div class="header-info">
+                <p>Audit Date: July 14, 2025</p>
+                <p>Auditor/Engineer: Nishen Harichunder</p>
+            </div>
+        </div>
+        
+        <div class="risk-banner">
+            OVERALL SECURITY RISK: HIGH
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number critical">0</div>
+                <div>Critical Issues</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number high">12</div>
+                <div>High Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number medium">10</div>
+                <div>Medium Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number low">0</div>
+                <div>Low Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" style="color: #17a2b8;">4</div>
+                <div>Controls Passed</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">24</div>
+                <div>Issues Found</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">28</div>
+                <div>Total Checks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">4</div>
+                <div>Compliance Frameworks</div>
+            </div>
+        </div>
+
+        <!-- Domain Controller Health Dashboard -->
+        <div class="dc-dashboard">
+            <div class="dc-dashboard-header">
+                <h2>🖥️ Domain Controller Health Dashboard 
+                    <span class="dc-count">5 Controllers</span>
+                </h2>
+            </div>
+            <div class="dc-grid">
+                <div class="dc-card">
+                    <div class="dc-card-header healthy">
+                        <span>ALAZ-DC01</span>
+                        <span>HEALTHY</span>
+                    </div>
+                    <div class="dc-card-body">
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Site:</span>
+                            <span class="dc-info-value">Azure</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Operating System:</span>
+                            <span class="dc-info-value">Windows Server 2016 Datacenter</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">IP Address:</span>
+                            <span class="dc-info-value">10.48.2.201</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">FSMO Roles:</span>
+                            <span class="dc-info-value">SchemaMaster, DomainNamingMaster, PDCEmulator, RIDMaster, InfrastructureMaster</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Last Contact:</span>
+                            <span class="dc-info-value">12:04:48</span>
+                        </div>
+                        <div class="dc-services">
+                            <strong>Services:</strong><br>
+                            <span class='dc-service running'>NTDS</span><span class='dc-service running'>Netlogon</span><span class='dc-service running'>W32Time</span><span class='dc-service running'>DNS</span><span class='dc-service running'>KDC</span><span class='dc-service running'>ADWS</span>
+                        </div>
+                        <div class="dc-tests">
+                            <strong>DCDIAG Tests:</strong><br>
+                            <span class='dc-test passed'>SysVol</span><span class='dc-test passed'>Services</span><span class='dc-test passed'>Connectivity</span><span class='dc-test passed'>Replications</span><span class='dc-test passed'>Advertising</span>
+                        </div>
+                    </div>
+                </div>                 <div class="dc-card">
+                    <div class="dc-card-header healthy">
+                        <span>ALIP-DC01</span>
+                        <span>HEALTHY</span>
+                    </div>
+                    <div class="dc-card-body">
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Site:</span>
+                            <span class="dc-info-value">Ipswich</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Operating System:</span>
+                            <span class="dc-info-value">Windows Server 2016 Standard</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">IP Address:</span>
+                            <span class="dc-info-value">10.12.1.200</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">FSMO Roles:</span>
+                            <span class="dc-info-value">None</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Last Contact:</span>
+                            <span class="dc-info-value">12:04:48</span>
+                        </div>
+                        <div class="dc-services">
+                            <strong>Services:</strong><br>
+                            <span class='dc-service running'>NTDS</span><span class='dc-service running'>Netlogon</span><span class='dc-service running'>W32Time</span><span class='dc-service running'>DNS</span><span class='dc-service running'>KDC</span><span class='dc-service running'>ADWS</span>
+                        </div>
+                        <div class="dc-tests">
+                            <strong>DCDIAG Tests:</strong><br>
+                            <span class='dc-test passed'>SysVol</span><span class='dc-test passed'>Services</span><span class='dc-test passed'>Connectivity</span><span class='dc-test passed'>Replications</span><span class='dc-test passed'>Advertising</span>
+                        </div>
+                    </div>
+                </div>                 <div class="dc-card">
+                    <div class="dc-card-header healthy">
+                        <span>ALNO-DC01</span>
+                        <span>HEALTHY</span>
+                    </div>
+                    <div class="dc-card-body">
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Site:</span>
+                            <span class="dc-info-value">Norwich</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Operating System:</span>
+                            <span class="dc-info-value">Windows Server 2016 Standard</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">IP Address:</span>
+                            <span class="dc-info-value">10.4.0.201</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">FSMO Roles:</span>
+                            <span class="dc-info-value">None</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Last Contact:</span>
+                            <span class="dc-info-value">12:04:48</span>
+                        </div>
+                        <div class="dc-services">
+                            <strong>Services:</strong><br>
+                            <span class='dc-service running'>NTDS</span><span class='dc-service running'>Netlogon</span><span class='dc-service running'>W32Time</span><span class='dc-service running'>DNS</span><span class='dc-service running'>KDC</span><span class='dc-service running'>ADWS</span>
+                        </div>
+                        <div class="dc-tests">
+                            <strong>DCDIAG Tests:</strong><br>
+                            <span class='dc-test passed'>SysVol</span><span class='dc-test passed'>Services</span><span class='dc-test passed'>Connectivity</span><span class='dc-test passed'>Replications</span><span class='dc-test passed'>Advertising</span>
+                        </div>
+                    </div>
+                </div>                 <div class="dc-card">
+                    <div class="dc-card-header healthy">
+                        <span>ALCA-DC01</span>
+                        <span>HEALTHY</span>
+                    </div>
+                    <div class="dc-card-body">
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Site:</span>
+                            <span class="dc-info-value">Cambridge</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Operating System:</span>
+                            <span class="dc-info-value">Windows Server 2016 Standard</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">IP Address:</span>
+                            <span class="dc-info-value">10.6.0.201</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">FSMO Roles:</span>
+                            <span class="dc-info-value">None</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Last Contact:</span>
+                            <span class="dc-info-value">12:04:48</span>
+                        </div>
+                        <div class="dc-services">
+                            <strong>Services:</strong><br>
+                            <span class='dc-service running'>NTDS</span><span class='dc-service running'>Netlogon</span><span class='dc-service running'>W32Time</span><span class='dc-service running'>DNS</span><span class='dc-service running'>KDC</span><span class='dc-service running'>ADWS</span>
+                        </div>
+                        <div class="dc-tests">
+                            <strong>DCDIAG Tests:</strong><br>
+                            <span class='dc-test passed'>SysVol</span><span class='dc-test passed'>Services</span><span class='dc-test passed'>Connectivity</span><span class='dc-test passed'>Replications</span><span class='dc-test passed'>Advertising</span>
+                        </div>
+                    </div>
+                </div>                 <div class="dc-card">
+                    <div class="dc-card-header healthy">
+                        <span>ALFH-DC01</span>
+                        <span>HEALTHY</span>
+                    </div>
+                    <div class="dc-card-body">
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Site:</span>
+                            <span class="dc-info-value">Fornham</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Operating System:</span>
+                            <span class="dc-info-value">Windows Server 2016 Standard</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">IP Address:</span>
+                            <span class="dc-info-value">10.5.0.200</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">FSMO Roles:</span>
+                            <span class="dc-info-value">None</span>
+                        </div>
+                        <div class="dc-info-row">
+                            <span class="dc-info-label">Last Contact:</span>
+                            <span class="dc-info-value">12:04:48</span>
+                        </div>
+                        <div class="dc-services">
+                            <strong>Services:</strong><br>
+                            <span class='dc-service running'>NTDS</span><span class='dc-service running'>Netlogon</span><span class='dc-service running'>W32Time</span><span class='dc-service running'>DNS</span><span class='dc-service running'>KDC</span><span class='dc-service running'>ADWS</span>
+                        </div>
+                        <div class="dc-tests">
+                            <strong>DCDIAG Tests:</strong><br>
+                            <span class='dc-test passed'>SysVol</span><span class='dc-test passed'>Services</span><span class='dc-test passed'>Connectivity</span><span class='dc-test passed'>Replications</span><span class='dc-test passed'>Advertising</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-links">
+            <h3>Download Detailed Reports</h3>
+            <a href="Infrastructure-Audit-Report.xlsx">📊 Excel Report</a>
+            <a href="Infrastructure-Audit-Report.csv">📄 CSV Report</a>
+            <a href="Executive-Summary.txt">📋 Executive Summary</a>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Detailed Security Findings</h2>
+            <div style="text-align: right; margin: 10px 0;">
+                <button onclick="expandAll()" style="margin-right: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Expand All</button>
+                <button onclick="collapseAll()" style="padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Collapse All</button>
+            </div>
+            <div class="findings-container">
+                <div class="finding-group high-section">
+                    <h3 class="finding-group-title">🟠 HIGH PRIORITY FINDINGS (12 Issues)</h3>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F90915')">
+                            <div>
+                                <h4 class="finding-title">🟠 Service Accounts with Old Passwords</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F90915</span>
+                                    <span class="finding-category">Service Accounts</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F90915">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F90915">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>33 service accounts have passwords older than 180 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Old service account passwords increase risk of credential compromise.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Schedule coordinated password changes with application owners.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+SamAccountName      PasswordLastSet
+--------------      ---------------
+BigHand_SVC         6/17/2024 8:32:26 AM
+SVC_AzureADConnect  6/14/2024 3:02:00 PM
+SQLServices         6/14/2024 4:10:56 PM
+ServiceMGR-Apps     2/20/2015 9:29:31 AM
+ServiceMGR-Deploy   2/20/2015 9:37:50 AM
+ServiceMGR-Async    2/20/2015 9:31:36 AM
+SVC_NSAccount       12/4/2013 10:17:31 AM
+ServiceMGR-ADFS     2/20/2015 9:30:26 AM
+ServiceMGR-Share    2/20/2015 9:40:49 AM
+ServiceMGR-Sandbox  2/20/2015 9:32:50 AM
+ServiceMGR-DevSP    4/19/2017 11:38:16 AM
+Svc_MimecastLDAP    2/21/2021 4:25:21 PM
+Svc_SSRS2016        2/21/2019 7:03:34 PM
+svc-egres           5/8/2019 12:16:08 PM
+NPCXCrmSandbox      7/29/2019 1:06:14 PM
+NPCXCrmAsynchronous 7/29/2019 1:05:44 PM
+NPCXCrmAppPool      7/29/2019 1:05:32 PM
+svc-adfs            7/31/2019 12:01:48 PM
+Svc_AzureBackup     8/1/2019 7:50:40 PM
+CXServiceMGR-ASYNC  11/15/2019 12:21:02 PM
+CXServiceMGR-MON    11/15/2019 12:18:06 PM
+CXServiceMGR-APPS   11/15/2019 12:13:47 PM
+CXServiceMGR-SBOX   11/15/2019 12:24:17 PM
+CXServiceMGR-VSS    11/15/2019 12:25:36 PM
+CXADFSAdmin         12/9/2019 11:08:36 AM
+Svc_rmm             6/9/2021 12:41:24 PM
+Svc_HyperVBackup    4/27/2020 1:39:50 PM
+SQL_SVC             8/13/2020 10:18:28 AM
+ITServiceAccounts   2/21/2023 8:58:10 AM
+Svc_Net2Admin       6/13/2024 12:09:10 PM
+SVC_Securus_SDWAN   10/14/2022 12:47:50 PM
+Lansweeper_SVC      6/13/2024 12:18:57 PM
+SVC_AzureADConnect2 6/14/2024 3:15:06 PM
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>NIST</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:56</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F88514')">
+                            <div>
+                                <h4 class="finding-title">🟠 KRBTGT Password Too Old</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F88514</span>
+                                    <span class="finding-category">Kerberos Security</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F88514">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F88514">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>KRBTGT account password is 396 days old.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Old KRBTGT passwords can be exploited for Golden Ticket attacks.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Reset KRBTGT password twice with 10-hour intervals between resets.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Password last set: 06/13/2024 07:37:00</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:56</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F21682')">
+                            <div>
+                                <h4 class="finding-title">🟠 Password Never Expires Policy</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F21682</span>
+                                    <span class="finding-category">Password Policy</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F21682">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F21682">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Maximum password age is set to 0 days (passwords never expire).</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Passwords that never expire pose significant security risk as compromised credentials remain valid indefinitely.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Set maximum password age between 30-150 days for optimal security balance.</p>
+                            </div>
+                            
+                            
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>NIST</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:35</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F15266')">
+                            <div>
+                                <h4 class="finding-title">🟠 Non-Service Accounts with Password Never Expires</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F15266</span>
+                                    <span class="finding-category">Account Security</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F15266">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F15266">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Found 94 enabled non-service accounts with 'Password Never Expires' setting.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Accounts with non-expiring passwords increase security risk if compromised.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review and disable Password Never Expires for non-service accounts.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                            SamAccountName       LastLogonDate          Created
+----                            --------------       -------------          -------
+Human Resources                 HumanResource        11/1/2016 11:35:21 AM  10/16/2014 9:12:22 AM
+MimecastMSE                     MimecastMSE          9/4/2024 3:04:45 PM    3/27/2015 3:00:03 PM
+IUSR_GL-EXCH1                   IUSR_GL-EXCH1                               8/10/2002 6:22:58 PM
+IWAM_GL-EXCH1                   IWAM_GL-EXCH1                               8/10/2002 6:22:58 PM
+IWAM_AG2A                       IWAM_AG2A                                   8/11/2002 8:29:56 AM
+IUSR_AG2A                       IUSR_AG2A                                   8/11/2002 8:30:03 AM
+IUSR_EVOLNT4                    IUSR_EVOLNT4                                8/11/2002 8:44:08 AM
+IWAM_AG-IPSSVR                  IWAM_AG-IPSSVR                              9/20/2002 10:32:29 AM
+IUSR_AG-IPSSVR                  IUSR_AG-IPSSVR                              9/20/2002 10:32:51 AM
+IWAM_NODE1                      IWAM_NODE1                                  1/18/2003 2:37:43 PM
+IUSR_NODE1                      IUSR_NODE1                                  1/18/2003 2:39:34 PM
+IWAM_NODE2                      IWAM_NODE2                                  2/8/2003 5:20:18 PM
+IUSR_NODE2                      IUSR_NODE2                                  2/8/2003 5:22:16 PM
+IWAM_AG-EXCH                    IWAM_AG-EXCH                                1/10/2004 12:37:51 PM
+IUSR_AG-EXCH                    IUSR_AG-EXCH                                1/10/2004 12:37:58 PM
+IWAM_AG-EXCH1                   IWAM_AG-EXCH1                               1/11/2004 12:43:00 PM
+IUSR_AG-EXCH1                   IUSR_AG-EXCH1                               1/11/2004 12:43:03 PM
+IUSR_AG1                        IUSR_AG1             3/8/2015 9:41:14 PM    11/26/2006 11:39:01 AM
+IUSR_AG-MAIL1                   IUSR_AG-MAIL1        7/23/2011 10:21:47 AM  8/20/2007 2:42:49 PM
+IUSR_AG-MAIL2                   IUSR_AG-MAIL2        7/29/2011 9:11:11 AM   8/20/2007 2:43:33 PM
+IUSR_AG-BACKUP                  IUSR_AG-BACKUP       9/26/2011 5:16:04 PM   9/10/2007 1:27:29 PM
+IUSR_FLXSVR                     IUSR_FLXSVR          7/6/2014 8:19:54 PM    10/5/2009 11:38:01 AM
+Luke Hurst (Admin)              a-lh                 6/2/2025 4:40:01 PM    12/20/2012 8:59:21 AM
+BigHand Admin                   BigHand Admin        3/21/2022 4:13:52 PM   7/1/2008 12:27:43 PM
+Steven Feltham-Pye (Admin)      a-sfp                7/9/2025 11:56:26 AM   7/18/2018 9:46:39 AM
+PTLDelegate                     PTLDelegate          4/4/2025 1:12:54 AM    2/25/2015 12:52:40 PM
+PTLAdmin                        PTLAdmin             6/30/2025 11:20:40 AM  2/20/2015 11:43:13 AM
+Learning and Development        Learninganddevelopme 9/27/2018 2:32:53 PM   10/6/2011 3:05:31 PM
+PlatformGateway                 PlatformGateway      5/8/2025 3:20:58 PM    2/20/2015 11:46:06 AM
+Peppermint Admin                PeppermintAdmin      7/13/2025 8:40:11 AM   9/14/2016 4:26:46 PM
+BH Admin                        BighandSA            7/14/2025 9:37:23 AM   1/7/2016 11:15:14 AM
+IWAM_AG1                        IWAM_AG1                                    11/26/2006 11:39:00 AM
+IWAM_AG-MAIL1                   IWAM_AG-MAIL1                               8/20/2007 2:42:51 PM
+IWAM_AG-MAIL2                   IWAM_AG-MAIL2                               8/20/2007 2:43:36 PM
+IWAM_AG-BACKUP                  IWAM_AG-BACKUP                              9/10/2007 1:27:32 PM
+IWAM_FLXSVR                     IWAM_FLXSVR          4/20/2010 11:59:25 AM  10/5/2009 11:38:13 AM
+Allison Southgate               southgate_a          7/14/2025 7:28:59 AM   12/7/2012 4:10:50 PM
+Portal Server                   portal               9/12/2011 10:50:46 AM  9/12/2011 10:50:54 AM
+WSS USER                        wssuser              2/1/2010 12:36:18 PM   2/1/2010 12:34:34 PM
+IUSR_AG-FLXSVR                  IUSR_AG-FLXSVR                              8/14/2002 3:30:26 PM
+AKCJDatabase                    AKCJDatabase                                2/3/2012 3:00:55 PM
+IT Support                      ITSupport            11/21/2020 1:59:30 AM  1/19/2012 4:22:43 PM
+AccountsBills                   AccountsBills        2/17/2015 5:38:25 PM   2/6/2012 1:27:53 PM
+CN Central                      CNCentral                                   10/24/2014 2:37:45 PM
+HR Impersonation                HRImpersonation      10/15/2014 12:47:47 PM 10/13/2014 12:42:42 PM
+Marketing and Events            market               5/19/2010 8:13:32 AM   7/28/2008 4:06:06 PM
+Compliance                      compliance                                  5/16/2003 11:02:49 AM
+voicemail server                voicemail            12/22/2020 3:43:11 PM  10/25/2006 1:03:04 PM
+PI Central                      PICentral                                   3/13/2015 10:22:55 AM
+NI Central                      NICentral            10/18/2018 9:23:49 AM  3/13/2015 10:23:27 AM
+portal-noreply                  portal-noreply                              10/15/2015 1:29:45 PM
+Audit Investigation             Audit                7/29/2024 2:52:04 PM   2/24/2017 2:10:48 PM
+COPInvoices                     COPInvoices          8/2/2019 11:18:40 AM   7/19/2017 9:16:15 AM
+Accounts Mailbox                AccountsMailbox      9/28/2017 8:58:30 AM   7/19/2017 3:15:05 PM
+mimecast                        mimecast             12/30/2018 1:43:21 PM  9/23/2011 11:12:19 AM
+BigHand Reporting               BH3Reports                                  8/26/2008 9:41:39 AM
+NPCXSQLAgent                    npcxsqlagent         5/8/2025 3:19:27 PM    7/15/2019 10:39:37 AM
+NPCXSQLSrv                      npcxsqlsrv           5/5/2025 11:05:05 AM   7/15/2019 10:41:14 AM
+NPCXAsynchronousMaint           NPCXAsynchronousMain 7/27/2019 12:24:40 PM  7/17/2019 10:34:55 AM
+NPCXCrmMonitoring               NPCXCrmMonitoring    5/8/2025 3:17:13 PM    7/17/2019 10:35:31 AM
+NPCXCrmDeployment               NPCXCrmDeployment    7/29/2019 1:12:22 PM   7/17/2019 10:36:15 AM
+NPCXCrmAdmin                    NPCXCrmAdmin                                7/17/2019 10:37:28 AM
+NPCXCrmVss                      NPCXCrmVss           5/8/2025 3:17:13 PM    7/17/2019 2:53:53 PM
+CXServiceMGR-MON                CXServiceMGR-MON     4/20/2025 11:10:45 PM  11/15/2019 12:18:06 PM
+CXServiceMGR-VSS                CXServiceMGR-VSS     4/20/2025 11:13:32 PM  11/15/2019 12:25:36 PM
+CXServcieMGR-DEPLOY             CXServcieMGR-DEPLOY  3/21/2025 10:24:16 PM  11/15/2019 12:26:38 PM
+PTLCXAdmin                      PTLCXAdmin           4/22/2025 7:09:03 AM   11/15/2019 3:06:20 PM
+COP Shared CRM Mailbox          COPSharedCRMMailbox  12/20/2019 2:18:52 PM  11/20/2019 10:19:50 AM
+HPScan                          HPScan               7/7/2025 3:38:30 PM    12/19/2019 1:55:48 PM
+lansweeper                      lansweeper           5/24/2022 1:50:00 PM   1/21/2020 3:06:04 PM
+AXA SFTP Service                AXA_SFTP_SVC         7/13/2025 11:03:59 PM  6/16/2020 11:56:32 AM
+Kofax                           Kofax                7/13/2025 9:00:09 AM   6/18/2020 11:06:05 AM
+WVDAdmin                        WVDAdmin             4/5/2023 10:10:52 AM   6/19/2020 2:58:43 PM
+mimecast mso                    mimecastmso          7/16/2020 2:14:02 PM   7/16/2020 2:01:54 PM
+BigHand                         bighand                                     12/14/2020 10:14:41 AM
+IT Service Accounts             ITServiceAccounts    6/3/2024 2:25:00 PM    1/20/2021 10:57:39 AM
+Peppermint Document Production  PeppDocProduction    7/5/2025 8:44:11 AM    4/29/2021 11:05:05 AM
+powerbiadmin                    powerbiadmin         7/7/2025 1:00:10 PM    5/18/2021 4:18:30 PM
+Bighand recurringtasks          BighandRecurringtask 11/10/2022 11:32:55 AM 11/10/2022 10:58:45 AM
+Bighand Tasks                   BighandTasks                                1/12/2023 11:34:55 AM
+Check CoP Invoices              CheckCoPInvoices                            1/27/2023 1:36:56 PM
+Josh Teague (Admin)             a-jt                 7/10/2025 11:06:10 AM  5/2/2023 2:58:55 PM
+CSC Residential                 cforesidential                              10/4/2023 2:21:03 PM
+Lansweeper Service Account      Lansweeper_SVC       7/6/2025 3:20:46 PM    6/13/2024 12:18:57 PM
+AAD_17dd14a2bf1b                AAD_17dd14a2bf1b     7/6/2025 11:19:16 PM   6/14/2024 3:17:12 PM
+MSOL_e2f9b4b7df35               MSOL_e2f9b4b7df35    7/8/2025 8:15:50 AM    6/14/2024 3:48:20 PM
+SPDocPreview                    SPDocPreview         2/14/2025 12:03:39 PM  6/21/2024 2:56:17 PM
+Comxo                           Comxo                7/14/2025 6:30:01 AM   7/1/2024 12:09:43 PM
+Stuart Ferguson (First Tech)    SFADMIN              6/25/2025 12:01:11 PM  3/31/2025 4:45:31 PM
+Duwayne Padayachi (First Tech)  DPADMIN                                     3/31/2025 4:48:11 PM
+Oliver Govender (First Tech)    OGADMIN              7/9/2025 9:47:39 AM    3/31/2025 4:49:40 PM
+Kyle Naidoo (First Tech)        KNADMIN              7/11/2025 11:19:52 AM  3/31/2025 4:53:45 PM
+Lincoln Phillips-Morris (Admin) a-lpm                7/7/2025 9:34:53 AM    4/29/2025 11:07:05 AM
+Accounts Audit                  accounts.audit       6/18/2025 4:27:55 PM   5/22/2025 9:52:59 AM
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>NIST</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:36</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F23201')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: BigHand Admin</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F23201</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F23201">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F23201">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account BigHand Admin has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 03/21/2022 16:13:52</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:37</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F62370')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: SVC_AzureADConnect</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F62370</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F62370">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F62370">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account SVC_AzureADConnect has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 06/05/2024 03:38:35</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:37</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F49656')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: SVC_AzureADConnect2</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F49656</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F49656">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F49656">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account SVC_AzureADConnect2 has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 06/14/2024 15:16:11</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:38</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F15587')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: SPDocPreview</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F15587</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F15587">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F15587">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account SPDocPreview has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 02/14/2025 12:03:39</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:38</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F12315')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: SVC_AzureADConnect2</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F12315</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F12315">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F12315">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account SVC_AzureADConnect2 has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 06/14/2024 15:16:11</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:38</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F86285')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: svc_vmm</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F86285</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F86285">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F86285">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account svc_vmm has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 10/27/2019 02:57:02</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:38</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F82178')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: SVC_AzureADConnect</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F82178</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F82178">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F82178">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account SVC_AzureADConnect has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 06/05/2024 03:38:35</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:39</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item high-finding">
+                        <div class="finding-header" onclick="toggleFinding('F22383')">
+                            <div>
+                                <h4 class="finding-title">🟠 Inactive Privileged Account: evosched</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F22383</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge high">HIGH</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F22383">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F22383">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Privileged account evosched has not logged in for over 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Inactive privileged accounts create security risk and compliance violations.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Disable or remove inactive privileged accounts after proper verification.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Last logon: 12/20/2014 23:45:41</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>ISO27001</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:39</p>
+                            </div>
+                        </div>
+                    </div>                </div>                 <div class="finding-group medium-section">
+                    <h3 class="finding-group-title">🟡 MEDIUM PRIORITY FINDINGS (10 Issues)</h3>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F82475')">
+                            <div>
+                                <h4 class="finding-title">🟡 System Events Requiring Attention on ALAZ-DC01.internal.ashtongraham.co.uk</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F82475</span>
+                                    <span class="finding-category">Domain Controller Health</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F82475">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F82475">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Domain controller ALAZ-DC01.internal.ashtongraham.co.uk has system events that may require attention.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Multiple system events may indicate maintenance needs or configuration issues.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review event logs for patterns and address any recurring issues. Most events may be informational.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Event 25 at 07/13/2025 23:11:01; Event 25 at 07/13/2025 23:11:01; Event 906 at 07/13/2025 23:10:53; Event 906 at 07/13/2025 23:10:53; Event 906 at 07/13/2025 23:10:53</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 11:23:59</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F37585')">
+                            <div>
+                                <h4 class="finding-title">🟡 System Events Requiring Attention on ALFH-DC01.internal.ashtongraham.co.uk</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F37585</span>
+                                    <span class="finding-category">Domain Controller Health</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F37585">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F37585">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Domain controller ALFH-DC01.internal.ashtongraham.co.uk has system events that may require attention.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Multiple system events may indicate maintenance needs or configuration issues.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review event logs for patterns and address any recurring issues. Most events may be informational.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Event 2002 at 07/14/2025 07:03:10</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:06</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F23112')">
+                            <div>
+                                <h4 class="finding-title">🟡 Computer Objects in Default Container</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F23112</span>
+                                    <span class="finding-category">AD Structure</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F23112">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F23112">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>2 computer objects found in default Computers container.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Objects in default containers cannot have Group Policy applied effectively.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Move computer objects to appropriate organizational units for proper management.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name
+----
+Computers
+BEServer
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:53</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F18176')">
+                            <div>
+                                <h4 class="finding-title">🟡 User Objects in Default Container</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F18176</span>
+                                    <span class="finding-category">AD Structure</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F18176">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F18176">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>81 user objects found in default Users container.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Users in default container cannot have proper Group Policy targeting.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Move user objects to appropriate organizational units based on department and function.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                                                          SamAccountName
+----                                                          --------------
+WSS USER                                                      wssuser
+Ipswich Resi                                                  ipswich.resi
+SophosSAUWFH-DC0                                              SophosSAUWFH-DC0
+SophosSAUNODE20                                               SophosSAUNODE20
+SophosSAUNODE10                                               SophosSAUNODE10
+SophosSAUAG-PRINTSV0                                          SophosSAUAG-PRINTSV0
+SophosSAUAG-IPSSVR0                                           SophosSAUAG-IPSSVR0
+SophosSAUAG-FLXSVR0                                           SophosSAUAG-FLXSVR0
+SophosSAUAG-BACKUP0                                           SophosSAUAG-BACKUP0
+IUSR_AG-FLXSVR                                                IUSR_AG-FLXSVR
+AKCJDatabase                                                  AKCJDatabase
+SophosSAUASCA-DC010                                           SophosSAUASCA-DC010
+SVC_NSAccount                                                 SVC_NSAccount
+ITTraining                                                    ITTraining
+Sharepoint                                                    sharepointUserGroup
+SophosSAUTRAF-DC0                                             SophosSAUTRAF-DC0
+AccountsBills                                                 AccountsBills
+SophosSAUBEAC-DC0                                             SophosSAUBEAC-DC0
+FMConway                                                      FMConway
+COP Central                                                   COP Central
+SophosSAUFLXSVR0                                              SophosSAUFLXSVR0
+SophosSAUCHEQ-DC0                                             SophosSAUCHEQ-DC0
+SophosSAUASTW-DC010                                           SophosSAUASTW-DC010
+Claims                                                        claims
+CN Central                                                    CNCentral
+SophosSAUASTW-DC020                                           SophosSAUASTW-DC020
+portal-noreply                                                portal-noreply
+SophosSAUDC20                                                 SophosSAUDC20
+payroll                                                       payroll
+SophosSAUASBG-DC010                                           SophosSAUASBG-DC010
+SophosSAUAG-IPSSVR1                                           SophosSAUAG-IPSSVR1
+SophosSAUASTW-DC0aaa                                          SophosSAUASTW-DC0aaa
+LTP Peppermint                                                LTPPeppermint
+SophosSAUDC10                                                 SophosSAUDC10
+SophosSAUASBK-DC010                                           SophosSAUASBK-DC010
+SophosSAUASNO-DC010                                           SophosSAUASNO-DC010
+SophosSAUASTH-DC0aaa                                          SophosSAUASTH-DC0aaa
+SophosSAUASTW-DC021                                           SophosSAUASTW-DC021
+SophosSAUASIP-DC010                                           SophosSAUASIP-DC010
+SophosSAUTHET-DC0                                             SophosSAUTHET-DC0
+AdminandFacilities                                            AdminandFacilities
+Charity                                                       Charity
+IWAM_AG1                                                      IWAM_AG1
+Human Resources                                               HumanResource
+IWAM_AG-MAIL1                                                 IWAM_AG-MAIL1
+IWAM_AG-MAIL2                                                 IWAM_AG-MAIL2
+IWAM_AG-BACKUP                                                IWAM_AG-BACKUP
+IWAM_FLXSVR                                                   IWAM_FLXSVR
+CSR Suggestions                                               CSRSuggestions
+DiscoverySearchMailbox {D919BA05-46A6-415f-80AD-7E09334BB852} SM_86e3ce7812194057a
+PI Central                                                    PICentral
+IUSR_GL-EXCH1                                                 IUSR_GL-EXCH1
+NI Central                                                    NICentral
+IWAM_GL-EXCH1                                                 IWAM_GL-EXCH1
+IWAM_AG2A                                                     IWAM_AG2A
+IUSR_AG2A                                                     IUSR_AG2A
+IUSR_EVOLNT4                                                  IUSR_EVOLNT4
+IWAM_AG-IPSSVR                                                IWAM_AG-IPSSVR
+IUSR_AG-IPSSVR                                                IUSR_AG-IPSSVR
+IWAM_NODE1                                                    IWAM_NODE1
+IUSR_NODE1                                                    IUSR_NODE1
+IWAM_NODE2                                                    IWAM_NODE2
+IUSR_NODE2                                                    IUSR_NODE2
+IWAM_AG-EXCH                                                  IWAM_AG-EXCH
+IUSR_AG-EXCH                                                  IUSR_AG-EXCH
+IWAM_AG-EXCH1                                                 IWAM_AG-EXCH1
+IUSR_AG-EXCH1                                                 IUSR_AG-EXCH1
+IUSR_AG1                                                      IUSR_AG1
+IUSR_AG-MAIL1                                                 IUSR_AG-MAIL1
+IUSR_AG-MAIL2                                                 IUSR_AG-MAIL2
+IUSR_AG-BACKUP                                                IUSR_AG-BACKUP
+IUSR_FLXSVR                                                   IUSR_FLXSVR
+SophosManagement                                              SophosManagement
+CambridgeBid                                                  cbo
+COPInvoices                                                   COPInvoices
+Accounts Mailbox                                              AccountsMailbox
+Business System Training                                      BusinessSystemTraini
+axa_supplierlinks                                             axa_supplierlinks
+NewBusinessRescon                                             newbusinessResCon
+HR Email                                                      HRemail
+HR Impersonation                                              HRImpersonation
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:54</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F45172')">
+                            <div>
+                                <h4 class="finding-title">🟡 DNS Health Issues Detected</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F45172</span>
+                                    <span class="finding-category">DNS Infrastructure</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F45172">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F45172">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>DNS diagnostic tests detected configuration or operational issues.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>DNS issues can cause authentication failures and service disruptions.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review DNS configuration and resolve identified issues.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Directory Server Diagnosis
+
+
+Performing initial setup:
+
+   * Identified AD Forest. 
+   Done gathering initial info.
+
+
+Doing initial required tests
+
+   
+   Testing server: Azure\ALAZ-DC01
+
+      Starting test: Connectivity
+
+         ......................... ALAZ-DC01 passed test Connectivity
+
+
+
+Doing primary tests
+
+   
+   Testing server: Azure\ALAZ-DC01
+
+   
+      Starting test: DNS
+
+         
+
+         DNS Tests are running and not hung. Please wait a few minutes...
+
+         ......................... ALAZ-DC01 passed test DNS
+
+   
+   Running partition tests on : ForestDnsZones
+
+   
+   Running partition tests on : DomainDnsZones
+
+   
+   Running partition tests on : Schema
+
+   
+   Running partition tests on : Configuration
+
+   
+   Running partition tests on : internal
+
+   
+   Running enterprise tests on : internal.ashtongraham.co.uk
+
+      Starting test: DNS
+
+         Test results for domain controllers:
+
+            
+            DC: ALAZ-DC01.internal.ashtongraham.co.uk
+
+            Domain: internal.ashtongraham.co.uk
+
+            
+
+                  
+               TEST: Basic (Basc)
+                  Warning: Adapter 00:22:48:01:1E:9E has dynamic IP address
+
+                  (can be a misconfiguration)
+
+                  
+               TEST: Dynamic update (Dyn)
+                  Warning: Failed to delete the test record dcdiag-test-record in zone internal.ashtongraham.co.uk
+         
+               ALAZ-DC01                    PASS WARN PASS PASS WARN PASS n/a  
+         ......................... internal.ashtongraham.co.uk passed test DNS
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:33</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F94272')">
+                            <div>
+                                <h4 class="finding-title">🟡 Excessive Privileged Group Membership: Domain Admins</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F94272</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F94272">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F94272">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Domain Admins has 29 members.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Large privileged groups increase attack surface and compliance risk.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review privileged group membership and remove unnecessary accounts.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                            ObjectClass
+----                            -----------
+Administrator                   user
+Simon Bugeja (Admin)            user
+Luke Hurst (Admin)              user
+BigHand_SVC                     user
+BigHand Admin                   user
+Steven Feltham-Pye (Admin)      user
+SVC_AzureADConnect              user
+Oli Stockman (Admin)            user
+Peppermint Admin                user
+SQLServices                     user
+BH Admin                        user
+NPCXSQLAgent                    user
+NPCXSQLSrv                      user
+Svc_rmm                         user
+Rynhardt van Vuuren (Admin)     user
+Svc_Net2Admin                   user
+Josh Teague (Admin)             user
+Azure Connect                   user
+SPDocPreview                    user
+Sorren Day (Admin)              user
+svc_ADFSPepermint               user
+Nishen Harichunder (First Tech) user
+Oliver Govender (First Tech)    user
+Svc-nable                       user
+Svc-rapidfire                   user
+Lincoln Phillips-Morris (Admin) user
+sql_svc_progressDB              user
+PTLCXAdmin                      user
+Lansweeper Service Account      user
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:36</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F28109')">
+                            <div>
+                                <h4 class="finding-title">🟡 Excessive Privileged Group Membership: Administrators</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F28109</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F28109">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F28109">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Administrators has 9 members.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Large privileged groups increase attack surface and compliance risk.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review privileged group membership and remove unnecessary accounts.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                                 ObjectClass
+----                                 -----------
+Azure Connect                        user
+svc_vmm                              user
+SVC_AzureADConnect                   user
+Evolution Scheduler                  user
+Domain Admins                        group
+Enterprise Admins                    group
+Administrator                        user
+Exchange Trusted Subsystem           group
+Exchange Organization Administrators group
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:37</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F77857')">
+                            <div>
+                                <h4 class="finding-title">🟡 Sensitive Group Has Members: Remote Desktop Users</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F77857</span>
+                                    <span class="finding-category">Privileged Access</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F77857">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F77857">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Remote Desktop Users has 10 members.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Members of Remote Desktop Users have elevated privileges that could be misused.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review membership of Remote Desktop Users and remove unnecessary accounts.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                  ObjectClass
+----                  -----------
+Ashtons RDP Admins    group
+Quiss Helpdesk        user
+Quiss Solcase Account user
+Audit Investigation   user
+Peppermint Admin      user
+PlatformGateway       user
+PTLAdmin              user
+PTLDelegate           user
+IT Admins             group
+Administrator         user
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:40</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F34875')">
+                            <div>
+                                <h4 class="finding-title">🟡 Old Disabled User Accounts</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F34875</span>
+                                    <span class="finding-category">Account Hygiene</span>
+                                    <span class="finding-type">Compliance</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F34875">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F34875">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Found 165 user accounts that have been disabled for more than 90 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Old disabled accounts consume resources and may indicate incomplete cleanup processes.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review old disabled accounts and remove them if no longer needed for auditing purposes.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Name                                                          SamAccountName       LastLogonDate          WhenChanged
+----                                                          --------------       -------------          -----------
+DefaultAccount                                                DefaultAccount                              12/20/2018 8:56:04 AM
+Norwich Main Fax                                              Norwich_Main_Fax                            8/31/2022 11:47:40 AM
+Knowledge and Information Intray                              Knowledge-Intray                            8/31/2022 11:48:44 AM
+Risk and Compliance Intray                                    Risk-Intray                                 8/31/2022 11:49:59 AM
+DiscoverySearchMailbox {D919BA05-46A6-415f-80AD-7E09334BB852} SM_86e3ce7812194057a                        9/1/2022 1:37:33 PM
+Records Intray                                                Records-Intray                              10/17/2022 4:01:19 PM
+Court of Protection Intray                                    COP-Intray                                  10/17/2022 4:01:19 PM
+Family Intray                                                 Family-Intray                               10/17/2022 4:01:19 PM
+Project Management Office Intray                              PMO-Intray                                  10/25/2022 4:31:25 PM
+Norwich Resi Fax                                              NorwichResiFax                              10/25/2022 4:31:25 PM
+Dispute Resolution Intray                                     Disputes-Intray                             10/25/2022 4:31:25 PM
+Company Commercial Intray                                     COCO-Intray                                 10/25/2022 5:01:25 PM
+Centralised File Opening Intray                               CFO-Intray                                  10/28/2022 3:01:28 PM
+Bury Resi Fax                                                 bury_resi_fax                               10/28/2022 3:31:26 PM
+Agriculture and Estates Intray                                AE-Intray                                   10/28/2022 3:31:26 PM
+Commercial Property Intray                                    ComProp-Intray                              10/28/2022 3:31:26 PM
+Human Resources Intray                                        HR-Intray                                   10/28/2022 3:31:26 PM
+Finance Intray                                                Finance-Intray                              10/28/2022 4:01:27 PM
+Employment Intray                                             Employment-Intray                           10/28/2022 4:01:27 PM
+Business Systems Intray                                       BS-INTRAY                                   10/28/2022 4:01:27 PM
+COP Team D                                                    COPTeam_D                                   10/28/2022 4:01:27 PM
+Clinical Negligence Intray                                    CN-Intray                                   10/28/2022 4:01:27 PM
+French Legal Intray                                           French-Intray                               10/28/2022 4:01:27 PM
+Cambridge Main Fax                                            CambsMainFax                                10/28/2022 4:01:27 PM
+Business Development Intray                                   BD-Intray                                   10/28/2022 5:01:27 PM
+Tax and Trusts Intray                                         TT-Intray                                   10/28/2022 5:01:27 PM
+Personal Injury Intray                                        PI-Intray                                   10/28/2022 5:01:27 PM
+Regulatory Intray                                             Regulatory-Intray                           10/28/2022 5:01:27 PM
+Management Group Intray                                       Management-Intray                           10/28/2022 5:01:27 PM
+Lifetime Planning Intray - Norwich                            LTP-Intray-Norwich                          1/3/2023 4:20:16 PM
+Lifetime Planning Intray - Ipswich                            LTP-Intray-Ipswich                          1/3/2023 4:20:41 PM
+Lifetime Planning Intray - Cambridge                          LTP-Intray-Cambridge                        1/3/2023 4:21:32 PM
+Lifetime Planning Intray - Bury                               LTP-Intray-Bury                             1/3/2023 4:21:46 PM
+COP Team R                                                    COPTeam_R                                   1/27/2023 1:48:39 PM
+Residential Conveyancing Intray                               Resi-Intray                                 6/8/2023 4:37:09 PM
+COP Team C                                                    COPTeam_C                                   6/22/2023 8:42:23 AM
+krbtgt                                                        krbtgt                                      6/13/2024 7:37:00 AM
+Stephen Chalmers                                              chalm_s              10/16/2023 9:44:05 AM  6/17/2024 2:26:21 PM
+PTLSupport3                                                   ptlsupport3                                 6/19/2024 9:28:03 AM
+PTLSupport2                                                   ptlsupport2                                 6/19/2024 9:28:08 AM
+PTLSupport1                                                   ptlsupport1                                 6/19/2024 9:28:14 AM
+Emma Shaw                                                     shaw_e               3/4/2024 9:04:10 AM    6/19/2024 9:28:33 AM
+Neli Panaiti                                                  Panaiti_N            3/4/2024 9:42:39 AM    6/19/2024 9:28:40 AM
+MDTDeploy                                                     MDTDeploy            6/10/2024 11:30:20 AM  6/19/2024 9:32:46 AM
+Evolution Scheduler                                           evosched             12/20/2014 11:45:41 PM 6/19/2024 9:32:50 AM
+EvolAdmin                                                     evoladmin            4/30/2020 12:18:54 PM  6/19/2024 9:32:59 AM
+evol scheduler                                                evolsched                                   6/19/2024 9:33:04 AM
+Alanis James                                                  james_a              2/26/2024 8:59:01 AM   6/28/2024 4:41:52 PM
+Michael Fahy                                                  Fahy_M               3/21/2024 9:40:30 AM   7/1/2024 10:05:51 AM
+SophosSAUAG-PRINTSV0                                          SophosSAUAG-PRINTSV0 9/13/2011 9:07:55 PM   7/5/2024 1:04:20 PM
+SophosSAUAG-IPSSVR0                                           SophosSAUAG-IPSSVR0                         7/5/2024 1:04:20 PM
+SophosSAUAG-FLXSVR0                                           SophosSAUAG-FLXSVR0                         7/5/2024 1:04:20 PM
+SophosSAUAG-BACKUP0                                           SophosSAUAG-BACKUP0  9/27/2011 10:10:48 PM  7/5/2024 1:04:20 PM
+SophosSAUASIP-DC010                                           SophosSAUASIP-DC010  1/18/2019 3:53:50 AM   7/5/2024 1:04:20 PM
+SophosSAUASTW-DC020                                           SophosSAUASTW-DC020  2/4/2015 2:47:33 PM    7/5/2024 1:04:20 PM
+SophosSAUASTW-DC010                                           SophosSAUASTW-DC010  2/4/2015 2:47:53 PM    7/5/2024 1:04:20 PM
+SophosSAUAG-IPSSVR1                                           SophosSAUAG-IPSSVR1  3/8/2015 2:22:06 AM    7/5/2024 1:04:20 PM
+SophosSAUASTW-DC0aaa                                          SophosSAUASTW-DC0aaa 10/28/2019 3:52:47 AM  7/5/2024 1:04:20 PM
+SophosManagement                                              SophosManagement     10/27/2019 9:07:00 AM  7/5/2024 1:04:20 PM
+SophosSAUASBK-DC010                                           SophosSAUASBK-DC010  6/26/2017 9:01:18 AM   7/5/2024 1:04:20 PM
+SophosSAUASCA-DC010                                           SophosSAUASCA-DC010  1/18/2019 11:49:54 PM  7/5/2024 1:04:20 PM
+SophosSAUASNO-DC010                                           SophosSAUASNO-DC010  1/19/2019 12:19:47 AM  7/5/2024 1:04:20 PM
+SophosSAUASTH-DC0aaa                                          SophosSAUASTH-DC0aaa 1/20/2019 12:21:26 PM  7/5/2024 1:04:20 PM
+SophosSAUASTW-DC021                                           SophosSAUASTW-DC021  10/26/2019 1:34:16 AM  7/5/2024 1:04:20 PM
+SophosSAUBEAC-DC0                                             SophosSAUBEAC-DC0    3/15/2015 8:41:56 PM   7/5/2024 1:04:21 PM
+SophosSAUCHEQ-DC0                                             SophosSAUCHEQ-DC0    3/19/2015 10:10:57 AM  7/5/2024 1:04:21 PM
+SophosSAUDC20                                                 SophosSAUDC20        3/10/2015 2:07:24 PM   7/5/2024 1:04:21 PM
+SophosSAUFLXSVR0                                              SophosSAUFLXSVR0     7/2/2014 7:55:59 PM    7/5/2024 1:04:21 PM
+SophosSAUNODE20                                               SophosSAUNODE20                             7/5/2024 1:04:21 PM
+SophosSAUNODE10                                               SophosSAUNODE10                             7/5/2024 1:04:21 PM
+SophosSAUASBG-DC010                                           SophosSAUASBG-DC010  2/7/2019 9:23:43 AM    7/5/2024 1:04:21 PM
+SophosSAUDC10                                                 SophosSAUDC10        3/18/2015 4:08:11 AM   7/5/2024 1:04:21 PM
+SophosSAUTHET-DC0                                             SophosSAUTHET-DC0    3/20/2015 6:42:03 AM   7/5/2024 1:04:21 PM
+SophosSAUWFH-DC0                                              SophosSAUWFH-DC0     11/17/2011 10:38:10 PM 7/5/2024 1:04:21 PM
+SophosSAUTRAF-DC0                                             SophosSAUTRAF-DC0    3/16/2015 1:56:46 PM   7/5/2024 1:04:21 PM
+web spam catcher                                              web                                         7/5/2024 1:05:12 PM
+LFC Insurance                                                 lfc                                         7/5/2024 1:05:16 PM
+Ipswich Main Fax                                              IpswichFax                                  7/5/2024 1:17:43 PM
+Bury Main Fax                                                 BuryMainFax                                 7/5/2024 1:17:54 PM
+Ashtons HR Consulting Intray                                  AHRC_Intray                                 7/5/2024 1:18:17 PM
+Elaine Brooks                                                 brooks_e             6/5/2024 7:41:21 AM    7/5/2024 1:27:39 PM
+Elise Dowds                                                   Dowds_E              1/12/2024 9:09:42 AM   7/5/2024 1:27:48 PM
+Rebecca Hill                                                  Hill_R               5/28/2024 8:59:50 AM   7/5/2024 1:28:07 PM
+Katrina Drake                                                 drake_k              7/4/2023 8:47:14 AM    7/5/2024 1:28:47 PM
+HealthMailbox5875b208bdba4d8caf5d50d0027851e2                 HealthMailbox5875b20                        7/8/2024 11:14:25 AM
+HealthMailbox745440bca8eb4f1fb0554cea5b37b35d                 HealthMailbox745440b                        7/8/2024 11:14:25 AM
+HealthMailbox6ae95769f307474d846c5aa9ee58310e                 HealthMailbox6ae9576                        7/8/2024 11:14:25 AM
+HealthMailbox7062c66ed3e748f0a9f16d39cbc6d669                 HealthMailbox7062c66 10/28/2021 10:05:26 AM 7/8/2024 11:14:25 AM
+HealthMailbox8ab10b6a9e18417a99eb385490305a11                 HealthMailbox8ab10b6 10/28/2021 9:46:30 AM  7/8/2024 11:14:25 AM
+HealthMailbox7ade78110670442d9a74cddc44e206a3                 HealthMailbox7ade781                        7/8/2024 11:14:25 AM
+HealthMailbox3f7a39e58319412aa71ea4d58955085c                 HealthMailbox3f7a39e                        7/8/2024 11:14:25 AM
+HealthMailbox4aef67aab55b4c1d8b6406ad9c87708d                 HealthMailbox4aef67a                        7/8/2024 11:14:25 AM
+HealthMailbox6c6eb60801dd455aa0e5aa761f9d809c                 HealthMailbox6c6eb60                        7/8/2024 11:14:25 AM
+HealthMailbox75be56821ee34f5489989e9fcbfef0ee                 HealthMailbox75be568                        7/8/2024 11:14:25 AM
+HealthMailbox833db65a9ef847668b35a01bac0820cc                 HealthMailbox833db65                        7/8/2024 11:14:25 AM
+HealthMailbox106333cde8e14fb69a76a33cfd7d375a                 HealthMailbox106333c                        7/8/2024 11:14:25 AM
+HealthMailbox07bf1d610ce54cc689f914ab8811adae                 HealthMailbox07bf1d6                        7/8/2024 11:14:25 AM
+HealthMailbox43909a289770448ab25624fb649b42b4                 HealthMailbox43909a2                        7/8/2024 11:14:25 AM
+HealthMailbox67d82140eeba4a8f80266648052ec38a                 HealthMailbox67d8214                        7/8/2024 11:14:25 AM
+HealthMailbox4cef5b64e89d423a8982d6c78a4dc013                 HealthMailbox4cef5b6                        7/8/2024 11:14:25 AM
+HealthMailbox5eeed824dcf7435e92039bf20aa77bf9                 HealthMailbox5eeed82 8/25/2022 3:32:32 PM   7/8/2024 11:14:25 AM
+HealthMailbox1571f6e5b30c471aaa0186254f36c101                 HealthMailbox1571f6e 11/12/2021 8:50:50 PM  7/8/2024 11:14:25 AM
+HealthMailbox40442eb6dce44f44bd65707cbafa1cf0                 HealthMailbox40442eb 11/13/2021 8:10:08 AM  7/8/2024 11:14:25 AM
+HealthMailbox61e1bb0b5dde4dfd9cea1224d51be970                 HealthMailbox61e1bb0                        7/8/2024 11:14:25 AM
+HealthMailbox64abdc1c3dee41a8bfe5c78723af4bf8                 HealthMailbox64abdc1                        7/8/2024 11:14:25 AM
+HealthMailbox2e55f208c5ab482695eb9c0faa69dc59                 HealthMailbox2e55f20                        7/8/2024 11:14:25 AM
+HealthMailbox38dab75534d64e34b82131c370ee7af8                 HealthMailbox38dab75                        7/8/2024 11:14:25 AM
+HealthMailboxd90074598aeb46679b12513dab2acc73                 HealthMailboxd900745                        7/8/2024 11:14:26 AM
+HealthMailboxedf85f5d37b54f2d8bd5f2bd09617ad8                 HealthMailboxedf85f5                        7/8/2024 11:14:26 AM
+HealthMailboxe3619f78fc314ae08d88865fc713ba55                 HealthMailboxe3619f7                        7/8/2024 11:14:26 AM
+HealthMailboxea47a1116c5447c5b43d25d84f7aaff4                 HealthMailboxea47a11                        7/8/2024 11:14:26 AM
+HealthMailboxf998c9ecd10241388ebc55e07a4dfb23                 HealthMailboxf998c9e                        7/8/2024 11:14:26 AM
+HealthMailboxb1438e5bdb0141d4b9521a4022005a96                 HealthMailboxb1438e5                        7/8/2024 11:14:26 AM
+HealthMailbox9c3f6e29e8384806833da8e87bfc8266                 HealthMailbox9c3f6e2                        7/8/2024 11:14:26 AM
+HealthMailbox9bd9f6eabb554d088baa61417112410f                 HealthMailbox9bd9f6e                        7/8/2024 11:14:26 AM
+HealthMailboxea24330007b84bab96de76f48f8fdcd3                 HealthMailboxea24330                        7/8/2024 11:14:26 AM
+HealthMailbox9487d448b3d543fbbcf147c247829a0f                 HealthMailbox9487d44 10/28/2021 9:46:29 AM  7/8/2024 11:14:26 AM
+HealthMailboxf3aa5198ea9c42b78faabd49e50e315c                 HealthMailboxf3aa519                        7/8/2024 11:14:26 AM
+HealthMailboxeb2dcce72a5c44a8b8bb1bbc28dd4375                 HealthMailboxeb2dcce                        7/8/2024 11:14:26 AM
+HealthMailboxdc1c56fccba648b58568391eba729b92                 HealthMailboxdc1c56f                        7/8/2024 11:14:26 AM
+HealthMailboxd7f0e653095046dabcb0c2f4c0c1461e                 HealthMailboxd7f0e65                        7/8/2024 11:14:26 AM
+HealthMailboxa66eb8f7c2874b26a66c4ebb4967033d                 HealthMailboxa66eb8f                        7/8/2024 11:14:26 AM
+Katy Rush                                                     rush_k               3/25/2024 9:09:21 AM   7/18/2024 5:05:50 PM
+Syeda Mahfuz                                                  Mahfuz_S             7/3/2024 3:38:14 PM    7/19/2024 5:14:58 PM
+Mary Porch                                                    porch_m              10/19/2021 8:15:47 AM  8/6/2024 1:47:39 PM
+Ela Banfield                                                  banfield_e           7/18/2024 11:52:58 AM  10/31/2024 9:19:29 AM
+Private Wealth Disputes Intr                                  PWDisputes-intray                           11/27/2024 11:25:54 AM
+George Howard                                                 Howard_G             8/27/2024 8:21:52 AM   12/4/2024 11:59:13 AM
+Connor Cross                                                  cross_c              9/2/2024 3:18:42 PM    12/11/2024 8:21:48 AM
+Olivia Wiffen                                                 Wiffen_O             8/22/2024 11:41:03 AM  1/10/2025 2:11:07 PM
+Billie Jo Janes                                               Janes_B              9/27/2024 11:16:28 AM  1/13/2025 2:03:07 PM
+Helen Fullerton                                               fullerton_h          9/20/2024 9:19:55 AM   1/15/2025 8:48:57 AM
+Lizzie Atkinson                                               Atkinson_E           1/13/2025 9:03:39 AM   1/17/2025 5:37:46 PM
+Georgia Shipp                                                 Shipp_G              1/13/2025 8:50:34 AM   1/20/2025 10:31:18 AM
+Madison Davies                                                Davies_M             10/8/2024 11:15:01 AM  1/22/2025 11:26:24 AM
+Kate Lonergan                                                 lonergan_k           1/2/2025 9:00:19 AM    1/24/2025 5:07:05 PM
+Grace Winchester                                              winchester_g         1/23/2025 12:44:35 PM  1/24/2025 5:08:47 PM
+Katie Tooley                                                  Tooley_K             8/22/2024 8:26:06 AM   1/27/2025 11:27:27 AM
+Nabat Sotork                                                  Sotork_N             9/30/2024 8:59:36 AM   1/27/2025 4:32:24 PM
+Emilie Ancelin                                                Ancelin_E            10/23/2024 5:36:50 PM  2/3/2025 11:39:22 AM
+Ebony Flack                                                   Flack_E              1/23/2025 12:47:12 PM  2/4/2025 1:18:39 PM
+Robert Hitchcock                                              Hitchcock_R          10/28/2024 9:53:57 AM  2/11/2025 10:07:09 AM
+Sophie Burrell                                                Burrell_S            10/30/2024 9:03:59 AM  2/11/2025 10:07:21 AM
+Louise Hall                                                   hall_l               11/5/2024 8:22:19 AM   2/11/2025 2:01:37 PM
+Amy Rose                                                      Rose_A               2/6/2025 9:07:39 AM    2/14/2025 5:22:21 PM
+Zinzi Hoxsie                                                  hoxsie_z             2/13/2025 9:52:10 AM   2/18/2025 9:04:08 AM
+Lisa Shimmon                                                  Shimmon_l            2/7/2025 9:00:19 AM    2/18/2025 9:06:57 AM
+Ellen Alcock                                                  kentfiel_e           1/12/2024 9:26:03 AM   2/24/2025 9:55:37 AM
+Emir Supri                                                    supri_e              8/8/2024 8:53:34 AM    2/24/2025 3:44:15 PM
+Jessica Herbert                                               Herbert_J            2/17/2025 8:59:45 AM   2/25/2025 5:17:19 PM
+Saima Salsabil                                                Salsabil_S           11/21/2024 9:10:55 AM  2/26/2025 2:01:12 PM
+Maebel Gould                                                  gould_m              2/25/2025 9:00:35 AM   2/28/2025 5:22:04 PM
+Daniel Ingle                                                  Ingle_D              3/20/2024 3:13:19 PM   3/19/2025 11:23:49 AM
+Suzanne Whyman                                                whyman_s             12/12/2024 9:09:28 AM  3/19/2025 2:07:39 PM
+svc_fse                                                       svc_fse              11/11/2024 11:45:34 PM 3/19/2025 3:53:43 PM
+Svc_SQLALB                                                    Svc_SQLALB           10/24/2023 5:56:14 PM  3/19/2025 3:54:06 PM
+SVC-SentryOne                                                 SVC-SentryOne        3/18/2023 6:09:31 PM   3/19/2025 3:54:16 PM
+svc_vmm                                                       svc_vmm              10/27/2019 2:57:02 AM  3/19/2025 3:54:38 PM
+MICROSOFT$DPM$Acct                                            MICROSOFT$DPM$Acct   9/30/2019 10:40:41 AM  3/19/2025 3:55:20 PM
+Intranet                                                      intranet             11/11/2014 12:04:57 PM 3/19/2025 3:55:34 PM
+Joanna Bradshaw                                               bradshaw_j           11/9/2024 2:11:17 AM   3/20/2025 10:34:42 AM
+Alisha Begum                                                  begum_a              2/27/2025 10:35:50 AM  3/24/2025 2:40:13 PM
+Owain Atthill                                                 atthill_o            3/20/2025 8:51:24 AM   3/24/2025 2:41:55 PM
+Chloe Parish                                                  Parish_C             12/24/2024 9:05:42 AM  3/25/2025 9:08:15 AM
+Grace White                                                   White_G              10/21/2024 9:07:26 AM  4/10/2025 10:00:41 AM
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:41</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item medium-finding">
+                        <div class="finding-header" onclick="toggleFinding('F45431')">
+                            <div>
+                                <h4 class="finding-title">🟡 Certificates Expiring Soon</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: F45431</span>
+                                    <span class="finding-category">Certificate Services</span>
+                                    <span class="finding-type">Configuration</span>
+                                    <span class="severity-badge medium">MEDIUM</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-F45431">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-F45431">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>1 certificates will expire within 30 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Certificate expiration can cause service disruptions and authentication failures.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Review expiring certificates and plan for renewal.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">
+Subject                                                                          NotAfter
+-------                                                                          --------
+CN=0b48c5df-1935-4bb1-b336-95eb89a195e7, DC=7300c426-fef3-4ba1-b7a9-b9161ac742d1 7/15/2025 10:27:37 AM
+
+</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:41</p>
+                            </div>
+                        </div>
+                    </div>                </div>                 <div class="finding-group passed-section">
+                    <h3 class="finding-group-title">✅ SECURITY CONTROLS PASSED (4 Issues)</h3>                    <div class="finding-item passed-finding">
+                        <div class="finding-header" onclick="toggleFinding('P15728')">
+                            <div>
+                                <h4 class="finding-title">✅ Domain Controller Infrastructure Health - All Systems Operational</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: P15728</span>
+                                    <span class="finding-category">Domain Controller Health</span>
+                                    <span class="finding-type">Availability</span>
+                                    <span class="severity-badge passed">PASSED</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-P15728">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-P15728">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>All 5 domain controllers passed comprehensive health assessment with no critical issues detected.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Positive security posture - no action required.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Continue current security practices.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Domain Controller Connectivity: Successfully connected to 5 domain controllers; Domain Controller Services: Verified critical AD services (NTDS, Netlogon, DNS, KDC, W32Time, ADWS) are running; DCDIAG Health Checks: Comprehensive diagnostic tests passed (Connectivity, Advertising, Replications, Services, SysVol); PowerShell Remoting: Successfully established secure connections for detailed monitoring</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>Microsoft</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:04:48</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item passed-finding">
+                        <div class="finding-header" onclick="toggleFinding('P85701')">
+                            <div>
+                                <h4 class="finding-title">✅ Strong Minimum Password Length</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: P85701</span>
+                                    <span class="finding-category">Password Policy</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge passed">PASSED</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-P85701">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-P85701">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Minimum password length is appropriately set to 14 characters.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Positive security posture - no action required.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Continue current security practices.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Current setting: 14 characters (meets recommended standard of 14+)</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>NIST</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:35</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item passed-finding">
+                        <div class="finding-header" onclick="toggleFinding('P11270')">
+                            <div>
+                                <h4 class="finding-title">✅ Password Complexity Properly Enforced</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: P11270</span>
+                                    <span class="finding-category">Password Policy</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge passed">PASSED</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-P11270">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-P11270">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Password complexity requirements are enabled and enforced.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Positive security posture - no action required.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Continue current security practices.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Complexity enabled: True</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:35</p>
+                            </div>
+                        </div>
+                    </div>                    <div class="finding-item passed-finding">
+                        <div class="finding-header" onclick="toggleFinding('P63299')">
+                            <div>
+                                <h4 class="finding-title">✅ Appropriate Minimum Password Age Policy</h4>
+                                <div class="finding-meta">
+                                    <span class="finding-id">ID: P63299</span>
+                                    <span class="finding-category">Password Policy</span>
+                                    <span class="finding-type">Security</span>
+                                    <span class="severity-badge passed">PASSED</span>
+                                </div>
+                            </div>
+                            <span class="finding-toggle" id="toggle-P63299">+</span>
+                        </div>
+                        
+                        <div class="finding-content" id="content-P63299">
+                            <div class="description-section">
+                                <h5>📋 Description:</h5>
+                                <p>Minimum password age is appropriately set to 1 days.</p>
+                            </div>
+                            
+                            <div class="impact-section">
+                                <h5>⚠️ Business Impact:</h5>
+                                <p>Positive security posture - no action required.</p>
+                            </div>
+                            
+                            <div class="recommendation-section">
+                                <h5>🔧 Recommended Action:</h5>
+                                <p>Continue current security practices.</p>
+                            </div>
+                            
+                                                    <div class="evidence-section">
+                            <h5>📊 Evidence/Data:</h5>
+                            <pre class="evidence-data">Current setting: 1 days (prevents password history bypass)</pre>
+                        </div>
+                            
+                            <div class="finding-footer">
+                                <p><strong>📝 Compliance Framework:</strong> <span class='compliance-tag'>CIS</span></p>
+                                <p><strong>⏰ Discovered:</strong> 2025-07-14 12:05:35</p>
+                            </div>
+                        </div>
+                    </div>                </div>
+            </div>
+        </div>
+        
+
+
+        <div class="section">
+            <h2>📊 Executive Summary & Risk Analysis</h2>
+            <div class="executive-summary">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>🔍 Audit Scope</h3>
+                        <ul>
+                            <li><strong>Customer:</strong> Ashtons Legal</li>
+                            <li><strong>Audit Date:</strong> July 14, 2025</li>
+                            <li><strong>Engineer/Auditor:</strong> Nishen Harichunder</li>
+                            <li><strong>Systems Assessed:</strong> Active Directory Infrastructure</li>
+                            <li><strong>Note:</strong> Server infrastructure audit temporarily disabled</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>⚠️ Risk Assessment</h3>
+                        <div class="risk-summary">
+                            <p><strong>Overall Risk Level:</strong> <span class="risk-level high">HIGH</span></p>
+                            <p><strong>Priority Actions:</strong> 12 immediate items</p>
+                            <p><strong>Total Findings:</strong> 28 security issues identified</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="key-findings">
+                    <h3>🎯 Key Security Concerns</h3>
+                    <div class="concern-list">
+                        <div class="concern-item">
+                            <span class="concern-icon">🟠</span>
+                            <div class="concern-content">
+                                <strong>Privileged Access:</strong> Inactive Privileged Account: BigHand Admin
+                                <br><small>Inactive privileged accounts create security risk and compliance violations.</small>
+                            </div>
+                        </div>                         <div class="concern-item">
+                            <span class="concern-icon">🟠</span>
+                            <div class="concern-content">
+                                <strong>Privileged Access:</strong> Inactive Privileged Account: evosched
+                                <br><small>Inactive privileged accounts create security risk and compliance violations.</small>
+                            </div>
+                        </div>                         <div class="concern-item">
+                            <span class="concern-icon">🟠</span>
+                            <div class="concern-content">
+                                <strong>Privileged Access:</strong> Inactive Privileged Account: SPDocPreview
+                                <br><small>Inactive privileged accounts create security risk and compliance violations.</small>
+                            </div>
+                        </div>                         <div class="concern-item">
+                            <span class="concern-icon">🟠</span>
+                            <div class="concern-content">
+                                <strong>Privileged Access:</strong> Inactive Privileged Account: SVC_AzureADConnect
+                                <br><small>Inactive privileged accounts create security risk and compliance violations.</small>
+                            </div>
+                        </div>                         <div class="concern-item">
+                            <span class="concern-icon">🟠</span>
+                            <div class="concern-content">
+                                <strong>Privileged Access:</strong> Inactive Privileged Account: SVC_AzureADConnect
+                                <br><small>Inactive privileged accounts create security risk and compliance violations.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="compliance-overview">
+                    <h3>📋 Compliance Framework Analysis</h3>
+                    <div class="compliance-grid">
+                        <div class="compliance-item">
+                            <h4>ISO27001</h4>
+                            <p>8 findings (0 critical, 8 high priority)</p>
+                        </div>                         <div class="compliance-item">
+                            <h4>Microsoft</h4>
+                            <p>8 findings (0 critical, 1 high priority)</p>
+                        </div>                         <div class="compliance-item">
+                            <h4>CIS</h4>
+                            <p>7 findings (0 critical, 0 high priority)</p>
+                        </div>                         <div class="compliance-item">
+                            <h4>NIST</h4>
+                            <p>4 findings (0 critical, 3 high priority)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <p><strong>Audit Summary</strong></p>
+            <p>This comprehensive audit assessed 28 security and compliance findings across the Active Directory infrastructure.</p>
+        </div>
+    </div>
+
+    <script>
+        // Collapsible findings functionality
+        function toggleFinding(findingId) {
+            const content = document.getElementById('content-' + findingId);
+            const toggle = document.getElementById('toggle-' + findingId);
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.textContent = '+';
+                toggle.classList.remove('open');
+            } else {
+                content.classList.add('show');
+                toggle.textContent = '−';
+                toggle.classList.add('open');
+            }
+        }
+        
+        // Expand/Collapse all functions
+        function expandAll() {
+            document.querySelectorAll('.finding-content').forEach(content => {
+                content.classList.add('show');
+            });
+            document.querySelectorAll('.finding-toggle').forEach(toggle => {
+                toggle.textContent = '−';
+                toggle.classList.add('open');
+            });
+        }
+        
+        function collapseAll() {
+            document.querySelectorAll('.finding-content').forEach(content => {
+                content.classList.remove('show');
+            });
+            document.querySelectorAll('.finding-toggle').forEach(toggle => {
+                toggle.textContent = '+';
+                toggle.classList.remove('open');
+            });
+        }
+        
+        console.log('Infrastructure Audit Report loaded successfully');
+        console.log('Total findings: 28');
+        console.log('Risk level: HIGH');
+        
+        // Initialize all findings as collapsed by default
+        document.addEventListener('DOMContentLoaded', function() {
+            collapseAll();
+        });
+    </script>
+</body>
+</html>

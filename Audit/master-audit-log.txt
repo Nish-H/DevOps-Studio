@@ -1,0 +1,430 @@
+[2025-07-14 02:31:00] [Header] Starting Master Infrastructure Audit for Ashtons Legal
+[2025-07-14 02:31:00] [Info] Technician: Nishen Harichunder
+[2025-07-14 02:31:01] [Info] Output Directory: C:\ServerAudits
+[2025-07-14 02:31:01] [Info] Export Formats: HTML, Excel, CSV
+[2025-07-14 02:31:01] [Info] Logo path initialized: 
+[2025-07-14 02:31:01] [Info] Overall Progress: 0% - Starting Active Directory assessment...
+[2025-07-14 02:31:01] [Header] Starting Active Directory Infrastructure Health Assessment
+[2025-07-14 02:31:01] [Success] Connected to domain: internal.ashtongraham.co.uk
+[2025-07-14 02:31:01] [Info] Forest functional level: Windows2012R2Forest
+[2025-07-14 02:31:01] [Info] Domain functional level: Windows2012R2Domain
+[2025-07-14 02:31:01] [Info] Checking Domain Controller Health...
+[2025-07-14 02:31:01] [Info] Found 5 domain controllers
+[2025-07-14 02:31:01] [Info] Testing DC: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:02] [Info] Testing connectivity and establishing session to ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:02] [Info] Testing WinRM connectivity to ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:12] [Success] PowerShell remoting is working on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:12] [Success] PowerShell remoting session established to ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:18] [Info] Processing DC health data for ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:18] [Success] Service KDC on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Success] Service W32Time on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Success] Service Netlogon on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Success] Service ADWS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Success] Service DNS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Success] Service NTDS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:31:18] [Error] [High] Domain Controller Health - Critical Events on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:18] [Info] Running DCDIAG tests on ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:18] [Info] Running comprehensive DCDIAG on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:52] [Success] All DCDIAG tests passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:52] [Info] Running focused DCDIAG test: Connectivity on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:52] [Success] DCDIAG Connectivity test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:52] [Info] Running focused DCDIAG test: Advertising on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Success] DCDIAG Advertising test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Info] Running focused DCDIAG test: Replications on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Success] DCDIAG Replications test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Info] Running focused DCDIAG test: Services on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Success] DCDIAG Services test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Info] Running focused DCDIAG test: SysVolCheck on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Success] DCDIAG SysVolCheck test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:53] [Info] Testing DC: ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:54] [Info] Testing connectivity and establishing session to ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:54] [Info] Testing WinRM connectivity to ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:31:57] [Success] PowerShell remoting is working on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:31:58] [Success] PowerShell remoting session established to ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:04] [Info] Processing DC health data for ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:04] [Success] Service KDC on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Success] Service W32Time on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Success] Service Netlogon on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Success] Service ADWS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Success] Service DNS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Success] Service NTDS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:04] [Error] [High] Domain Controller Health - Critical Events on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:04] [Info] Running DCDIAG tests on ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:04] [Info] Running comprehensive DCDIAG on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Success] All DCDIAG tests passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Info] Running focused DCDIAG test: Connectivity on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Success] DCDIAG Connectivity test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Info] Running focused DCDIAG test: Advertising on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Success] DCDIAG Advertising test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:38] [Info] Running focused DCDIAG test: Replications on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:39] [Success] DCDIAG Replications test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:39] [Info] Running focused DCDIAG test: Services on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:40] [Success] DCDIAG Services test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:40] [Info] Running focused DCDIAG test: SysVolCheck on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:40] [Success] DCDIAG SysVolCheck test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:40] [Info] Testing DC: ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:41] [Info] Testing connectivity and establishing session to ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:41] [Info] Testing WinRM connectivity to ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:45] [Success] PowerShell remoting is working on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:45] [Success] PowerShell remoting session established to ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:51] [Info] Processing DC health data for ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:51] [Success] Service KDC on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Success] Service W32Time on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Success] Service Netlogon on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Success] Service ADWS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Success] Service DNS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Success] Service NTDS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:32:51] [Error] [High] Domain Controller Health - Critical Events on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:32:51] [Info] Running DCDIAG tests on ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:32:51] [Info] Running comprehensive DCDIAG on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:27] [Success] All DCDIAG tests passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:27] [Info] Running focused DCDIAG test: Connectivity on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:27] [Success] DCDIAG Connectivity test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:27] [Info] Running focused DCDIAG test: Advertising on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:28] [Success] DCDIAG Advertising test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:28] [Info] Running focused DCDIAG test: Replications on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:29] [Success] DCDIAG Replications test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:29] [Info] Running focused DCDIAG test: Services on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:31] [Success] DCDIAG Services test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:31] [Info] Running focused DCDIAG test: SysVolCheck on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:32] [Success] DCDIAG SysVolCheck test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:32] [Info] Testing DC: ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:33] [Info] Testing connectivity and establishing session to ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:33:33] [Info] Testing WinRM connectivity to ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:33:36] [Success] PowerShell remoting is working on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:37] [Success] PowerShell remoting session established to ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:43] [Info] Processing DC health data for ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:33:43] [Success] Service KDC on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Success] Service W32Time on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Success] Service Netlogon on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Success] Service ADWS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Success] Service DNS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Success] Service NTDS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:33:43] [Error] [High] Domain Controller Health - Critical Events on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:33:43] [Info] Running DCDIAG tests on ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:33:43] [Info] Running comprehensive DCDIAG on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:48] [Success] All DCDIAG tests passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:48] [Info] Running focused DCDIAG test: Connectivity on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:48] [Success] DCDIAG Connectivity test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:48] [Info] Running focused DCDIAG test: Advertising on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:49] [Success] DCDIAG Advertising test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:49] [Info] Running focused DCDIAG test: Replications on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:50] [Success] DCDIAG Replications test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:50] [Info] Running focused DCDIAG test: Services on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:52] [Success] DCDIAG Services test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:52] [Info] Running focused DCDIAG test: SysVolCheck on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:53] [Success] DCDIAG SysVolCheck test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:53] [Info] Testing DC: ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:54] [Info] Testing connectivity and establishing session to ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:34:54] [Info] Testing WinRM connectivity to ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:34:57] [Success] PowerShell remoting is working on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:34:58] [Success] PowerShell remoting session established to ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:05] [Info] Processing DC health data for ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:35:05] [Success] Service KDC on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:05] [Success] Service W32Time on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:05] [Success] Service Netlogon on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:05] [Success] Service ADWS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:05] [Success] Service DNS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:06] [Success] Service NTDS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:35:06] [Error] [High] Domain Controller Health - Critical Events on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:06] [Info] Running DCDIAG tests on ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:35:06] [Info] Running comprehensive DCDIAG on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:38] [Success] All DCDIAG tests passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:38] [Info] Running focused DCDIAG test: Connectivity on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:38] [Success] DCDIAG Connectivity test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:38] [Info] Running focused DCDIAG test: Advertising on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:39] [Success] DCDIAG Advertising test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:39] [Info] Running focused DCDIAG test: Replications on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:40] [Success] DCDIAG Replications test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:40] [Info] Running focused DCDIAG test: Services on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:41] [Success] DCDIAG Services test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:41] [Info] Running focused DCDIAG test: SysVolCheck on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:42] [Success] DCDIAG SysVolCheck test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:42] [Info] Performing Extended Domain Controller Health Checks...
+[2025-07-14 02:35:42] [Info] Testing domain controllers in internal.ashtongraham.co.uk
+[2025-07-14 02:35:42] [Info] Testing DC: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:43] [Error] [Critical] Domain Controller Health - Critical Issues on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:43] [Info] Testing DC: ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:45] [Error] [Critical] Domain Controller Health - Critical Issues on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:45] [Info] Testing DC: ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:47] [Error] [Critical] Domain Controller Health - Critical Issues on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:47] [Info] Testing DC: ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:48] [Error] [Critical] Domain Controller Health - Critical Issues on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:48] [Info] Testing DC: ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:51] [Error] [Critical] Domain Controller Health - Critical Issues on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:51] [Error] [Critical] Domain Controller Health - Critical Domain Controller Issues Detected
+[2025-07-14 02:35:51] [Success] Extended DC health check completed. Tested 5 domain controllers.
+[2025-07-14 02:35:51] [Info] Checking Active Directory Replication Health...
+[2025-07-14 02:35:53] [Info] Checking FSMO Role Holder Availability...
+[2025-07-14 02:35:53] [Info] Checking Infrastructure Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:53] [Info] Checking Schema Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:53] [Info] Checking PDC Emulator on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:53] [Info] Checking Domain Naming Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:53] [Info] Checking RID Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:35:53] [Info] Analyzing AD Container Structure and Best Practices...
+[2025-07-14 02:35:53] [Warning] [Medium] AD Structure - Computer Objects in Default Container
+[2025-07-14 02:35:53] [Warning] [Medium] AD Structure - User Objects in Default Container
+[2025-07-14 02:35:53] [Info] Analyzing Group Policy Configuration and Compliance...
+[2025-07-14 02:35:53] [Warning] Group Policy module not available, skipping GP analysis
+[2025-07-14 02:35:53] [Info] [Info] Group Policy - Group Policy Module Not Available
+[2025-07-14 02:35:53] [Info] Analyzing Service Account Security...
+[2025-07-14 02:35:54] [Error] [High] Service Accounts - Service Accounts with Old Passwords
+[2025-07-14 02:35:54] [Error] [High] Kerberos Security - KRBTGT Password Too Old
+[2025-07-14 02:35:54] [Info] Analyzing DNS Infrastructure Health...
+[2025-07-14 02:35:54] [Info] Running DNS diagnostics against PDC Emulator: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:36:18] [Warning] [Medium] DNS Infrastructure - DNS Health Issues Detected
+[2025-07-14 02:36:18] [Warning] Could not check DNS zones (may not be DNS server)
+[2025-07-14 02:36:18] [Info] Analyzing Active Directory Security Configuration...
+[2025-07-14 02:36:18] [Info] Analyzing complete password policy configuration...
+[2025-07-14 02:36:18] [Info] [Info] Password Policy - Complete Password Policy Configuration
+[2025-07-14 02:36:18] [Success] [PASSED] Password Policy - Strong Minimum Password Length
+[2025-07-14 02:36:18] [Success] [PASSED] Password Policy - Password Complexity Properly Enforced
+[2025-07-14 02:36:18] [Error] [High] Password Policy - Password Never Expires Policy
+[2025-07-14 02:36:18] [Success] [PASSED] Password Policy - Appropriate Minimum Password Age Policy
+[2025-07-14 02:36:18] [Info] Checking for accounts with problematic password settings...
+[2025-07-14 02:36:18] [Error] [High] Account Security - Non-Service Accounts with Password Never Expires
+[2025-07-14 02:36:18] [Info] Analyzing privileged and sensitive group memberships...
+[2025-07-14 02:36:18] [Warning] [Medium] Privileged Access - Excessive Privileged Group Membership: Domain Admins
+[2025-07-14 02:36:19] [Warning] [Medium] Privileged Access - Excessive Privileged Group Membership: Administrators
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: BigHand Admin
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect2
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: SPDocPreview
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect2
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: svc_vmm
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect
+[2025-07-14 02:36:19] [Error] [High] Privileged Access - Inactive Privileged Account: evosched
+[2025-07-14 02:36:20] [Warning] [Medium] Privileged Access - Sensitive Group Has Members: Remote Desktop Users
+[2025-07-14 02:36:20] [Info] Checking for disabled user accounts...
+[2025-07-14 02:36:20] [Warning] [Medium] Account Hygiene - Old Disabled User Accounts
+[2025-07-14 02:36:20] [Info] Analyzing Certificate Services Infrastructure...
+[2025-07-14 02:36:20] [Info] Certificate Services not installed on this system
+[2025-07-14 02:36:20] [Warning] [Medium] Certificate Services - Certificates Expiring Soon
+[2025-07-14 02:36:20] [Warning] Server infrastructure audit temporarily disabled due to connectivity issues
+[2025-07-14 02:36:20] [Info] Focus on Active Directory findings - server audit can be run separately if needed
+[2025-07-14 02:36:20] [Info] Overall Progress: 67% - Generating comprehensive reports...
+[2025-07-14 02:36:20] [Header] Generating comprehensive audit reports...
+[2025-07-14 02:36:20] [Info] Generating HTML report...
+[2025-07-14 02:36:20] [Success] HTML report saved: C:\ServerAudits\Infrastructure-Audit-Report.html
+[2025-07-14 02:36:20] [Info] Generating Excel report...
+[2025-07-14 02:36:22] [Success] Excel report saved: C:\ServerAudits\Infrastructure-Audit-Report.xlsx
+[2025-07-14 02:36:22] [Info] Generating CSV reports...
+[2025-07-14 02:36:22] [Success] CSV reports saved: C:\ServerAudits\Audit-Findings.csv, C:\ServerAudits\Server-Status.csv
+[2025-07-14 02:36:22] [Info] Generating executive summary...
+[2025-07-14 02:36:22] [Success] Executive summary saved: C:\ServerAudits\Executive-Summary.txt
+[2025-07-14 02:36:22] [Success] All reports generated successfully in: C:\ServerAudits
+[2025-07-14 02:36:22] [Success] Master Infrastructure Audit completed successfully
+[2025-07-14 02:36:22] [Info] Total execution time: 5.36 minutes
+[2025-07-14 02:53:03] [Header] Starting Master Infrastructure Audit for Ashtons Legal
+[2025-07-14 02:53:04] [Info] Technician: Nishen Harichunder
+[2025-07-14 02:53:04] [Info] Output Directory: C:\ServerAudits
+[2025-07-14 02:53:04] [Info] Export Formats: HTML, Excel, CSV
+[2025-07-14 02:53:04] [Info] Logo path initialized: 
+[2025-07-14 02:53:04] [Info] Overall Progress: 0% - Starting Active Directory assessment...
+[2025-07-14 02:53:04] [Header] Starting Active Directory Infrastructure Health Assessment
+[2025-07-14 02:53:04] [Success] Connected to domain: internal.ashtongraham.co.uk
+[2025-07-14 02:53:04] [Info] Forest functional level: Windows2012R2Forest
+[2025-07-14 02:53:04] [Info] Domain functional level: Windows2012R2Domain
+[2025-07-14 02:53:04] [Info] Checking Domain Controller Health...
+[2025-07-14 02:53:04] [Info] Found 5 domain controllers
+[2025-07-14 02:53:04] [Info] Testing DC: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:05] [Info] Testing connectivity and establishing session to ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:05] [Info] Testing WinRM connectivity to ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:09] [Success] PowerShell remoting is working on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:09] [Success] PowerShell remoting session established to ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:15] [Info] Processing DC health data for ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:15] [Success] Service KDC on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Success] Service W32Time on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Success] Service Netlogon on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Success] Service ADWS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Success] Service DNS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Success] Service NTDS on ALAZ-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:15] [Warning] [Medium] Domain Controller Health - System Events Requiring Attention on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:15] [Info] Running DCDIAG tests on ALAZ-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:15] [Info] Running comprehensive DCDIAG on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Success] All DCDIAG tests passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Info] Running focused DCDIAG test: Connectivity on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Success] DCDIAG Connectivity test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Info] Running focused DCDIAG test: Advertising on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Success] DCDIAG Advertising test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:45] [Info] Running focused DCDIAG test: Replications on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Success] DCDIAG Replications test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Info] Running focused DCDIAG test: Services on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Success] DCDIAG Services test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Info] Running focused DCDIAG test: SysVolCheck on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Success] DCDIAG SysVolCheck test passed on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:46] [Info] Testing DC: ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:47] [Info] Testing connectivity and establishing session to ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:47] [Info] Testing WinRM connectivity to ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:50] [Success] PowerShell remoting is working on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:51] [Success] PowerShell remoting session established to ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:53:57] [Info] Processing DC health data for ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:57] [Success] Service KDC on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Success] Service W32Time on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Success] Service Netlogon on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Success] Service ADWS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Success] Service DNS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Success] Service NTDS on ALIP-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:53:57] [Info] Running DCDIAG tests on ALIP-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:53:57] [Info] Running comprehensive DCDIAG on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:30] [Success] All DCDIAG tests passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:30] [Info] Running focused DCDIAG test: Connectivity on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:30] [Success] DCDIAG Connectivity test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:30] [Info] Running focused DCDIAG test: Advertising on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:31] [Success] DCDIAG Advertising test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:31] [Info] Running focused DCDIAG test: Replications on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:31] [Success] DCDIAG Replications test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:31] [Info] Running focused DCDIAG test: Services on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:32] [Success] DCDIAG Services test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:32] [Info] Running focused DCDIAG test: SysVolCheck on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:33] [Success] DCDIAG SysVolCheck test passed on ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:33] [Info] Testing DC: ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:34] [Info] Testing connectivity and establishing session to ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:54:34] [Info] Testing WinRM connectivity to ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:54:37] [Success] PowerShell remoting is working on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:37] [Success] PowerShell remoting session established to ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:54:43] [Info] Processing DC health data for ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:54:43] [Success] Service KDC on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Success] Service W32Time on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Success] Service Netlogon on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Success] Service ADWS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Success] Service DNS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Success] Service NTDS on ALNO-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:54:43] [Info] Running DCDIAG tests on ALNO-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:54:43] [Info] Running comprehensive DCDIAG on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:24] [Success] All DCDIAG tests passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:24] [Info] Running focused DCDIAG test: Connectivity on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:25] [Success] DCDIAG Connectivity test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:25] [Info] Running focused DCDIAG test: Advertising on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:26] [Success] DCDIAG Advertising test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:26] [Info] Running focused DCDIAG test: Replications on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:27] [Success] DCDIAG Replications test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:27] [Info] Running focused DCDIAG test: Services on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:28] [Success] DCDIAG Services test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:28] [Info] Running focused DCDIAG test: SysVolCheck on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:29] [Success] DCDIAG SysVolCheck test passed on ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:29] [Info] Testing DC: ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:30] [Info] Testing connectivity and establishing session to ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:55:30] [Info] Testing WinRM connectivity to ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:55:33] [Success] PowerShell remoting is working on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:34] [Success] PowerShell remoting session established to ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:55:40] [Info] Processing DC health data for ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:55:40] [Success] Service KDC on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Success] Service W32Time on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Success] Service Netlogon on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Success] Service ADWS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Success] Service DNS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Success] Service NTDS on ALCA-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:55:40] [Info] Running DCDIAG tests on ALCA-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:55:40] [Info] Running comprehensive DCDIAG on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:40] [Success] All DCDIAG tests passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:40] [Info] Running focused DCDIAG test: Connectivity on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:41] [Success] DCDIAG Connectivity test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:41] [Info] Running focused DCDIAG test: Advertising on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:42] [Success] DCDIAG Advertising test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:42] [Info] Running focused DCDIAG test: Replications on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:43] [Success] DCDIAG Replications test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:43] [Info] Running focused DCDIAG test: Services on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:44] [Success] DCDIAG Services test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:44] [Info] Running focused DCDIAG test: SysVolCheck on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:45] [Success] DCDIAG SysVolCheck test passed on ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:45] [Info] Testing DC: ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:46] [Info] Testing connectivity and establishing session to ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:56:46] [Info] Testing WinRM connectivity to ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:56:49] [Success] PowerShell remoting is working on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:50] [Success] PowerShell remoting session established to ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:56:55] [Info] Processing DC health data for ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:56:55] [Success] Service KDC on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Success] Service W32Time on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Success] Service Netlogon on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Success] Service ADWS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Success] Service DNS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Success] Service NTDS on ALFH-DC01.internal.ashtongraham.co.uk - Running
+[2025-07-14 02:56:55] [Info] Running DCDIAG tests on ALFH-DC01.internal.ashtongraham.co.uk...
+[2025-07-14 02:56:55] [Info] Running comprehensive DCDIAG on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:27] [Success] All DCDIAG tests passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:27] [Info] Running focused DCDIAG test: Connectivity on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:28] [Success] DCDIAG Connectivity test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:28] [Info] Running focused DCDIAG test: Advertising on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:28] [Success] DCDIAG Advertising test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:28] [Info] Running focused DCDIAG test: Replications on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:29] [Success] DCDIAG Replications test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:29] [Info] Running focused DCDIAG test: Services on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:30] [Success] DCDIAG Services test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:30] [Info] Running focused DCDIAG test: SysVolCheck on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:31] [Success] DCDIAG SysVolCheck test passed on ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:31] [Info] Performing Extended Domain Controller Health Checks...
+[2025-07-14 02:57:31] [Info] Testing domain controllers in internal.ashtongraham.co.uk
+[2025-07-14 02:57:32] [Info] Testing DC: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:32] [Warning] Extended health check marked ALAZ-DC01.internal.ashtongraham.co.uk as critical due to: Service Check Failed, DCDIAG Connectivity Failed, DCDIAG Replication Failed, DCDIAG Services Failed, DCDIAG Advertising Failed, DCDIAG SysVol Failed
+[2025-07-14 02:57:32] [Info] Testing DC: ALCA-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:35] [Warning] Extended health check marked ALCA-DC01.internal.ashtongraham.co.uk as critical due to: Service Check Failed, DCDIAG Connectivity Failed, DCDIAG Replication Failed, DCDIAG Services Failed, DCDIAG Advertising Failed, DCDIAG SysVol Failed
+[2025-07-14 02:57:35] [Info] Testing DC: ALFH-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:37] [Warning] Extended health check marked ALFH-DC01.internal.ashtongraham.co.uk as critical due to: Service Check Failed, DCDIAG Connectivity Failed, DCDIAG Replication Failed, DCDIAG Services Failed, DCDIAG Advertising Failed, DCDIAG SysVol Failed
+[2025-07-14 02:57:37] [Info] Testing DC: ALIP-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:38] [Warning] Extended health check marked ALIP-DC01.internal.ashtongraham.co.uk as critical due to: Service Check Failed, DCDIAG Connectivity Failed, DCDIAG Replication Failed, DCDIAG Services Failed, DCDIAG Advertising Failed, DCDIAG SysVol Failed
+[2025-07-14 02:57:38] [Info] Testing DC: ALNO-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:40] [Warning] Extended health check marked ALNO-DC01.internal.ashtongraham.co.uk as critical due to: Service Check Failed, DCDIAG Connectivity Failed, DCDIAG Replication Failed, DCDIAG Services Failed, DCDIAG Advertising Failed, DCDIAG SysVol Failed
+[2025-07-14 02:57:41] [Error] [Critical] Domain Controller Health - Critical Domain Controller Issues Detected
+[2025-07-14 02:57:41] [Success] Extended DC health check completed. Tested 5 domain controllers.
+[2025-07-14 02:57:41] [Info] Checking Active Directory Replication Health...
+[2025-07-14 02:57:42] [Info] Checking FSMO Role Holder Availability...
+[2025-07-14 02:57:43] [Info] Checking Infrastructure Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:43] [Info] Checking Schema Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:43] [Info] Checking PDC Emulator on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:43] [Info] Checking Domain Naming Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:43] [Info] Checking RID Master on ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:57:43] [Info] Analyzing AD Container Structure and Best Practices...
+[2025-07-14 02:57:43] [Warning] [Medium] AD Structure - Computer Objects in Default Container
+[2025-07-14 02:57:43] [Warning] [Medium] AD Structure - User Objects in Default Container
+[2025-07-14 02:57:43] [Info] Analyzing Group Policy Configuration and Compliance...
+[2025-07-14 02:57:43] [Warning] Group Policy module not available, skipping GP analysis
+[2025-07-14 02:57:43] [Info] [Info] Group Policy - Group Policy Module Not Available
+[2025-07-14 02:57:43] [Info] Analyzing Service Account Security...
+[2025-07-14 02:57:43] [Error] [High] Service Accounts - Service Accounts with Old Passwords
+[2025-07-14 02:57:43] [Error] [High] Kerberos Security - KRBTGT Password Too Old
+[2025-07-14 02:57:43] [Info] Analyzing DNS Infrastructure Health...
+[2025-07-14 02:57:43] [Info] Running DNS diagnostics against PDC Emulator: ALAZ-DC01.internal.ashtongraham.co.uk
+[2025-07-14 02:58:07] [Warning] [Medium] DNS Infrastructure - DNS Health Issues Detected
+[2025-07-14 02:58:07] [Warning] Could not check DNS zones (may not be DNS server)
+[2025-07-14 02:58:07] [Info] Analyzing Active Directory Security Configuration...
+[2025-07-14 02:58:08] [Info] Analyzing complete password policy configuration...
+[2025-07-14 02:58:08] [Info] [Info] Password Policy - Complete Password Policy Configuration
+[2025-07-14 02:58:08] [Success] [PASSED] Password Policy - Strong Minimum Password Length
+[2025-07-14 02:58:08] [Success] [PASSED] Password Policy - Password Complexity Properly Enforced
+[2025-07-14 02:58:08] [Error] [High] Password Policy - Password Never Expires Policy
+[2025-07-14 02:58:08] [Success] [PASSED] Password Policy - Appropriate Minimum Password Age Policy
+[2025-07-14 02:58:08] [Info] Checking for accounts with problematic password settings...
+[2025-07-14 02:58:08] [Error] [High] Account Security - Non-Service Accounts with Password Never Expires
+[2025-07-14 02:58:08] [Info] Analyzing privileged and sensitive group memberships...
+[2025-07-14 02:58:08] [Warning] [Medium] Privileged Access - Excessive Privileged Group Membership: Domain Admins
+[2025-07-14 02:58:08] [Warning] [Medium] Privileged Access - Excessive Privileged Group Membership: Administrators
+[2025-07-14 02:58:08] [Error] [High] Privileged Access - Inactive Privileged Account: BigHand Admin
+[2025-07-14 02:58:08] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect
+[2025-07-14 02:58:08] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect2
+[2025-07-14 02:58:08] [Error] [High] Privileged Access - Inactive Privileged Account: SPDocPreview
+[2025-07-14 02:58:09] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect2
+[2025-07-14 02:58:09] [Error] [High] Privileged Access - Inactive Privileged Account: svc_vmm
+[2025-07-14 02:58:09] [Error] [High] Privileged Access - Inactive Privileged Account: SVC_AzureADConnect
+[2025-07-14 02:58:09] [Error] [High] Privileged Access - Inactive Privileged Account: evosched
+[2025-07-14 02:58:09] [Warning] [Medium] Privileged Access - Sensitive Group Has Members: Remote Desktop Users
+[2025-07-14 02:58:09] [Info] Checking for disabled user accounts...
+[2025-07-14 02:58:09] [Warning] [Medium] Account Hygiene - Old Disabled User Accounts
+[2025-07-14 02:58:09] [Info] Analyzing Certificate Services Infrastructure...
+[2025-07-14 02:58:09] [Info] Certificate Services not installed on this system
+[2025-07-14 02:58:10] [Warning] [Medium] Certificate Services - Certificates Expiring Soon
+[2025-07-14 02:58:10] [Warning] Server infrastructure audit temporarily disabled due to connectivity issues
+[2025-07-14 02:58:10] [Info] Focus on Active Directory findings - server audit can be run separately if needed
+[2025-07-14 02:58:10] [Info] Overall Progress: 67% - Generating comprehensive reports...
+[2025-07-14 02:58:10] [Header] Generating comprehensive audit reports...
+[2025-07-14 02:58:10] [Info] Generating HTML report...
+[2025-07-14 02:58:10] [Success] HTML report saved: C:\ServerAudits\Infrastructure-Audit-Report.html
+[2025-07-14 02:58:10] [Info] Generating Excel report...
+[2025-07-14 02:58:11] [Success] Excel report saved: C:\ServerAudits\Infrastructure-Audit-Report.xlsx
+[2025-07-14 02:58:11] [Info] Generating CSV reports...
+[2025-07-14 02:58:11] [Success] CSV reports saved: C:\ServerAudits\Audit-Findings.csv, C:\ServerAudits\Server-Status.csv
+[2025-07-14 02:58:11] [Info] Generating executive summary...
+[2025-07-14 02:58:11] [Success] Executive summary saved: C:\ServerAudits\Executive-Summary.txt
+[2025-07-14 02:58:11] [Success] All reports generated successfully in: C:\ServerAudits
+[2025-07-14 02:58:11] [Success] Master Infrastructure Audit completed successfully
+[2025-07-14 02:58:11] [Info] Total execution time: 5.13 minutes

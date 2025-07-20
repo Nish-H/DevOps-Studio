@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createDataManager, DATA_VERSIONS } from '../../lib/dataManager'
+import { createBulletproofStorage } from '../../lib/bulletproofStorage'
+import ContactDetails from './ContactDetails'
 import { 
   FileText, 
   Plus, 
@@ -41,6 +44,318 @@ interface NoteCategory {
   count: number
 }
 
+// Demo data for Notes
+const DEMO_CATEGORIES: NoteCategory[] = [
+  { id: 'cat-1', name: 'System Admin', color: '#ff073a', count: 0 },
+  { id: 'cat-2', name: 'Development', color: '#cc5500', count: 0 },
+  { id: 'cat-3', name: 'Documentation', color: '#0ea5e9', count: 0 },
+  { id: 'cat-4', name: 'Ideas', color: '#10b981', count: 0 },
+  { id: 'cat-5', name: 'Personal', color: '#8B9499', count: 0 }
+]
+
+const DEMO_NOTES: Note[] = [
+  {
+    id: 'note-1',
+    title: 'PowerShell Best Practices',
+    content: `# PowerShell Best Practices for System Administration
+
+## Key Guidelines:
+- Always use approved verbs (Get-, Set-, New-, Remove-)
+- Use proper error handling with try/catch blocks
+- Implement parameter validation
+- Use Write-Output instead of Write-Host for data
+- Always test scripts in development environment first
+
+## Security Considerations:
+- Use execution policies appropriately
+- Avoid hardcoded credentials
+- Implement proper logging
+- Use constrained endpoints when possible
+
+## Performance Tips:
+- Use pipeline efficiently
+- Avoid unnecessary object creation
+- Filter left, format right
+- Use specific property selection`,
+    category: 'System Admin',
+    tags: ['powershell', 'best-practices', 'security'],
+    created: new Date('2025-06-15'),
+    modified: new Date('2025-06-30'),
+    isPinned: true,
+    isArchived: false,
+    type: 'markdown'
+  },
+  {
+    id: 'note-2',
+    title: 'Next.js 14 Project Setup',
+    content: `# Next.js 14 Project Setup Notes
+
+## Installation:
+\`\`\`bash
+npx create-next-app@latest my-app
+cd my-app
+npm run dev
+\`\`\`
+
+## Key Features in v14:
+- App Router (stable)
+- Server Components by default
+- Improved TypeScript support
+- Turbopack (beta)
+
+## Essential Dependencies:
+- tailwindcss
+- @types/node
+- lucide-react for icons
+
+## Configuration Tips:
+- Use exact versions to avoid compatibility issues
+- Configure tailwind.config.ts for custom colors
+- Set up proper ESLint rules`,
+    category: 'Development',
+    tags: ['nextjs', 'react', 'setup'],
+    created: new Date('2025-06-20'),
+    modified: new Date('2025-06-28'),
+    isPinned: false,
+    isArchived: false,
+    type: 'markdown'
+  },
+  {
+    id: 'note-3',
+    title: 'Workspace Color Scheme',
+    content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nishen's AI Workspace Color Palette</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .color-swatch {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-right: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .neon-red { background: #ff073a; }
+        .burnt-orange { background: #cc5500; }
+        .british-silver { background: #8B9499; }
+        .neon-green { background: #00CC33; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Nishen's AI Workspace Color Palette</h1>
+        
+        <div class="color-swatch">
+            <div class="color-box neon-red"></div>
+            <div>
+                <strong>Neon Red</strong> - #ff073a<br>
+                <small>Primary actions, highlights, active states</small>
+            </div>
+        </div>
+        
+        <div class="color-swatch">
+            <div class="color-box burnt-orange"></div>
+            <div>
+                <strong>Burnt Orange</strong> - #cc5500<br>
+                <small>Secondary actions, accents, hover states</small>
+            </div>
+        </div>
+        
+        <div class="color-swatch">
+            <div class="color-box british-silver"></div>
+            <div>
+                <strong>British Silver</strong> - #8B9499<br>
+                <small>Professional silver theme, neutral accents</small>
+            </div>
+        </div>
+        
+        <div class="color-swatch">
+            <div class="color-box neon-green"></div>
+            <div>
+                <strong>Neon Green</strong> - #00CC33<br>
+                <small>Success states, accent green theme</small>
+            </div>
+        </div>
+        
+        <h2>🎯 Usage Guidelines</h2>
+        <ul>
+            <li>Use neon red for primary CTAs and active states</li>
+            <li>Burnt orange for secondary actions and hover states</li>
+            <li>Gray scale for text hierarchy</li>
+            <li>Maintain WCAG contrast ratios</li>
+        </ul>
+    </div>
+</body>
+</html>`,
+    category: 'Documentation',
+    tags: ['design', 'colors', 'branding'],
+    created: new Date('2025-06-25'),
+    modified: new Date('2025-06-25'),
+    isPinned: false,
+    isArchived: false,
+    type: 'html'
+  },
+  {
+    id: 'note-skills-development',
+    title: 'Nishen\'s Skills Development and Knowledge Gained on the Job and in R&D',
+    content: `# Nishen's Skills Development and Knowledge Gained on the Job and in R&D
+
+## Project Portfolio & Technical Skills
+
+### 🚀 Nishen's AI Workspace (July 2025 - Ongoing)
+**Status**: Production Ready | **Time Invested**: 17.5+ hours | **Category**: Full-Stack Web/Desktop Application
+
+#### Technologies Mastered:
+- **Frontend**: React 18.2.0, Next.js 14.2.5, TypeScript, Tailwind CSS
+- **Desktop**: Electron (cross-platform Windows/macOS/Linux)
+- **State Management**: React Context API, localStorage persistence
+- **UI/UX**: Dynamic theming system, responsive design, accessibility (WCAG)
+- **Build Tools**: npm, webpack, electron-builder
+- **Development**: VS Code, ESLint, Hot reload, TypeScript strict mode
+
+#### Architecture Patterns Learned:
+- **Single-page workspace architecture** with state-based routing
+- **Component composition** with conditional rendering
+- **CSS custom properties** for dynamic theming
+- **Hydration-safe rendering** for SSR/CSR compatibility
+- **Systematic error handling** and dependency management
+- **Minimal dependency approach** for stability
+- **Production build optimization** and static export configuration
+
+#### Advanced Features Implemented:
+- **Real-time settings system** with 6 configuration categories
+- **Multi-format file preview** (HTML/Markdown rendering)
+- **Terminal simulation** with command history and Claude integration
+- **Note-taking system** with categories, search, tags, pin/unpin functionality
+- **Professional prompt engineering database** with usage tracking
+- **20+ system administration tools** with monitoring simulation
+- **Cross-platform desktop packaging** with native menu integration
+
+#### Key Problem-Solving Skills Developed:
+- **Systematic debugging methodology** using scanning approaches
+- **Production deployment troubleshooting** (Electron static export issues)
+- **TypeScript error resolution** with proper type casting
+- **CSS architecture design** for maintainable theming systems
+- **Performance optimization** for smooth user experience
+- **Version control management** with meaningful commit messages
+
+### 🛠️ Development Environment Expertise
+
+#### Platforms Mastered:
+- **Ubuntu Linux** (WSL2 on Windows) - Primary development environment
+- **Windows PowerShell** - Cross-platform scripting and terminal management
+- **VS Code** - Advanced configuration, extensions, integrated terminal usage
+- **Git** - Version control, branching strategies, commit message standards
+
+#### Command Line Proficiency:
+- **Node.js/npm** - Package management, script automation, dependency resolution
+- **Bash/PowerShell** - File system operations, process management, environment setup
+- **Build tools** - npm scripts, webpack configuration, production optimization
+- **System administration** - Process monitoring, resource management, troubleshooting
+
+### 📊 Technical Documentation & Project Management
+
+#### Skills Developed:
+- **Comprehensive time tracking** with detailed session logs
+- **Technical documentation** writing (README files, API docs, user guides)
+- **Project planning** with phase-based development approaches
+- **Code review methodologies** and systematic testing approaches
+- **Backup and recovery procedures** with versioned snapshots
+- **Performance monitoring** and resource optimization
+
+#### Professional Development Practices:
+- **Agile methodology** application in solo development
+- **Test-driven development** mindset for reliability
+- **Security-first approach** in authentication and data handling
+- **User experience design** with accessibility considerations
+- **Cross-browser compatibility** testing and optimization
+
+### 🎯 Current Expertise Level Assessment
+
+#### Advanced Skills:
+- React/Next.js full-stack development
+- TypeScript advanced type system usage
+- Electron desktop application development
+- CSS architecture and dynamic theming
+- Component-based UI design patterns
+
+#### Intermediate Skills:
+- System administration and monitoring
+- Build tool configuration and optimization
+- Cross-platform development considerations
+- Performance profiling and optimization
+- API design and integration patterns
+
+#### Growing Skills:
+- Advanced Node.js backend development
+- Database design and management
+- DevOps and CI/CD pipeline setup
+- Cloud deployment and scaling
+- Advanced security implementation
+
+### 📈 Learning & Development Goals
+
+#### Short-term (Next 30 days):
+- Real Claude AI API integration with streaming responses
+- Advanced terminal emulation with multiple shell support
+- File system integration for real file operations
+- Performance optimization and memory management
+
+#### Medium-term (Next 90 days):
+- Backend API development with authentication
+- Database integration (PostgreSQL/MongoDB)
+- Real-time collaboration features
+- Advanced DevOps and deployment automation
+
+#### Long-term (Next 6 months):
+- Cloud-native architecture design
+- Microservices development patterns
+- Advanced security and compliance implementation
+- Team leadership and code review processes
+
+---
+
+**Last Updated**: July 12, 2025  
+**Auto-Update Schedule**: Every 2 days  
+**Total Projects Completed**: 1 major (Nishen's AI Workspace)  
+**Total Development Hours**: 17.5+ hours  
+**Current Focus**: Real-time features and Claude AI integration`,
+    category: 'Personal',
+    tags: ['skills', 'development', 'career', 'projects', 'learning'],
+    created: new Date('2025-07-12'),
+    modified: new Date('2025-07-12'),
+    isPinned: true,
+    isArchived: false,
+    type: 'markdown'
+  }
+]
+
 export default function Notes() {
   const [notes, setNotes] = useState<Note[]>([])
   const [categories, setCategories] = useState<NoteCategory[]>([])
@@ -48,6 +363,9 @@ export default function Notes() {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState('')
   const [editTitle, setEditTitle] = useState('')
+  
+  // BULLETPROOF STORAGE - ENTERPRISE GRADE
+  const bulletproofStorage = createBulletproofStorage('NOTES', 'nishen-workspace-notes')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [isPreviewMode, setIsPreviewMode] = useState(false)
@@ -55,6 +373,7 @@ export default function Notes() {
   // Modals
   const [showNewNoteModal, setShowNewNoteModal] = useState(false)
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false)
+  const [showCategoryManagement, setShowCategoryManagement] = useState(false)
   
   // Form states
   const [newNoteTitle, setNewNoteTitle] = useState('')
@@ -64,20 +383,170 @@ export default function Notes() {
   const [newCategoryName, setNewCategoryName] = useState('')
   const [newCategoryColor, setNewCategoryColor] = useState('#ff073a')
 
-  // Load data from localStorage or demo data
+  // BULLETPROOF DATA LOADING - ENTERPRISE GRADE
   useEffect(() => {
-    const savedNotes = localStorage.getItem('nishen-workspace-notes')
+    // Load with automatic recovery from multiple storage layers
+    const loadedNotes = bulletproofStorage.loadData(DEMO_NOTES)
     const savedCategories = localStorage.getItem('nishen-workspace-categories')
     
-    if (savedNotes && savedCategories) {
+    if (loadedNotes && savedCategories) {
       try {
-        const parsedNotes = JSON.parse(savedNotes).map((n: any) => ({
+        const parsedNotes = loadedNotes.map((n: any) => ({
           ...n,
           created: new Date(n.created),
           modified: new Date(n.modified)
         }))
+        let parsedCategories = JSON.parse(savedCategories)
+        
+        // Clean up any unwanted categories and ensure Personal category exists
+        parsedCategories = parsedCategories.filter((cat: any) => cat.name !== 'Personal Notes' && cat.name !== 'personal notes')
+        
+        const hasPersonalCategory = parsedCategories.some((cat: any) => cat.name === 'Personal')
+        if (!hasPersonalCategory) {
+          parsedCategories.push({ id: 'cat-5', name: 'Personal', color: '#8B9499', count: 0 })
+        }
+        
+        // Always ensure Skills Development note exists
+        const hasSkillsNote = parsedNotes.some((note: any) => note.title.includes('Skills Development'))
+        if (!hasSkillsNote) {
+          const skillsNote = {
+            id: 'note-skills-' + Date.now(),
+            title: 'Nishen\'s Skills Development and Knowledge Gained on the Job and in R&D',
+            content: `# Nishen's Skills Development and Knowledge Gained on the Job and in R&D
+
+## Project Portfolio & Technical Skills
+
+### 🚀 Nishen's AI Workspace (July 2025 - Ongoing)
+**Status**: Production Ready | **Time Invested**: 17.5+ hours | **Category**: Full-Stack Web/Desktop Application
+
+#### Technologies Mastered:
+- **Frontend**: React 18.2.0, Next.js 14.2.5, TypeScript, Tailwind CSS
+- **Desktop**: Electron (cross-platform Windows/macOS/Linux)
+- **State Management**: React Context API, localStorage persistence
+- **UI/UX**: Dynamic theming system, responsive design, accessibility (WCAG)
+- **Build Tools**: npm, webpack, electron-builder
+- **Development**: VS Code, ESLint, Hot reload, TypeScript strict mode
+
+#### Architecture Patterns Learned:
+- **Single-page workspace architecture** with state-based routing
+- **Component composition** with conditional rendering
+- **CSS custom properties** for dynamic theming
+- **Hydration-safe rendering** for SSR/CSR compatibility
+- **Systematic error handling** and dependency management
+- **Minimal dependency approach** for stability
+- **Production build optimization** and static export configuration
+
+#### Advanced Features Implemented:
+- **Real-time settings system** with 6 configuration categories
+- **Multi-format file preview** (HTML/Markdown rendering)
+- **Terminal simulation** with command history and Claude integration
+- **Note-taking system** with categories, search, tags, pin/unpin functionality
+- **Professional prompt engineering database** with usage tracking
+- **20+ system administration tools** with monitoring simulation
+- **Cross-platform desktop packaging** with native menu integration
+
+#### Key Problem-Solving Skills Developed:
+- **Systematic debugging methodology** using scanning approaches
+- **Production deployment troubleshooting** (Electron static export issues)
+- **TypeScript error resolution** with proper type casting
+- **CSS architecture design** for maintainable theming systems
+- **Performance optimization** for smooth user experience
+- **Version control management** with meaningful commit messages
+
+### 🛠️ Development Environment Expertise
+
+#### Platforms Mastered:
+- **Ubuntu Linux** (WSL2 on Windows) - Primary development environment
+- **Windows PowerShell** - Cross-platform scripting and terminal management
+- **VS Code** - Advanced configuration, extensions, integrated terminal usage
+- **Git** - Version control, branching strategies, commit message standards
+
+#### Command Line Proficiency:
+- **Node.js/npm** - Package management, script automation, dependency resolution
+- **Bash/PowerShell** - File system operations, process management, environment setup
+- **Build tools** - npm scripts, webpack configuration, production optimization
+- **System administration** - Process monitoring, resource management, troubleshooting
+
+### 📊 Technical Documentation & Project Management
+
+#### Skills Developed:
+- **Comprehensive time tracking** with detailed session logs
+- **Technical documentation** writing (README files, API docs, user guides)
+- **Project planning** with phase-based development approaches
+- **Code review methodologies** and systematic testing approaches
+- **Backup and recovery procedures** with versioned snapshots
+- **Performance monitoring** and resource optimization
+
+#### Professional Development Practices:
+- **Agile methodology** application in solo development
+- **Test-driven development** mindset for reliability
+- **Security-first approach** in authentication and data handling
+- **User experience design** with accessibility considerations
+- **Cross-browser compatibility** testing and optimization
+
+### 🎯 Current Expertise Level Assessment
+
+#### Advanced Skills:
+- React/Next.js full-stack development
+- TypeScript advanced type system usage
+- Electron desktop application development
+- CSS architecture and dynamic theming
+- Component-based UI design patterns
+
+#### Intermediate Skills:
+- System administration and monitoring
+- Build tool configuration and optimization
+- Cross-platform development considerations
+- Performance profiling and optimization
+- API design and integration patterns
+
+#### Growing Skills:
+- Advanced Node.js backend development
+- Database design and management
+- DevOps and CI/CD pipeline setup
+- Cloud deployment and scaling
+- Advanced security implementation
+
+### 📈 Learning & Development Goals
+
+#### Short-term (Next 30 days):
+- Real Claude AI API integration with streaming responses
+- Advanced terminal emulation with multiple shell support
+- File system integration for real file operations
+- Performance optimization and memory management
+
+#### Medium-term (Next 90 days):
+- Backend API development with authentication
+- Database integration (PostgreSQL/MongoDB)
+- Real-time collaboration features
+- Advanced DevOps and deployment automation
+
+#### Long-term (Next 6 months):
+- Cloud-native architecture design
+- Microservices development patterns
+- Advanced security and compliance implementation
+- Team leadership and code review processes
+
+---
+
+**Last Updated**: July 12, 2025  
+**Auto-Update Schedule**: Every 2 days  
+**Total Projects Completed**: 1 major (Nishen's AI Workspace)  
+**Total Development Hours**: 17.5+ hours  
+**Current Focus**: Real-time features and Claude AI integration`,
+            category: 'Personal',
+            tags: ['skills', 'development', 'career', 'projects', 'learning'],
+            created: new Date('2025-07-12'),
+            modified: new Date('2025-07-12'),
+            isPinned: true,
+            isArchived: false,
+            type: 'markdown'
+          }
+          parsedNotes.unshift(skillsNote) // Add at beginning so it's prominent
+        }
+        
         setNotes(parsedNotes)
-        setCategories(JSON.parse(savedCategories))
+        setCategories(parsedCategories)
         return
       } catch (error) {
         console.error('Error loading saved notes:', error)
@@ -89,7 +558,8 @@ export default function Notes() {
       { id: 'cat-1', name: 'System Admin', color: '#ff073a', count: 0 },
       { id: 'cat-2', name: 'Development', color: '#cc5500', count: 0 },
       { id: 'cat-3', name: 'Documentation', color: '#0ea5e9', count: 0 },
-      { id: 'cat-4', name: 'Ideas', color: '#10b981', count: 0 }
+      { id: 'cat-4', name: 'Ideas', color: '#10b981', count: 0 },
+      { id: 'cat-5', name: 'Personal', color: '#8B9499', count: 0 }
     ]
 
     const demoNotes: Note[] = [
@@ -259,6 +729,139 @@ npm run dev
         isPinned: false,
         isArchived: false,
         type: 'html'
+      },
+      {
+        id: 'note-4',
+        title: 'Nishen\'s Skills Development and Knowledge Gained on the Job and in R&D',
+        content: `# Nishen's Skills Development and Knowledge Gained on the Job and in R&D
+
+## Project Portfolio & Technical Skills
+
+### 🚀 Nishen's AI Workspace (July 2025 - Ongoing)
+**Status**: Production Ready | **Time Invested**: 17.5+ hours | **Category**: Full-Stack Web/Desktop Application
+
+#### Technologies Mastered:
+- **Frontend**: React 18.2.0, Next.js 14.2.5, TypeScript, Tailwind CSS
+- **Desktop**: Electron (cross-platform Windows/macOS/Linux)
+- **State Management**: React Context API, localStorage persistence
+- **UI/UX**: Dynamic theming system, responsive design, accessibility (WCAG)
+- **Build Tools**: npm, webpack, electron-builder
+- **Development**: VS Code, ESLint, Hot reload, TypeScript strict mode
+
+#### Architecture Patterns Learned:
+- **Single-page workspace architecture** with state-based routing
+- **Component composition** with conditional rendering
+- **CSS custom properties** for dynamic theming
+- **Hydration-safe rendering** for SSR/CSR compatibility
+- **Systematic error handling** and dependency management
+- **Minimal dependency approach** for stability
+- **Production build optimization** and static export configuration
+
+#### Advanced Features Implemented:
+- **Real-time settings system** with 6 configuration categories
+- **Multi-format file preview** (HTML/Markdown rendering)
+- **Terminal simulation** with command history and Claude integration
+- **Note-taking system** with categories, search, tags, pin/unpin functionality
+- **Professional prompt engineering database** with usage tracking
+- **20+ system administration tools** with monitoring simulation
+- **Cross-platform desktop packaging** with native menu integration
+
+#### Key Problem-Solving Skills Developed:
+- **Systematic debugging methodology** using scanning approaches
+- **Production deployment troubleshooting** (Electron static export issues)
+- **TypeScript error resolution** with proper type casting
+- **CSS architecture design** for maintainable theming systems
+- **Performance optimization** for smooth user experience
+- **Version control management** with meaningful commit messages
+
+### 🛠️ Development Environment Expertise
+
+#### Platforms Mastered:
+- **Ubuntu Linux** (WSL2 on Windows) - Primary development environment
+- **Windows PowerShell** - Cross-platform scripting and terminal management
+- **VS Code** - Advanced configuration, extensions, integrated terminal usage
+- **Git** - Version control, branching strategies, commit message standards
+
+#### Command Line Proficiency:
+- **Node.js/npm** - Package management, script automation, dependency resolution
+- **Bash/PowerShell** - File system operations, process management, environment setup
+- **Build tools** - npm scripts, webpack configuration, production optimization
+- **System administration** - Process monitoring, resource management, troubleshooting
+
+### 📊 Technical Documentation & Project Management
+
+#### Skills Developed:
+- **Comprehensive time tracking** with detailed session logs
+- **Technical documentation** writing (README files, API docs, user guides)
+- **Project planning** with phase-based development approaches
+- **Code review methodologies** and systematic testing approaches
+- **Backup and recovery procedures** with versioned snapshots
+- **Performance monitoring** and resource optimization
+
+#### Professional Development Practices:
+- **Agile methodology** application in solo development
+- **Test-driven development** mindset for reliability
+- **Security-first approach** in authentication and data handling
+- **User experience design** with accessibility considerations
+- **Cross-browser compatibility** testing and optimization
+
+### 🎯 Current Expertise Level Assessment
+
+#### Advanced Skills:
+- React/Next.js full-stack development
+- TypeScript advanced type system usage
+- Electron desktop application development
+- CSS architecture and dynamic theming
+- Component-based UI design patterns
+
+#### Intermediate Skills:
+- System administration and monitoring
+- Build tool configuration and optimization
+- Cross-platform development considerations
+- Performance profiling and optimization
+- API design and integration patterns
+
+#### Growing Skills:
+- Advanced Node.js backend development
+- Database design and management
+- DevOps and CI/CD pipeline setup
+- Cloud deployment and scaling
+- Advanced security implementation
+
+### 📈 Learning & Development Goals
+
+#### Short-term (Next 30 days):
+- Real Claude AI API integration with streaming responses
+- Advanced terminal emulation with multiple shell support
+- File system integration for real file operations
+- Performance optimization and memory management
+
+#### Medium-term (Next 90 days):
+- Backend API development with authentication
+- Database integration (PostgreSQL/MongoDB)
+- Real-time collaboration features
+- Advanced DevOps and deployment automation
+
+#### Long-term (Next 6 months):
+- Cloud-native architecture design
+- Microservices development patterns
+- Advanced security and compliance implementation
+- Team leadership and code review processes
+
+---
+
+**Last Updated**: July 12, 2025  
+**Auto-Update Schedule**: Every 2 days  
+**Total Projects Completed**: 1 major (Nishen's AI Workspace)  
+**Total Development Hours**: 17.5+ hours  
+**Current Focus**: Real-time features and Claude AI integration`,
+        category: 'Personal',
+        tags: ['skills', 'development', 'career', 'projects', 'learning'],
+        created: new Date('2025-07-12'),
+        modified: new Date('2025-07-12'),
+        isPinned: true,
+        isArchived: false,
+        type: 'markdown'
       }
     ]
 
@@ -266,10 +869,10 @@ npm run dev
     setCategories(demoCategories)
   }, [])
 
-  // Save data to localStorage
+  // BULLETPROOF SAVE - ENTERPRISE GRADE
   const saveToLocalStorage = () => {
     try {
-      localStorage.setItem('nishen-workspace-notes', JSON.stringify(notes))
+      bulletproofStorage.saveData(notes, 'USER_SAVE')
       localStorage.setItem('nishen-workspace-categories', JSON.stringify(categories))
     } catch (error) {
       console.error('Error saving notes:', error)
@@ -485,6 +1088,27 @@ Start writing your note here...`
     setShowNewCategoryModal(false)
   }
 
+  const deleteCategory = (categoryName: string) => {
+    // Don't delete if there are notes in this category
+    const notesInCategory = notes.filter(note => note.category === categoryName && !note.isArchived)
+    if (notesInCategory.length > 0) {
+      alert(`Cannot delete category "${categoryName}" because it contains ${notesInCategory.length} note(s). Please move or delete the notes first.`)
+      return
+    }
+    
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete the "${categoryName}" category?`)) {
+      return
+    }
+    
+    setCategories(prev => prev.filter(cat => cat.name !== categoryName))
+    
+    // If the deleted category was selected, switch to 'all'
+    if (selectedCategory === categoryName) {
+      setSelectedCategory('all')
+    }
+  }
+
   const saveNote = () => {
     if (!selectedNote) return
     
@@ -536,14 +1160,16 @@ Start writing your note here...`
   const selectedNoteData = notes.find(n => n.id === selectedNote)
 
   return (
-    <div className="flex h-full bg-black text-white">
+    <div className="flex flex-col h-full bg-black text-white">
+      <ContactDetails />
+      <div className="flex h-full bg-black text-white">
       {/* Sidebar - Categories & Notes */}
       <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
           {/* Version Info */}
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>Nishen's AI Workspace v0.1.1</span>
+            <span>DevOps Studio v0.1.1</span>
             <span>Notes Module</span>
           </div>
           
@@ -575,12 +1201,22 @@ Start writing your note here...`
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-300">Categories</span>
-              <button
-                onClick={() => setShowNewCategoryModal(true)}
-                className="text-xs text-gray-400 hover:text-neon-red"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowCategoryManagement(!showCategoryManagement)}
+                  className="text-xs text-gray-400 hover:text-neon-red"
+                  title="Manage Categories"
+                >
+                  <Edit3 className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => setShowNewCategoryModal(true)}
+                  className="text-xs text-gray-400 hover:text-neon-red"
+                  title="Add Category"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
             </div>
             
             <div className="space-y-1">
@@ -597,24 +1233,37 @@ Start writing your note here...`
               </button>
               
               {categories.map(category => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.name)}
-                  className={`w-full flex items-center justify-between p-2 rounded text-sm transition-colors ${
-                    selectedCategory === category.name 
-                      ? 'bg-neon-red/20 text-neon-red' 
-                      : 'text-gray-300 hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <div 
-                      className="w-3 h-3 rounded-full mr-2" 
-                      style={{ backgroundColor: category.color }}
-                    />
-                    <span>{category.name}</span>
-                  </div>
-                  <span className="text-xs">{category.count}</span>
-                </button>
+                <div key={category.id} className="flex items-center group">
+                  <button
+                    onClick={() => setSelectedCategory(category.name)}
+                    className={`flex-1 flex items-center justify-between p-2 rounded text-sm transition-colors ${
+                      selectedCategory === category.name 
+                        ? 'bg-neon-red/20 text-neon-red' 
+                        : 'text-gray-300 hover:bg-gray-800'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <span>{category.name}</span>
+                    </div>
+                    <span className="text-xs">{category.count}</span>
+                  </button>
+                  {showCategoryManagement && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteCategory(category.name)
+                      }}
+                      className="ml-1 p-1 text-gray-400 hover:text-red-400 transition-colors"
+                      title={`Delete ${category.name} category`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -1006,6 +1655,7 @@ Start writing your note here...`
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

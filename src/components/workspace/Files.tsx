@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createBulletproofStorage } from '../../lib/bulletproofStorage'
+import ContactDetails from './ContactDetails'
 import { 
   FolderOpen, 
   File, 
@@ -65,6 +67,9 @@ interface TimerState {
 }
 
 export default function Files() {
+  // BULLETPROOF STORAGE - ENTERPRISE GRADE
+  const bulletproofStorage = createBulletproofStorage('FILES', 'nishen-workspace-dev')
+  
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
@@ -127,30 +132,25 @@ export default function Files() {
       }
     }
     
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData)
-        // Convert date strings back to Date objects
-        const processedProjects = parsed.map((p: any) => ({
-          ...p,
-          created: new Date(p.created),
-          timerStartTime: p.timerStartTime ? new Date(p.timerStartTime) : undefined,
-          files: p.files.map((f: any) => ({
-            ...f,
-            created: new Date(f.created),
-            modified: new Date(f.modified),
-            versions: f.versions.map((v: any) => ({
-              ...v,
-              timestamp: new Date(v.timestamp)
-            }))
+    // BULLETPROOF DATA LOADING - ENTERPRISE GRADE  
+    let processedProjects = bulletproofStorage.loadData([])
+    
+    // Convert date strings back to Date objects if needed
+    if (processedProjects.length > 0) {
+      processedProjects = processedProjects.map((p: any) => ({
+        ...p,
+        created: new Date(p.created),
+        timerStartTime: p.timerStartTime ? new Date(p.timerStartTime) : undefined,
+        files: p.files.map((f: any) => ({
+          ...f,
+          created: new Date(f.created),
+          modified: new Date(f.modified),
+          versions: f.versions.map((v: any) => ({
+            ...v,
+            timestamp: new Date(v.timestamp)
           }))
         }))
-        setProjects(processedProjects)
-        setExpandedProjects(new Set(['proj-1']))
-        return
-      } catch (error) {
-        console.error('Error loading saved data:', error)
-      }
+      }))
     }
 
     // Default demo data if no saved data
@@ -209,14 +209,31 @@ export default function Files() {
         isTimerRunning: false
       }
     ]
-    setProjects(demoProjects)
+    
+    // SAFE PATTERN: Merge user data with demo data, preserve user projects
+    if (processedProjects.length === 0) {
+      // No user data, use demo data
+      setProjects(demoProjects)
+    } else {
+      // Have user data, check if demo projects exist and add them if missing
+      const userProjectIds = new Set(processedProjects.map(p => p.id))
+      const missingDemoProjects = demoProjects.filter(demo => !userProjectIds.has(demo.id))
+      
+      if (missingDemoProjects.length > 0) {
+        // Add missing demo projects to user data
+        setProjects([...processedProjects, ...missingDemoProjects])
+      } else {
+        // User has all demo projects, keep their data
+        setProjects(processedProjects)
+      }
+    }
     setExpandedProjects(new Set(['proj-1']))
   }, [])
 
-  // Save data to localStorage
+  // BULLETPROOF SAVE - ENTERPRISE GRADE
   const saveToLocalStorage = (projectsData: Project[]) => {
     try {
-      localStorage.setItem('nishen-workspace-dev', JSON.stringify(projectsData))
+      bulletproofStorage.saveData(projectsData, 'USER_SAVE')
     } catch (error) {
       console.error('Error saving data:', error)
     }
@@ -848,14 +865,16 @@ use a dedicated PDF generation tool.`
   const selectedFileData = selectedProjectData?.files.find(f => f.id === selectedFile)
 
   return (
-    <div className="flex h-full bg-black text-white">
+    <div className="flex flex-col h-full bg-black text-white">
+      <ContactDetails />
+      <div className="flex h-full bg-black text-white">
       {/* Sidebar - Projects & Files */}
       <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
           {/* Version Info */}
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>Nishen's AI Workspace v0.1.1</span>
+            <span>DevOps Studio v0.1.1</span>
             <span>Files Module</span>
           </div>
           
@@ -1399,6 +1418,7 @@ use a dedicated PDF generation tool.`
         </div>
       )}
 
+      </div>
     </div>
   )
 }

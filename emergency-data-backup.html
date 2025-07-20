@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emergency Data Backup - Nishen's AI Workspace</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .backup-section { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { background: #ff073a; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        textarea { width: 100%; height: 200px; background: #333; color: #fff; border: 1px solid #555; padding: 10px; }
+        .timestamp { font-size: 12px; color: #888; }
+        .critical { border-left: 4px solid #ff073a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Emergency Data Backup Tool</h1>
+        <p class="timestamp">Created: <span id="timestamp"></span></p>
+        
+        <div class="backup-section critical">
+            <h2>IMMEDIATE BACKUP - Current localStorage Data</h2>
+            <button onclick="backupAllData()">📥 BACKUP ALL CURRENT DATA</button>
+            <button onclick="downloadBackup()">💾 DOWNLOAD BACKUP FILE</button>
+            <textarea id="backupData" placeholder="Backup data will appear here..."></textarea>
+        </div>
+
+        <div class="backup-section">
+            <h2>Data Recovery Tools</h2>
+            <button onclick="restoreData()">🔄 RESTORE FROM BACKUP</button>
+            <button onclick="exportToFile()">📁 EXPORT TO JSON FILE</button>
+            <textarea id="restoreData" placeholder="Paste backup data here to restore..."></textarea>
+        </div>
+
+        <div class="backup-section">
+            <h2>Current Storage Analysis</h2>
+            <button onclick="analyzeStorage()">🔍 ANALYZE CURRENT STORAGE</button>
+            <div id="analysis"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        function backupAllData() {
+            const allData = {};
+            const timestamp = new Date().toISOString();
+            
+            // Backup all localStorage keys related to the workspace
+            const workspaceKeys = [
+                'nishen-workspace-settings',
+                'nishen-workspace-notes',
+                'nishen-workspace-note-categories', 
+                'nishen-workspace-files',
+                'nishen-workspace-projects',
+                'nishen-workspace-file-browser',
+                'nishen-workspace-prompts',
+                'nishen-workspace-prompt-categories',
+                'nishen-workspace-tools-data',
+                'nishen-workspace-terminal-history',
+                'nishen-workspace-urls',
+                'nishen-workspace-url-categories'
+            ];
+            
+            workspaceKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    allData[key] = JSON.parse(data);
+                }
+            });
+            
+            // Also backup any other keys that might be workspace-related
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('nishen') && !workspaceKeys.includes(key)) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        try {
+                            allData[key] = JSON.parse(data);
+                        } catch (e) {
+                            allData[key] = data; // Store as string if not JSON
+                        }
+                    }
+                }
+            }
+            
+            const backup = {
+                timestamp: timestamp,
+                version: "emergency-backup-v1.0",
+                data: allData,
+                keys_found: Object.keys(allData),
+                total_keys: Object.keys(allData).length
+            };
+            
+            document.getElementById('backupData').value = JSON.stringify(backup, null, 2);
+            
+            // Also save to localStorage as emergency backup
+            localStorage.setItem('EMERGENCY_BACKUP_' + timestamp.replace(/[:.]/g, '-'), JSON.stringify(backup));
+            
+            alert(`✅ BACKUP COMPLETE! Found ${Object.keys(allData).length} data keys.`);
+        }
+
+        function downloadBackup() {
+            const backupData = document.getElementById('backupData').value;
+            if (!backupData) {
+                alert('❌ No backup data found. Please run backup first.');
+                return;
+            }
+            
+            const blob = new Blob([backupData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nishen-workspace-emergency-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function restoreData() {
+            const restoreData = document.getElementById('restoreData').value;
+            if (!restoreData) {
+                alert('❌ No restore data provided.');
+                return;
+            }
+            
+            try {
+                const backup = JSON.parse(restoreData);
+                if (backup.data) {
+                    Object.keys(backup.data).forEach(key => {
+                        localStorage.setItem(key, JSON.stringify(backup.data[key]));
+                    });
+                    alert(`✅ RESTORE COMPLETE! Restored ${Object.keys(backup.data).length} data keys.`);
+                    location.reload();
+                } else {
+                    alert('❌ Invalid backup format.');
+                }
+            } catch (e) {
+                alert('❌ Invalid JSON format: ' + e.message);
+            }
+        }
+
+        function exportToFile() {
+            backupAllData();
+            downloadBackup();
+        }
+
+        function analyzeStorage() {
+            let analysis = '<h3>localStorage Analysis</h3>';
+            analysis += `<p><strong>Total localStorage keys:</strong> ${localStorage.length}</p>`;
+            
+            const workspaceKeys = [];
+            const otherKeys = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('nishen')) {
+                    workspaceKeys.push(key);
+                } else {
+                    otherKeys.push(key);
+                }
+            }
+            
+            analysis += `<p><strong>Workspace-related keys:</strong> ${workspaceKeys.length}</p>`;
+            workspaceKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                const size = data ? data.length : 0;
+                analysis += `<p>📁 ${key}: ${size} characters</p>`;
+            });
+            
+            analysis += `<p><strong>Other keys:</strong> ${otherKeys.length}</p>`;
+            
+            document.getElementById('analysis').innerHTML = analysis;
+        }
+
+        // Auto-run analysis on page load
+        window.addEventListener('load', () => {
+            analyzeStorage();
+        });
+    </script>
+</body>
+</html>

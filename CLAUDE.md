@@ -45,7 +45,8 @@ The application uses a **single-page workspace architecture** with:
 - **Files**: File management interface with HTML/Markdown preview, version control, time tracking
 - **Notes**: Note-taking system with categories, search, tags, markdown support
 - **Terminal**: Command simulation with history and Claude integration
-- **UI Enhancements (NEW)**: Version headers, content scrolling, centered controls
+- **Prompt Engineering (NEW)**: Professional prompt database with search, categories, and usage tracking
+- **UI Enhancements**: Version headers, content scrolling, centered controls
 
 **Component Structure**:
 - `workspace/` - Main workspace orchestration components
@@ -133,15 +134,145 @@ npm run lint
 - Deliverables completed
 - Weekly reporting schedule
 
-**Current Total**: ~14 hours invested (July 1-2, 2025)
-**Next Report Due**: July 9, 2025
+**Current Total**: ~17.5+ hours invested (July 1-12, 2025)
+**Next Report Due**: July 16, 2025
+
+## Skills Development Documentation & Auto-Update System
+
+**CRITICAL INSTRUCTION**: Every 2 days, automatically update the "Nishen's Skills Development and Knowledge Gained on the Job and in R&D" note in the Personal category with:
+
+### Auto-Update Requirements:
+1. **New Projects**: Add any new projects we work on with:
+   - Project name, duration, complexity level
+   - Technologies used (languages, frameworks, tools, platforms)
+   - Architecture patterns learned
+   - Key features implemented
+   - Problem-solving skills developed
+
+2. **Technology Stack Updates**: Document all tools and technologies used:
+   - **Development Tools**: VS Code extensions, terminal configurations, IDE setups
+   - **Languages & Frameworks**: JavaScript, TypeScript, Python, React, Node.js, etc.
+   - **Platforms & OS**: Ubuntu Linux, Windows PowerShell, macOS, etc.
+   - **Build Tools**: npm, webpack, Vite, Docker, etc.
+   - **Version Control**: Git workflows, branching strategies, CI/CD pipelines
+
+3. **Skills Assessment Updates**: 
+   - Move skills between Beginner → Intermediate → Advanced levels
+   - Add new skills to Growing Skills section
+   - Update learning goals based on project requirements
+   - Document certifications, courses, or training completed
+
+4. **Professional Development Tracking**:
+   - Time invested in learning new technologies
+   - Problem-solving methodologies developed
+   - Code review and debugging improvements
+   - Team collaboration and communication skills
+
+### Update Schedule:
+- **Every 2 days**: Automatic review and update of skills note
+- **Major milestones**: Immediate updates when completing significant features
+- **Weekly reviews**: Comprehensive skills assessment and goal adjustment
+- **Monthly reports**: Career development progress and expertise growth
+
+### Note Location:
+- **File**: Notes system → Personal category → "Nishen's Skills Development and Knowledge Gained on the Job and in R&D"
+- **Auto-Update**: Append new content, update "Last Updated" timestamp
+- **Backup**: Maintain version history for career documentation
+
+**INHERITANCE**: All new projects created in this workspace must inherit this skills documentation requirement.
+
+## 🔧 LocalStorage Data Management & New Content Addition
+
+### Current Safe Pattern (Preserves User Data)
+The workspace uses localStorage persistence to maintain user data between sessions. When adding new demo content, use this **SAFE PATTERN** that preserves existing user data:
+
+**Example Pattern (from Notes.tsx lines 81-88):**
+```typescript
+// Always ensure Personal category exists
+const hasPersonalCategory = parsedCategories.some((cat: any) => cat.name === 'Personal')
+if (!hasPersonalCategory) {
+  parsedCategories.push({ id: 'cat-5', name: 'Personal', color: '#8B9499', count: 0 })
+}
+
+// Always ensure Skills Development note exists
+const hasSkillsNote = parsedNotes.some((note: any) => note.title.includes('Skills Development'))
+if (!hasSkillsNote) {
+  // Add new demo content here
+}
+```
+
+### Safe Addition Guidelines:
+1. **Check for existence first** - Use `.some()` or `.find()` to check if content already exists
+2. **Append, don't replace** - Add new content to existing arrays without removing user data
+3. **Use unique identifiers** - Ensure new demo content has unique IDs that won't conflict
+4. **Test with existing data** - Always test that new additions work with pre-existing localStorage
+
+### Modules Using This Pattern:
+- ✅ **Notes.tsx** - Safely adds Personal category and Skills Development note
+- 🔄 **URLLinks.tsx** - Needs safe addition pattern for new demo links  
+- 🔄 **PromptEngineering.tsx** - Needs safe addition pattern for new demo prompts
+- ✅ **Files.tsx** - Uses demo data only when no saved data exists
+- ✅ **Settings.tsx** - Uses Context pattern, not localStorage override
+
+### Adding New Demo Content:
+When adding new demo links, prompts, or other content:
+1. **Create backup** first (pattern: `backups/YYYYMMDD_HHMMSS_description/`)
+2. **Use existence checking** before adding new items
+3. **Test in browser** with existing localStorage data
+4. **Verify old data preserved** after addition
+
+**CRITICAL**: Never replace the entire localStorage loading logic - this pattern preserves 17.5+ hours of user work and data integrity.
+
+## 🚨 DATA LOSS RESOLUTION (July 13, 2025)
+
+### Critical Issue Identified & Fixed
+- **PROBLEM**: Multiple components using UNSAFE localStorage patterns causing data loss
+- **IMPACT**: User data in Notes, Files, Prod, URLLinks reverting to demo mode
+- **ROOT CAUSE**: Components not following the safe localStorage pattern from CLAUDE.md
+
+### Components Fixed with SAFE PATTERN:
+- ✅ **URLLinks.tsx** - Fixed unsafe loading pattern (lines 90-115)
+- ✅ **Files.tsx** - Fixed unsafe loading pattern and added proper merging
+- ✅ **Prod.tsx** - Fixed unsafe loading pattern and added proper merging
+- ✅ **Notes.tsx** - Already using safe pattern (reference implementation)
+
+### New AUTOMATIC BACKUP SYSTEM Implemented:
+- **File**: `src/lib/autoBackup.ts` - Comprehensive backup management
+- **Features**: 
+  - Auto-backup every 5 minutes
+  - Manual backup on demand
+  - Backup before data changes
+  - Export/import functionality
+  - Keep last 50 backups
+  - Browser console access: `workspaceBackup.create()`, `workspaceBackup.list()`, etc.
+- **Integration**: SimpleWorkspace.tsx initializes backup system on load
+
+### Emergency Recovery Tools:
+- **File**: `emergency-data-backup.html` - Standalone backup/recovery tool
+- **Console Commands**: Available in browser dev tools for immediate backup/restore
+
+### LESSON LEARNED - SAFE PATTERN ENFORCEMENT:
+```typescript
+// ❌ UNSAFE PATTERN (causes data loss):
+if (savedData) {
+  setData(JSON.parse(savedData))
+}
+
+// ✅ SAFE PATTERN (preserves user data):
+let processedData: DataType[] = []
+if (savedData) {
+  processedData = JSON.parse(savedData)
+}
+// Always merge with demo data, never replace user data
+```
 
 ## Current Implementation Status
 
-### ✅ Completed Features (LATEST SNAPSHOT: 20250710_173941)
+### ✅ Completed Features (LATEST SNAPSHOT: 20250712_230000)
 - **Claude AI Interface**: Demo mode with simulated responses and chat history
 - **Terminal Component**: Full command simulation with history and Claude integration
 - **Files Management System**: Complete CRUD operations with HTML/Markdown preview, version control, time tracking
+- **🗂️ File Browser Module**: Full virtual file system with CRUD operations, localStorage persistence, text editing, and workspace integration
 - **Notes System**: Categories, search, tags, pin/unpin, markdown support with localStorage persistence  
 - **Tools Module**: 20+ system administration utilities with monitoring simulation
 - **Settings Module**: Real-time theme switching with 6 configuration categories and export/import
@@ -149,6 +280,7 @@ npm run lint
 - **Responsive Design**: Mobile-friendly interface with proper contrast ratios
 - **Data Persistence**: Full localStorage integration with auto-save functionality
 - **🆕 UI Enhancements**: Version headers, scrollable content areas, centered controls, universal timer config
+- **🧠 Prompt Engineering**: Professional prompt database with search, categories, usage tracking, and copy functionality
 
 ### 🚧 In Progress / Next Phase  
 - **PowerShell Web Terminal**: Full PowerShell functionality in web browser (NEXT IMPLEMENTATION)
@@ -192,6 +324,125 @@ npm run lint
 - **Backup Created**: `backups/20250710_173941_ui_enhancements_complete/`
 - **Testing Status**: All changes maintain existing functionality
 - **Theme Compatibility**: Full support for Red/Silver/Green accent switching
+
+## 🧠 Prompt Engineering Module (July 10, 2025)
+
+### Features Implemented
+
+**1. Professional Prompt Database**
+- Pre-loaded with 5 expert-level prompts covering system administration, code generation, analysis, documentation, and problem-solving
+- Structured prompt templates for consistent quality and effectiveness
+- Usage tracking and rating system for optimization
+
+**2. Advanced Search & Filtering**
+- Real-time search across titles, content, tags, and categories
+- Category-based filtering with color-coded organization
+- Difficulty levels: Beginner, Intermediate, Advanced
+- Type classification: System, User, Assistant, Creative, Technical
+
+**3. Professional Workflow Features**
+- One-click copy to clipboard for immediate use
+- Pin frequently used prompts for quick access
+- Usage statistics and performance tracking
+- Rating system with visual star display
+- Tag-based organization with auto-completion
+
+**4. Data Management**
+- localStorage persistence with auto-save functionality
+- Category management with custom colors and descriptions
+- CRUD operations for prompts and categories
+- Export/import ready data structure
+
+### Demo Prompt Categories
+1. **System Prompts** - Core system instructions and personas
+2. **Code Generation** - Programming and development assistance  
+3. **Analysis & Research** - Data analysis and research methodologies
+4. **Creative Writing** - Content creation and storytelling
+5. **Problem Solving** - Troubleshooting and solution design
+6. **Documentation** - Technical writing and user guides
+
+### Technical Architecture
+- **Component**: `PromptEngineering.tsx` following standard workspace template
+- **Storage**: localStorage keys `nishen-workspace-prompts` and `nishen-workspace-prompt-categories`
+- **Integration**: Seamless sidebar navigation with brain emoji (🧠) icon
+- **UI Consistency**: Matches existing modules with version header, scrolling, and centered controls
+
+### Usage Instructions
+1. **Browse Prompts**: Use category filters or search to find relevant prompts
+2. **Copy & Use**: Click "Copy" button to copy prompt to clipboard for immediate use
+3. **Customize**: Edit existing prompts or create new ones with custom categories
+4. **Track Performance**: Monitor usage counts and ratings to optimize prompt effectiveness
+5. **Organize**: Use tags and categories to maintain a structured prompt library
+
+## 🗂️ File Browser Module (July 12, 2025)
+
+### Advanced Virtual File System
+
+**1. Comprehensive File Operations**
+- Full CRUD operations: Create, Read, Update, Delete files and folders
+- Virtual file system with localStorage persistence for web version
+- Desktop-ready architecture for real file system integration in Electron
+- Breadcrumb navigation with path traversal
+- Multi-select operations with keyboard shortcuts
+
+**2. Professional File Management Interface**
+- List and Grid view modes for optimal file browsing
+- File type icons with MIME type detection (text, image, video, code, archive)
+- Sort by name, size, modified date, or file type
+- Search functionality across file names and content
+- Bookmarks system for quick access to frequently used folders
+
+**3. Integrated Text Editor**
+- Built-in text file editor with syntax awareness
+- Direct file content editing and saving
+- Support for various text formats (txt, json, md, js, py, etc.)
+- Real-time file size and modification tracking
+- Copy/paste integration with other workspace modules
+
+**4. Workspace Integration Features**
+- Import/export capabilities with Notes module
+- Quick access folders: Documents, Projects, Notes Export, Scripts, Temp
+- Context-aware file operations with confirmation dialogs
+- Safe delete operations with dependency checking
+- Version header consistency with other workspace modules
+
+### Technical Architecture
+- **Component**: `FileBrowserSimple.tsx` with complete virtual file system implementation
+- **Storage**: localStorage key `nishen-workspace-file-browser` for file data persistence
+- **Auto-Save**: Real-time persistence - all changes automatically saved to localStorage
+- **Web Compatibility**: Full functionality in browser environment with virtual file system
+- **Desktop Ready**: Architecture prepared for Node.js file system integration in Electron
+- **Data Safety**: Follows safe localStorage patterns established in other workspace modules
+
+### Default Structure
+```
+Virtual Drive/
+├── Documents/
+├── Projects/
+├── Notes Export/
+└── Welcome.txt
+```
+
+### Usage Instructions
+1. **Navigate**: Use breadcrumb navigation or sidebar quick access to browse folders
+2. **Create**: Click "Folder" or "File" buttons to create new items in current directory
+3. **Edit**: Double-click text files to open the integrated editor
+4. **Manage**: Use the toolbar buttons for refresh, up navigation, and delete operations
+5. **Persist**: All changes automatically save to localStorage - files persist between sessions
+6. **Organize**: Create folder hierarchies for project organization
+
+### Recent Improvements (July 13, 2025)
+- **✅ localStorage Persistence Added**: Files and folders now automatically save and persist between sessions
+- **✅ Auto-Save Functionality**: All CRUD operations immediately persist to browser storage
+- **✅ Enhanced Welcome File**: Updated with comprehensive usage instructions
+- **✅ Build Issue Resolution**: Excluded backup files from build process permanently
+
+### Future Enhancements (Desktop Integration)
+- Real file system browsing (C:\, D:\, network drives)
+- External editor integration
+- File associations and system integration
+- Cloud storage connectivity (Google Drive, OneDrive)
+- Advanced search with content indexing
 
 ## Critical Lessons Learned & Mistakes to Avoid
 
@@ -289,6 +540,20 @@ npm run lint
 **FINDING**: File exists but is completely unused - no imports anywhere
 **FIX**: Removed entire `src/lib/utils.ts` file (safe deletion)
 **PATTERN**: Remove unused utility files rather than installing missing dependencies
+
+### 🚨 BACKUP FILES IN BUILD PATH - Critical Build Issue Fixed
+**MISTAKE**: Backup directories were included in Next.js build process causing "Cannot find module" errors
+**IMPACT**: Build failures with "Failed to compile" errors from backup files trying to import non-existent modules
+**LESSON**: Always exclude backup directories from build tools - they should never be processed
+**SOLUTION IMPLEMENTED**:
+1. **next.config.js webpack configuration** - Excluded `/backups/`, `/backup/`, `/archive/`, `/temp/` directories
+2. **Updated .gitignore** - Comprehensive exclusion patterns for backup files and directories  
+3. **Moved backups outside project** - Relocated all backup directories to `../workspace-backups/`
+**PREVENTION**: 
+- All future backups automatically excluded from builds
+- Clear .gitignore patterns prevent accidental inclusion
+- Backup directories moved outside project root for complete isolation
+**CRITICAL RULE**: Never store backup files within the project src/ directory or any path that build tools scan
 
 ### 🚨 ELECTRON-BUILDER PATH ISSUES - Windows-Specific Fix Applied
 **ISSUE**: 'electron-builder' is not recognized in Windows PowerShell (npx failed)

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Forensics Recovery - Find Missing July 11-13 Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .forensics-section { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { background: #ff073a; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .success { background: #00ff00; color: #000; }
+        .found { background: #ffff00; color: #000; }
+        .data-display { background: #333; color: #fff; border: 1px solid #555; padding: 10px; max-height: 400px; overflow-y: auto; margin: 10px 0; font-size: 12px; }
+        .critical { border-left: 4px solid #ff073a; }
+        .potential { border-left: 4px solid #ffff00; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .timestamp { color: #00ff00; font-weight: bold; }
+        .key-name { color: #ff073a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DATA FORENSICS RECOVERY</h1>
+        <p class="critical">MISSION: Find and recover the missing July 11-13 data</p>
+        
+        <div class="forensics-section critical">
+            <h2>🚨 DEEP STORAGE SCAN</h2>
+            <button onclick="deepStorageScan()">🔍 SCAN ALL STORAGE LOCATIONS</button>
+            <button onclick="findDateRangeData()">📅 FIND JULY 11-13 DATA</button>
+            <button onclick="searchForKeywords()">🔎 SEARCH FOR CV/NOTES KEYWORDS</button>
+            <div id="deepScanResults"></div>
+        </div>
+
+        <div class="forensics-section potential">
+            <h2>📋 BROWSER CACHE FORENSICS</h2>
+            <button onclick="scanBrowserCache()">💾 SCAN BROWSER CACHE</button>
+            <button onclick="checkIndexedDB()">🗄️ CHECK INDEXEDDB</button>
+            <button onclick="scanSessionStorage()">⏱️ SCAN SESSION STORAGE</button>
+            <div id="cacheResults"></div>
+        </div>
+
+        <div class="forensics-section">
+            <h2>🕵️ BACKUP ARCHAEOLOGY</h2>
+            <button onclick="findAllBackups()">🏺 FIND ALL BACKUP TRACES</button>
+            <button onclick="searchTempData()">🗂️ SEARCH TEMPORARY DATA</button>
+            <button onclick="analyzeTimestamps()">⏰ ANALYZE TIMESTAMPS</button>
+            <div id="backupResults"></div>
+        </div>
+
+        <div class="forensics-section">
+            <h2>🔧 MANUAL RECOVERY TOOLS</h2>
+            <button onclick="exportFindings()">💾 EXPORT ALL FINDINGS</button>
+            <button onclick="reconstructData()">🔨 RECONSTRUCT FROM FRAGMENTS</button>
+            <div id="recoveryResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let allFindings = {};
+
+        function deepStorageScan() {
+            const results = document.getElementById('deepScanResults');
+            results.innerHTML = '<h3>🔍 Deep Storage Scan Results:</h3>';
+            
+            let foundItems = [];
+            
+            // Scan ALL localStorage keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        // Check for any workspace-related data
+                        if (key.includes('nishen') || key.includes('workspace') || 
+                            key.includes('notes') || key.includes('cv') || 
+                            key.includes('backup') || key.includes('temp')) {
+                            
+                            foundItems.push({
+                                key: key,
+                                size: data.length,
+                                data: data,
+                                type: 'localStorage'
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Scan sessionStorage
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) {
+                    const data = sessionStorage.getItem(key);
+                    if (data && (key.includes('nishen') || key.includes('workspace'))) {
+                        foundItems.push({
+                            key: key,
+                            size: data.length,
+                            data: data,
+                            type: 'sessionStorage'
+                        });
+                    }
+                }
+            }
+            
+            allFindings.deepScan = foundItems;
+            
+            foundItems.forEach(item => {
+                results.innerHTML += `
+                    <div class="data-display">
+                        <span class="key-name">${item.type}: ${item.key}</span> (${item.size} chars)
+                        <button onclick="viewData('${item.key}', '${item.type}')">VIEW</button>
+                        <button onclick="analyzeData('${item.key}', '${item.type}')">ANALYZE</button>
+                    </div>
+                `;
+            });
+            
+            if (foundItems.length === 0) {
+                results.innerHTML += '<p>❌ No additional workspace data found in standard locations</p>';
+            }
+        }
+
+        function findDateRangeData() {
+            const results = document.getElementById('deepScanResults');
+            results.innerHTML += '<h3>📅 July 11-13 Date Range Analysis:</h3>';
+            
+            const targetDates = ['2025-07-11', '2025-07-12', '2025-07-13'];
+            let foundDateData = [];
+            
+            // Check all localStorage for date-related content
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        // Search for target dates in the data
+                        targetDates.forEach(date => {
+                            if (data.includes(date)) {
+                                foundDateData.push({
+                                    key: key,
+                                    date: date,
+                                    data: data,
+                                    snippet: data.substring(Math.max(0, data.indexOf(date) - 100), data.indexOf(date) + 200)
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+            
+            if (foundDateData.length > 0) {
+                results.innerHTML += '<p class="found">🎯 FOUND DATA WITH TARGET DATES!</p>';
+                foundDateData.forEach(item => {
+                    results.innerHTML += `
+                        <div class="data-display potential">
+                            <strong>📅 ${item.date} found in: ${item.key}</strong><br>
+                            <pre>${item.snippet}</pre>
+                            <button onclick="extractFullData('${item.key}')">EXTRACT FULL DATA</button>
+                        </div>
+                    `;
+                });
+            } else {
+                results.innerHTML += '<p>❌ No data found with July 11-13 timestamps</p>';
+            }
+            
+            allFindings.dateRange = foundDateData;
+        }
+
+        function searchForKeywords() {
+            const results = document.getElementById('deepScanResults');
+            results.innerHTML += '<h3>🔎 CV/Notes Keyword Search:</h3>';
+            
+            const keywords = [
+                'cv', 'CV', 'curriculum', 'vitae', 'resume',
+                'skills', 'experience', 'personal', 'notes',
+                'project', 'work', 'development', 'engineering',
+                'Nishen', 'Harichunder', 'First Technology',
+                'Microsoft', 'Azure', 'MCSE', 'certification'
+            ];
+            
+            let keywordMatches = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        keywords.forEach(keyword => {
+                            if (data.toLowerCase().includes(keyword.toLowerCase())) {
+                                const index = data.toLowerCase().indexOf(keyword.toLowerCase());
+                                keywordMatches.push({
+                                    key: key,
+                                    keyword: keyword,
+                                    context: data.substring(Math.max(0, index - 150), index + 150),
+                                    fullData: data
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+            
+            if (keywordMatches.length > 0) {
+                results.innerHTML += '<p class="found">🎯 FOUND KEYWORD MATCHES!</p>';
+                keywordMatches.forEach(match => {
+                    results.innerHTML += `
+                        <div class="data-display potential">
+                            <strong>🔍 "${match.keyword}" in: ${match.key}</strong><br>
+                            <pre>${match.context}</pre>
+                            <button onclick="highlightKeyword('${match.key}', '${match.keyword}')">VIEW FULL</button>
+                        </div>
+                    `;
+                });
+            } else {
+                results.innerHTML += '<p>❌ No CV/experience keywords found</p>';
+            }
+            
+            allFindings.keywords = keywordMatches;
+        }
+
+        function scanBrowserCache() {
+            const results = document.getElementById('cacheResults');
+            results.innerHTML = '<h3>💾 Browser Cache Analysis:</h3>';
+            
+            // Check for any cache-related APIs
+            try {
+                if ('caches' in window) {
+                    caches.keys().then(cacheNames => {
+                        results.innerHTML += `<p>📦 Found ${cacheNames.length} cache stores:</p>`;
+                        cacheNames.forEach(name => {
+                            results.innerHTML += `<p>- ${name}</p>`;
+                        });
+                    });
+                } else {
+                    results.innerHTML += '<p>❌ Cache API not available</p>';
+                }
+            } catch (e) {
+                results.innerHTML += `<p>❌ Cache scan error: ${e.message}</p>`;
+            }
+            
+            // Check performance entries for resource timing
+            if ('performance' in window) {
+                const entries = performance.getEntries();
+                const workspaceEntries = entries.filter(entry => 
+                    entry.name.includes('workspace') || 
+                    entry.name.includes('nishen')
+                );
+                
+                if (workspaceEntries.length > 0) {
+                    results.innerHTML += '<p class="found">🎯 Found workspace-related performance entries!</p>';
+                    workspaceEntries.forEach(entry => {
+                        results.innerHTML += `<p>📊 ${entry.name} - ${new Date(entry.startTime).toISOString()}</p>`;
+                    });
+                }
+            }
+        }
+
+        function checkIndexedDB() {
+            const results = document.getElementById('cacheResults');
+            results.innerHTML += '<h3>🗄️ IndexedDB Analysis:</h3>';
+            
+            try {
+                if ('indexedDB' in window) {
+                    // This is a simplified check - full IndexedDB enumeration is complex
+                    results.innerHTML += '<p>🔍 IndexedDB available - checking for workspace databases...</p>';
+                    
+                    // Note: Full IndexedDB scanning requires async operations
+                    // For now, just check if it's available
+                    results.innerHTML += '<p>⚠️ Manual IndexedDB check needed - open DevTools → Application → Storage</p>';
+                } else {
+                    results.innerHTML += '<p>❌ IndexedDB not available</p>';
+                }
+            } catch (e) {
+                results.innerHTML += `<p>❌ IndexedDB error: ${e.message}</p>`;
+            }
+        }
+
+        function scanSessionStorage() {
+            const results = document.getElementById('cacheResults');
+            results.innerHTML += '<h3>⏱️ Session Storage Analysis:</h3>';
+            
+            let sessionFindings = [];
+            
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) {
+                    const data = sessionStorage.getItem(key);
+                    sessionFindings.push({
+                        key: key,
+                        size: data ? data.length : 0,
+                        hasWorkspaceData: data && (
+                            data.includes('nishen') || 
+                            data.includes('workspace') ||
+                            data.includes('notes') ||
+                            data.includes('cv')
+                        )
+                    });
+                }
+            }
+            
+            results.innerHTML += `<p>📋 Session storage has ${sessionFindings.length} items:</p>`;
+            sessionFindings.forEach(item => {
+                const status = item.hasWorkspaceData ? '🎯 POTENTIAL DATA' : '📝 Regular data';
+                results.innerHTML += `<p>${status}: ${item.key} (${item.size} chars)</p>`;
+            });
+            
+            allFindings.sessionStorage = sessionFindings;
+        }
+
+        function findAllBackups() {
+            const results = document.getElementById('backupResults');
+            results.innerHTML = '<h3>🏺 Backup Archaeology:</h3>';
+            
+            let backupKeys = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (
+                    key.includes('backup') || 
+                    key.includes('BACKUP') ||
+                    key.includes('emergency') ||
+                    key.includes('EMERGENCY') ||
+                    key.includes('temp') ||
+                    key.includes('TEMP') ||
+                    key.includes('save') ||
+                    key.includes('archive')
+                )) {
+                    const data = localStorage.getItem(key);
+                    backupKeys.push({
+                        key: key,
+                        size: data ? data.length : 0,
+                        data: data
+                    });
+                }
+            }
+            
+            if (backupKeys.length > 0) {
+                results.innerHTML += '<p class="found">🎯 FOUND BACKUP DATA!</p>';
+                backupKeys.forEach(backup => {
+                    results.innerHTML += `
+                        <div class="data-display potential">
+                            <strong>📦 ${backup.key}</strong> (${backup.size} chars)
+                            <button onclick="analyzeBackup('${backup.key}')">ANALYZE BACKUP</button>
+                            <button onclick="extractBackup('${backup.key}')">EXTRACT DATA</button>
+                        </div>
+                    `;
+                });
+            } else {
+                results.innerHTML += '<p>❌ No backup data found</p>';
+            }
+            
+            allFindings.backups = backupKeys;
+        }
+
+        function viewData(key, type) {
+            const storage = type === 'sessionStorage' ? sessionStorage : localStorage;
+            const data = storage.getItem(key);
+            
+            if (data) {
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(`
+                    <html>
+                    <head><title>Data Viewer: ${key}</title></head>
+                    <body style="background: #1a1a1a; color: #fff; font-family: monospace; padding: 20px;">
+                        <h2>${type}: ${key}</h2>
+                        <pre style="white-space: pre-wrap; word-wrap: break-word;">${data}</pre>
+                    </body>
+                    </html>
+                `);
+            }
+        }
+
+        function analyzeData(key, type) {
+            const storage = type === 'sessionStorage' ? sessionStorage : localStorage;
+            const data = storage.getItem(key);
+            
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    console.log(`📊 Analysis of ${key}:`, parsed);
+                    alert(`✅ ${key} contains valid JSON with ${Array.isArray(parsed) ? parsed.length + ' items' : 'object data'}`);
+                } catch (e) {
+                    alert(`⚠️ ${key} is not valid JSON: ${e.message}`);
+                }
+            }
+        }
+
+        function extractFullData(key) {
+            const data = localStorage.getItem(key);
+            if (data) {
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `recovered-${key}-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert(`💾 Extracted data from ${key} - check your downloads!`);
+            }
+        }
+
+        function exportFindings() {
+            const allData = {
+                timestamp: new Date().toISOString(),
+                findings: allFindings,
+                localStorage_snapshot: {},
+                sessionStorage_snapshot: {}
+            };
+            
+            // Add complete localStorage snapshot
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    allData.localStorage_snapshot[key] = localStorage.getItem(key);
+                }
+            }
+            
+            // Add complete sessionStorage snapshot
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key) {
+                    allData.sessionStorage_snapshot[key] = sessionStorage.getItem(key);
+                }
+            }
+            
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `forensics-complete-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('recoveryResults').innerHTML = '<p class="success">💾 Complete forensics exported - check downloads!</p>';
+        }
+
+        // Auto-run deep scan on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                deepStorageScan();
+                findDateRangeData();
+                searchForKeywords();
+                findAllBackups();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

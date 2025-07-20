@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Data Recovery - Nishen's AI Workspace</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .recovery-section { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { background: #ff073a; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .success { background: #00ff00; color: #000; }
+        .data-display { background: #333; color: #fff; border: 1px solid #555; padding: 10px; max-height: 300px; overflow-y: auto; margin: 10px 0; }
+        .critical { border-left: 4px solid #ff073a; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Force Data Recovery Tool</h1>
+        <p>Your data exists in localStorage but components aren't loading it. Let's force recovery.</p>
+        
+        <div class="recovery-section critical">
+            <h2>📊 Current Data Status</h2>
+            <button onclick="analyzeData()">🔍 ANALYZE ALL DATA</button>
+            <button onclick="viewSpecificData()">👁️ VIEW SPECIFIC MODULE DATA</button>
+            <div id="dataAnalysis"></div>
+        </div>
+
+        <div class="recovery-section">
+            <h2>🔄 Force Component Refresh</h2>
+            <button onclick="forceURLLinksRefresh()">🔗 Force URL Links Refresh</button>
+            <button onclick="forceNotesRefresh()">📝 Force Notes Refresh</button>
+            <button onclick="forceFilesRefresh()">📁 Force Files Refresh</button>
+            <button onclick="forceProdRefresh()">⚙️ Force Prod Refresh</button>
+            <div id="refreshResults"></div>
+        </div>
+
+        <div class="recovery-section">
+            <h2>🛠️ Data Repair Tools</h2>
+            <button onclick="repairAllData()">🔧 REPAIR ALL DATA STRUCTURES</button>
+            <button onclick="triggerComponentReload()">🔄 TRIGGER COMPONENT RELOAD</button>
+            <div id="repairResults"></div>
+        </div>
+
+        <div class="recovery-section">
+            <h2>📋 Manual Data Entry</h2>
+            <p>If recovery fails, manually re-add a test item to verify the fixes work:</p>
+            <button onclick="addTestURL()">➕ Add Test URL Link</button>
+            <button onclick="addTestNote()">➕ Add Test Note</button>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        function analyzeData() {
+            const analysis = document.getElementById('dataAnalysis');
+            let html = '<h3>📊 localStorage Analysis:</h3>';
+            
+            const workspaceKeys = [
+                'nishen-workspace-url-links',
+                'nishen-workspace-prompts', 
+                'nishen-workspace-settings',
+                'nishen-workspace-dev',
+                'nishen-workspace-file-browser',
+                'nishen-workspace-prod',
+                'nishen-workspace-categories',
+                'nishen-workspace-notes',
+                'nishen-workspace-prompt-categories',
+                'nishen-workspace-url-categories'
+            ];
+            
+            workspaceKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const size = data.length;
+                        const items = Array.isArray(parsed) ? parsed.length : 'Not array';
+                        html += `<p>✅ <strong>${key}</strong>: ${size} chars, ${items} items</p>`;
+                    } catch (e) {
+                        html += `<p>⚠️ <strong>${key}</strong>: ${data.length} chars (parsing error)</p>`;
+                    }
+                } else {
+                    html += `<p>❌ <strong>${key}</strong>: No data</p>`;
+                }
+            });
+            
+            analysis.innerHTML = html;
+        }
+
+        function viewSpecificData() {
+            const key = prompt('Enter localStorage key to view:', 'nishen-workspace-url-links');
+            if (key) {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const analysis = document.getElementById('dataAnalysis');
+                        analysis.innerHTML += `<h4>📋 Data for ${key}:</h4><pre>${JSON.stringify(parsed, null, 2)}</pre>`;
+                    } catch (e) {
+                        alert('Error parsing data: ' + e.message);
+                    }
+                } else {
+                    alert('No data found for key: ' + key);
+                }
+            }
+        }
+
+        function forceURLLinksRefresh() {
+            // This simulates what the component should do
+            const data = localStorage.getItem('nishen-workspace-url-links');
+            const categories = localStorage.getItem('nishen-workspace-url-categories');
+            
+            const results = document.getElementById('refreshResults');
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    results.innerHTML += `<p>✅ URL Links: Found ${parsed.length} links</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ URL Links: Parse error - ${e.message}</p>`;
+                }
+            } else {
+                results.innerHTML += `<p>❌ URL Links: No data found</p>`;
+            }
+            
+            if (categories) {
+                try {
+                    const parsed = JSON.parse(categories);
+                    results.innerHTML += `<p>✅ URL Categories: Found ${parsed.length} categories</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ URL Categories: Parse error - ${e.message}</p>`;
+                }
+            }
+        }
+
+        function forceNotesRefresh() {
+            const notes = localStorage.getItem('nishen-workspace-notes');
+            const categories = localStorage.getItem('nishen-workspace-categories');
+            
+            const results = document.getElementById('refreshResults');
+            if (notes) {
+                try {
+                    const parsed = JSON.parse(notes);
+                    results.innerHTML += `<p>✅ Notes: Found ${parsed.length} notes</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ Notes: Parse error - ${e.message}</p>`;
+                }
+            }
+            
+            if (categories) {
+                try {
+                    const parsed = JSON.parse(categories);
+                    results.innerHTML += `<p>✅ Note Categories: Found ${parsed.length} categories</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ Note Categories: Parse error - ${e.message}</p>`;
+                }
+            }
+        }
+
+        function forceFilesRefresh() {
+            const dev = localStorage.getItem('nishen-workspace-dev');
+            const results = document.getElementById('refreshResults');
+            
+            if (dev) {
+                try {
+                    const parsed = JSON.parse(dev);
+                    results.innerHTML += `<p>✅ Dev Files: Found ${parsed.length} projects</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ Dev Files: Parse error - ${e.message}</p>`;
+                }
+            }
+        }
+
+        function forceProdRefresh() {
+            const prod = localStorage.getItem('nishen-workspace-prod');
+            const results = document.getElementById('refreshResults');
+            
+            if (prod) {
+                try {
+                    const parsed = JSON.parse(prod);
+                    results.innerHTML += `<p>✅ Prod Files: Found ${parsed.length} projects</p>`;
+                } catch (e) {
+                    results.innerHTML += `<p>❌ Prod Files: Parse error - ${e.message}</p>`;
+                }
+            }
+        }
+
+        function repairAllData() {
+            const results = document.getElementById('repairResults');
+            results.innerHTML = '<p>🔧 Attempting data repair...</p>';
+            
+            // Force trigger events that components listen for
+            try {
+                // Dispatch storage events to force component updates
+                window.dispatchEvent(new Event('storage'));
+                
+                // Try to trigger React re-renders by modifying localStorage slightly
+                const tempKey = 'temp-recovery-trigger';
+                localStorage.setItem(tempKey, Date.now().toString());
+                localStorage.removeItem(tempKey);
+                
+                results.innerHTML += '<p>✅ Triggered storage events</p>';
+            } catch (e) {
+                results.innerHTML += `<p>❌ Repair failed: ${e.message}</p>`;
+            }
+        }
+
+        function triggerComponentReload() {
+            const results = document.getElementById('repairResults');
+            results.innerHTML += '<p>🔄 Triggering full component reload...</p>';
+            
+            // Clear session storage and force reload
+            sessionStorage.clear();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function addTestURL() {
+            const testLink = {
+                id: Date.now().toString(),
+                title: 'Test Recovery Link',
+                url: 'https://example.com',
+                description: 'Test link to verify recovery works',
+                category: 'web',
+                tags: ['test', 'recovery'],
+                isFavorite: false,
+                dateAdded: new Date().toISOString(),
+                accessCount: 0
+            };
+            
+            const existing = localStorage.getItem('nishen-workspace-url-links');
+            let links = [];
+            
+            if (existing) {
+                try {
+                    links = JSON.parse(existing);
+                } catch (e) {
+                    console.error('Error parsing existing links:', e);
+                }
+            }
+            
+            links.push(testLink);
+            localStorage.setItem('nishen-workspace-url-links', JSON.stringify(links));
+            
+            document.getElementById('testResults').innerHTML += 
+                `<p>✅ Added test URL link. Total links: ${links.length}</p>`;
+        }
+
+        function addTestNote() {
+            const testNote = {
+                id: Date.now().toString(),
+                title: 'Test Recovery Note',
+                content: 'This is a test note to verify data recovery works.',
+                category: 'Personal',
+                tags: ['test', 'recovery'],
+                created: new Date(),
+                modified: new Date(),
+                isPinned: false,
+                isArchived: false,
+                type: 'markdown'
+            };
+            
+            const existing = localStorage.getItem('nishen-workspace-notes');
+            let notes = [];
+            
+            if (existing) {
+                try {
+                    notes = JSON.parse(existing);
+                } catch (e) {
+                    console.error('Error parsing existing notes:', e);
+                }
+            }
+            
+            notes.push(testNote);
+            localStorage.setItem('nishen-workspace-notes', JSON.stringify(notes));
+            
+            document.getElementById('testResults').innerHTML += 
+                `<p>✅ Added test note. Total notes: ${notes.length}</p>`;
+        }
+
+        // Auto-run analysis on page load
+        window.addEventListener('load', () => {
+            analyzeData();
+        });
+    </script>
+</body>
+</html>
