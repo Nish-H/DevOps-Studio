@@ -67,8 +67,7 @@ export default function URLLinks() {
   const [links, setLinks] = useState<URLLink[]>([]);
   const [categories, setCategories] = useState<URLCategory[]>(defaultCategories);
   
-  // BULLETPROOF STORAGE - ENTERPRISE GRADE
-  const bulletproofStorage = createBulletproofStorage('URL_LINKS', 'nishen-workspace-url-links');
+  // Use standard localStorage for consistency with other modules
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -93,12 +92,22 @@ export default function URLLinks() {
   });
 
   useEffect(() => {
+    const savedLinks = localStorage.getItem('nishen-workspace-url-links');
     const savedCategories = localStorage.getItem('nishen-workspace-url-categories');
     
-    // BULLETPROOF LOADING - ENTERPRISE GRADE  
-    const loadedLinks = bulletproofStorage.loadData([]);
-    let parsedCategories: URLCategory[] = defaultCategories;
+    // Load saved links with safe parsing
+    let parsedLinks: URLLink[] = [];
+    if (savedLinks) {
+      try {
+        parsedLinks = JSON.parse(savedLinks);
+      } catch (error) {
+        console.warn('Failed to parse saved links, using empty array:', error);
+        parsedLinks = [];
+      }
+    }
     
+    // Load saved categories with safe parsing
+    let parsedCategories: URLCategory[] = defaultCategories;
     if (savedCategories) {
       try {
         parsedCategories = JSON.parse(savedCategories);
@@ -115,14 +124,13 @@ export default function URLLinks() {
       }
     }
     
-    setLinks(loadedLinks);
+    setLinks(parsedLinks);
     setCategories(parsedCategories);
   }, []);
 
   useEffect(() => {
-    if (links.length >= 0) {
-      bulletproofStorage.saveData(links, 'USER_UPDATE');
-    }
+    // Save links to localStorage whenever links change
+    localStorage.setItem('nishen-workspace-url-links', JSON.stringify(links));
   }, [links]);
 
   useEffect(() => {
