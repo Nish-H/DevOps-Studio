@@ -409,10 +409,10 @@ export default function SimpleWorkspace() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="text-6xl mb-4">
-                {menuItems.find(item => item.id === activeSection)?.icon}
+                {menuItems.find((item: any) => item.id === activeSection)?.icon}
               </div>
               <h2 className="text-2xl font-bold mb-2 text-orange-500">
-                {menuItems.find(item => item.id === activeSection)?.name}
+                {menuItems.find((item: any) => item.id === activeSection)?.name}
               </h2>
               <p className="text-gray-400">Coming soon...</p>
             </div>

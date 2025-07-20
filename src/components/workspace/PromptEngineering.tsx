@@ -302,7 +302,7 @@ Use creative thinking methods like:
   const updateCategoryCounts = (promptList: Prompt[], categoryList: PromptCategory[]) => {
     const updatedCategories = categoryList.map(category => ({
       ...category,
-      count: promptList.filter(prompt => !prompt.isArchived && prompt.category === category.name).length
+      count: promptList.filter((prompt: any) => !prompt.isArchived && prompt.category === category.name).length
     }))
     setCategories(updatedCategories)
   }
@@ -401,7 +401,7 @@ Write your prompt content here...
 
   const deletePrompt = (promptId: string) => {
     if (confirm('Are you sure you want to delete this prompt?')) {
-      setPrompts(prev => prev.filter(prompt => prompt.id !== promptId))
+      setPrompts(prev => prev.filter((prompt: any) => prompt.id !== promptId))
       if (selectedPrompt === promptId) {
         setSelectedPrompt(null)
       }
@@ -446,13 +446,13 @@ Write your prompt content here...
   }
 
   // Filter prompts based on search and category
-  const filteredPrompts = prompts.filter(prompt => {
+  const filteredPrompts = prompts.filter((prompt: any) => {
     if (prompt.isArchived) return false
     
     const matchesSearch = searchTerm === '' || 
       prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prompt.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      prompt.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
       prompt.category.toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesCategory = selectedCategory === 'all' || prompt.category === selectedCategory
@@ -468,7 +468,7 @@ Write your prompt content here...
     return b.modified.getTime() - a.modified.getTime()
   })
 
-  const selectedPromptData = prompts.find(p => p.id === selectedPrompt)
+  const selectedPromptData = prompts.find((p: any) => p.id === selectedPrompt)
 
   return (
     <div className="flex h-full bg-black text-white">
@@ -531,7 +531,7 @@ Write your prompt content here...
                 }`}
               >
                 <span>All Prompts</span>
-                <span className="text-xs">{prompts.filter(p => !p.isArchived).length}</span>
+                <span className="text-xs">{prompts.filter((p: any) => !p.isArchived).length}</span>
               </button>
               
               {categories.map(category => (

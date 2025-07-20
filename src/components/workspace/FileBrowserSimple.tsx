@@ -128,7 +128,7 @@ Try creating a new file or folder to get started!`
 
   const getParentPath = (path: string): string => {
     if (path === '/') return ''
-    const parts = path.split('/').filter(p => p)
+    const parts = path.split('/').filter((p: any) => p)
     if (parts.length === 1) return '/'
     return '/' + parts.slice(0, -1).join('/')
   }

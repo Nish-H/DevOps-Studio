@@ -641,7 +641,7 @@ Add your production content here...`
     if (confirm('⚠️ PRODUCTION WARNING: Are you sure you want to delete this production file? This action cannot be undone and may affect live systems.')) {
       setProjects(prev => prev.map((p: any) => 
         p.id === selectedProject
-          ? { ...p, files: p.files.filter(f => f.id !== fileId) }
+          ? { ...p, files: p.files.filter((f: any) => f.id !== fileId) }
           : p
       ))
       
@@ -707,8 +707,8 @@ Add your production content here...`
     return html
   }
 
-  const selectedProjectData = projects.find(p => p.id === selectedProject)
-  const selectedFileData = selectedProjectData?.files.find(f => f.id === selectedFile)
+  const selectedProjectData = projects.find((p: any) => p.id === selectedProject)
+  const selectedFileData = selectedProjectData?.files.find((f: any) => f.id === selectedFile)
 
   return (
     <div className="flex h-full bg-black text-white">
@@ -747,7 +747,7 @@ Add your production content here...`
                 </span>
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                {projects.find(p => p.id === timer.activeProject)?.name}
+                {projects.find((p: any) => p.id === timer.activeProject)?.name}
               </div>
             </div>
           )}

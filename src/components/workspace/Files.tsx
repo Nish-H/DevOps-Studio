@@ -676,7 +676,7 @@ Add your content here...`
     if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
       setProjects(prev => prev.map((p: any) => 
         p.id === selectedProject
-          ? { ...p, files: p.files.filter(f => f.id !== fileId) }
+          ? { ...p, files: p.files.filter((f: any) => f.id !== fileId) }
           : p
       ))
       
@@ -861,8 +861,8 @@ use a dedicated PDF generation tool.`
   
   
 
-  const selectedProjectData = projects.find(p => p.id === selectedProject)
-  const selectedFileData = selectedProjectData?.files.find(f => f.id === selectedFile)
+  const selectedProjectData = projects.find((p: any) => p.id === selectedProject)
+  const selectedFileData = selectedProjectData?.files.find((f: any) => f.id === selectedFile)
 
   return (
     <div className="flex flex-col h-full bg-black text-white">
@@ -903,7 +903,7 @@ use a dedicated PDF generation tool.`
                 </span>
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                {projects.find(p => p.id === timer.activeProject)?.name}
+                {projects.find((p: any) => p.id === timer.activeProject)?.name}
               </div>
             </div>
           )}

@@ -111,7 +111,7 @@ export default function URLLinks() {
         // Ensure default categories exist
         const mergedCategories = [...defaultCategories];
         parsedCategories.forEach((savedCat: URLCategory) => {
-          if (!mergedCategories.find(cat => cat.id === savedCat.id)) {
+          if (!mergedCategories.find((cat: any) => cat.id === savedCat.id)) {
             mergedCategories.push(savedCat);
           }
         });
@@ -195,15 +195,15 @@ export default function URLLinks() {
   const deleteLink = (id: string) => {
     const linkToDelete = links.find(link => link.id === id);
     console.log('🗑️ URLLinks: Deleting link:', linkToDelete?.title);
-    setLinks(prevLinks => prevLinks.filter(link => link.id !== id));
+    setLinks(prevLinks => prevLinks.filter((link: any) => link.id !== id));
   };
 
   const deleteCategory = (id: string) => {
-    if (defaultCategories.find(cat => cat.id === id)) {
+    if (defaultCategories.find((cat: any) => cat.id === id)) {
       alert('Cannot delete default categories');
       return;
     }
-    const categoryToDelete = categories.find(cat => cat.id === id);
+    const categoryToDelete = categories.find((cat: any) => cat.id === id);
     console.log('🗑️ URLLinks: Deleting category:', categoryToDelete?.name);
     setCategories(prevCategories => prevCategories.filter(cat => cat.id !== id));
     setLinks(prevLinks => prevLinks.map(link => link.category === id ? { ...link, category: 'web' } : link));
@@ -230,11 +230,11 @@ export default function URLLinks() {
     console.log('📋 URLLinks: Copied URL to clipboard');
   };
 
-  const filteredLinks = links.filter(link => {
+  const filteredLinks = links.filter((link: any) => {
     const matchesSearch = link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          link.url.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         link.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         link.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesCategory = selectedCategory === 'all' || link.category === selectedCategory;
     const matchesFavorites = !showFavoritesOnly || link.isFavorite;
@@ -323,7 +323,7 @@ export default function URLLinks() {
                 <div className="space-y-2">
                   {categories.map(category => {
                     const IconComponent = getCategoryIcon(category.icon);
-                    const categoryCount = links.filter(link => link.category === category.id).length;
+                    const categoryCount = links.filter((link: any) => link.category === category.id).length;
                     
                     return (
                       <div key={category.id} className="flex items-center justify-between">
@@ -339,7 +339,7 @@ export default function URLLinks() {
                           >
                             <Edit2 className="h-3 w-3" />
                           </button>
-                          {!defaultCategories.find(cat => cat.id === category.id) && (
+                          {!defaultCategories.find((cat: any) => cat.id === category.id) && (
                             <button
                               onClick={() => deleteCategory(category.id)}
                               className="p-1 hover:bg-gray-700 rounded text-red-400"
@@ -381,7 +381,7 @@ export default function URLLinks() {
                 style={{ maxHeight: 'calc(100vh - 300px)' }}
               >
                 {filteredLinks.map(link => {
-                  const category = categories.find(cat => cat.id === link.category);
+                  const category = categories.find((cat: any) => cat.id === link.category);
                   const IconComponent = category ? getCategoryIcon(category.icon) : Tag;
                   
                   return (

@@ -890,7 +890,7 @@ npm run dev
   useEffect(() => {
     setCategories(prev => prev.map(cat => ({
       ...cat,
-      count: notes.filter(note => note.category === cat.name && !note.isArchived).length
+      count: notes.filter((note: any) => note.category === cat.name && !note.isArchived).length
     })))
   }, [notes])
 
@@ -1090,7 +1090,7 @@ Start writing your note here...`
 
   const deleteCategory = (categoryName: string) => {
     // Don't delete if there are notes in this category
-    const notesInCategory = notes.filter(note => note.category === categoryName && !note.isArchived)
+    const notesInCategory = notes.filter((note: any) => note.category === categoryName && !note.isArchived)
     if (notesInCategory.length > 0) {
       alert(`Cannot delete category "${categoryName}" because it contains ${notesInCategory.length} note(s). Please move or delete the notes first.`)
       return
@@ -1123,7 +1123,7 @@ Start writing your note here...`
 
   const deleteNote = (noteId: string) => {
     if (confirm('Are you sure you want to delete this note?')) {
-      setNotes(prev => prev.filter(note => note.id !== noteId))
+      setNotes(prev => prev.filter((note: any) => note.id !== noteId))
       if (selectedNote === noteId) {
         setSelectedNote(null)
       }
@@ -1137,13 +1137,13 @@ Start writing your note here...`
   }
 
   // Filter notes based on search and category
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = notes.filter((note: any) => {
     if (note.isArchived) return false
     
     const matchesSearch = searchTerm === '' || 
       note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      note.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     
     const matchesCategory = selectedCategory === 'all' || note.category === selectedCategory
     
