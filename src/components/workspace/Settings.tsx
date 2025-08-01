@@ -38,6 +38,7 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react'
+import StorageManager from '../ui/StorageManager'
 
 export default function Settings() {
   const { 
@@ -53,6 +54,7 @@ export default function Settings() {
   const [showResetModal, setShowResetModal] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
   const [showDataBackupModal, setShowDataBackupModal] = useState(false)
+  const [showStorageManager, setShowStorageManager] = useState(false)
 
   const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -679,6 +681,25 @@ export default function Settings() {
           />
         </div>
       </div>
+
+      <div>
+        <h3 className="text-lg font-semibold text-neon-green mb-4 flex items-center">
+          <HardDrive className="w-5 h-5 mr-2" />
+          Storage Management
+        </h3>
+        <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg">
+          <p className="text-sm text-gray-300 mb-4">
+            Manage localStorage usage and cleanup screenshot data to prevent storage quota errors.
+          </p>
+          <button
+            onClick={() => setShowStorageManager(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            <HardDrive className="w-4 h-4" />
+            Open Storage Manager
+          </button>
+        </div>
+      </div>
       
       <div>
         <h3 className="text-lg font-semibold text-neon-green mb-4">Custom CSS</h3>
@@ -831,6 +852,15 @@ export default function Settings() {
                 Download
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Storage Manager Modal */}
+      {showStorageManager && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-4xl border border-gray-700 max-h-[90vh] overflow-y-auto">
+            <StorageManager onClose={() => setShowStorageManager(false)} />
           </div>
         </div>
       )}

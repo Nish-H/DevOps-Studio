@@ -23,6 +23,7 @@ import {
   Code,
   File
 } from 'lucide-react'
+import ScreenshotWidget from '../ui/ScreenshotWidget'
 
 interface Note {
   id: string
@@ -1492,6 +1493,23 @@ Start writing your note here...`
                   </pre>
                 </div>
               )}
+            </div>
+
+            {/* Screenshots Section */}
+            <div className="border-t border-gray-800 bg-gray-900 p-4">
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>
+                Screenshots & Visual Notes
+              </h3>
+              <ScreenshotWidget 
+                section="notes" 
+                parentId={selectedNoteData.id}
+                onScreenshotAdded={() => {
+                  // Optional: Add any additional handling when screenshots are added
+                }}
+                onScreenshotDeleted={() => {
+                  // Optional: Add any additional handling when screenshots are deleted
+                }}
+              />
             </div>
 
             {/* Note Metadata */}

@@ -34,6 +34,7 @@ import {
   Bug,
   Wrench
 } from 'lucide-react'
+import ScreenshotWidget from '../ui/ScreenshotWidget'
 
 interface SystemInfo {
   cpu: number
@@ -605,6 +606,26 @@ export default function Tools() {
               <p className="text-gray-500">No tools available in this category</p>
             </div>
           )}
+        </div>
+        
+        {/* Screenshots Section for SOPs and Documentation */}
+        <div className="border-t border-gray-800 bg-gray-900 p-6">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>
+            SOPs & Visual Documentation
+          </h3>
+          <p className="text-gray-400 text-sm mb-4">
+            Add screenshots of system configurations, monitoring dashboards, error logs, and step-by-step procedures.
+          </p>
+          <ScreenshotWidget 
+            section="tools" 
+            parentId={selectedCategory}
+            onScreenshotAdded={() => {
+              // Optional: Add any additional handling when screenshots are added
+            }}
+            onScreenshotDeleted={() => {
+              // Optional: Add any additional handling when screenshots are deleted
+            }}
+          />
         </div>
       </div>
     </div>

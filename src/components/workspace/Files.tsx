@@ -29,6 +29,7 @@ import {
   Upload,
   HardDrive
 } from 'lucide-react'
+import ScreenshotWidget from '../ui/ScreenshotWidget'
 
 interface FileVersion {
   id: string
@@ -1211,6 +1212,23 @@ use a dedicated PDF generation tool.`
                   {selectedFileData.content}
                 </pre>
               )}
+            </div>
+
+            {/* Screenshots Section */}
+            <div className="border-t border-gray-800 bg-gray-900 p-4">
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--primary-accent)' }}>
+                Screenshots & Visual Documentation
+              </h3>
+              <ScreenshotWidget 
+                section="files" 
+                parentId={selectedFileData.id}
+                onScreenshotAdded={() => {
+                  // Optional: Add any additional handling when screenshots are added
+                }}
+                onScreenshotDeleted={() => {
+                  // Optional: Add any additional handling when screenshots are deleted
+                }}
+              />
             </div>
 
             {/* Versions Panel */}
