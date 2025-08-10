@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Emergency Data Recovery - Nishen's AI Workspace</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 7, 58, 0.1);
+            border: 2px solid #ff073a;
+            border-radius: 10px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(139, 148, 153, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #8B9499;
+        }
+        .emergency {
+            background: rgba(255, 7, 58, 0.2);
+            border-left-color: #ff073a;
+        }
+        .success {
+            background: rgba(0, 204, 51, 0.2);
+            border-left-color: #00CC33;
+        }
+        button {
+            background: #ff073a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #d00530;
+        }
+        button.secondary {
+            background: #8B9499;
+        }
+        button.secondary:hover {
+            background: #6a7479;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .warning {
+            color: #ff073a;
+            font-weight: bold;
+        }
+        .info {
+            color: #8B9499;
+        }
+        .success-text {
+            color: #00CC33;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Emergency Data Recovery System</h1>
+            <p>Nishen's AI Workspace - Data Loss Prevention & Recovery</p>
+            <p class="warning">Use this tool if your workspace data is missing or corrupted</p>
+        </div>
+
+        <div class="section emergency">
+            <h2>🔍 Step 1: Diagnose the Problem</h2>
+            <p>First, let's check what data is currently stored in your browser:</p>
+            <button onclick="diagnoseStorage()">🔍 Scan Storage</button>
+            <button onclick="clearDiagnostic()">🗑️ Clear Diagnostic</button>
+            <div id="diagnostic" class="log"></div>
+        </div>
+
+        <div class="section">
+            <h2>💾 Step 2: Emergency Backup</h2>
+            <p>Create an immediate backup of any remaining data:</p>
+            <button onclick="createEmergencyBackup()">💾 Emergency Backup</button>
+            <button onclick="downloadBackup()">📥 Download Backup</button>
+            <textarea id="backupData" placeholder="Backup data will appear here..." readonly></textarea>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Step 3: Recovery Options</h2>
+            <p>Try these recovery methods in order:</p>
+            <button onclick="recoverFromSession()">🔄 Recover from Session Storage</button>
+            <button onclick="recoverFromBulletproof()">🛡️ Bulletproof Storage Recovery</button>
+            <button onclick="recoverFromAutoBackup()">⏰ Auto-Backup Recovery</button>
+        </div>
+
+        <div class="section">
+            <h2>📁 Step 4: Manual Data Import</h2>
+            <p>If you have a backup file, paste it here to restore:</p>
+            <textarea id="importData" placeholder="Paste your backup data here..."></textarea>
+            <br>
+            <button onclick="importBackup()">📁 Import & Restore</button>
+            <button onclick="validateImport()">✅ Validate Import</button>
+        </div>
+
+        <div class="section success">
+            <h2>📊 Recovery Status</h2>
+            <div id="status" class="log">Ready to begin recovery...</div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Advanced Recovery</h2>
+            <p>Advanced recovery tools for technical users:</p>
+            <button onclick="showAllStorageKeys()">🗝️ Show All Storage Keys</button>
+            <button onclick="exportAllStorage()">📤 Export All Browser Storage</button>
+            <button onclick="clearCorruptedData()">🧹 Clear Corrupted Data</button>
+            <button onclick="resetToDemo()">🔄 Reset to Demo Data</button>
+        </div>
+    </div>
+
+    <script>
+        // Storage keys used by the workspace
+        const WORKSPACE_KEYS = [
+            'nishen-workspace-settings',
+            'nishen-workspace-notes',
+            'nishen-workspace-categories', 
+            'nishen-workspace-dev',
+            'nishen-workspace-prod',
+            'nishen-workspace-files',
+            'nishen-workspace-file-browser',
+            'nishen-workspace-prompts',
+            'nishen-workspace-prompt-categories',
+            'devops-studio-url-links',
+            'devops-studio-url-categories',
+            'nishen-workspace-notes_BACKUP',
+            'nishen-workspace-notes_REDUNDANT',
+            'nishen-workspace-prod_BACKUP',
+            'nishen-workspace-prod_REDUNDANT'
+        ];
+
+        let emergencyBackupData = null;
+
+        function log(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff073a' : type === 'success' ? '#00CC33' : '#8B9499';
+            statusDiv.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+
+        function diagnoseStorage() {
+            const diagnosticDiv = document.getElementById('diagnostic');
+            let diagnostic = '🔍 STORAGE DIAGNOSTIC REPORT\n';
+            diagnostic += '=' * 50 + '\n\n';
+
+            // Check each workspace key
+            WORKSPACE_KEYS.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const size = new Blob([data]).size;
+                        diagnostic += `✅ ${key}: ${size} bytes, ${Array.isArray(parsed) ? parsed.length : 'object'} items\n`;
+                    } catch (e) {
+                        diagnostic += `⚠️  ${key}: ${data.length} bytes, CORRUPTED DATA\n`;
+                    }
+                } else {
+                    diagnostic += `❌ ${key}: NOT FOUND\n`;
+                }
+            });
+
+            // Check session storage
+            diagnostic += '\n📱 SESSION STORAGE:\n';
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && key.includes('nishen-workspace')) {
+                    const size = new Blob([sessionStorage.getItem(key) || '']).size;
+                    diagnostic += `   ${key}: ${size} bytes\n`;
+                }
+            }
+
+            // Check auto-backups
+            diagnostic += '\n💾 AUTO-BACKUPS:\n';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('WORKSPACE_BACKUP_')) {
+                    const size = new Blob([localStorage.getItem(key) || '']).size;
+                    diagnostic += `   ${key}: ${size} bytes\n`;
+                }
+            }
+
+            diagnosticDiv.textContent = diagnostic;
+            log('Storage diagnostic completed', 'success');
+        }
+
+        function clearDiagnostic() {
+            document.getElementById('diagnostic').textContent = '';
+            log('Diagnostic cleared');
+        }
+
+        function createEmergencyBackup() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                type: 'emergency_recovery',
+                data: {}
+            };
+
+            WORKSPACE_KEYS.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    backup.data[key] = data;
+                }
+            });
+
+            // Add session storage
+            backup.sessionData = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && key.includes('nishen-workspace')) {
+                    backup.sessionData[key] = sessionStorage.getItem(key);
+                }
+            }
+
+            emergencyBackupData = JSON.stringify(backup, null, 2);
+            document.getElementById('backupData').value = emergencyBackupData;
+            
+            log(`Emergency backup created: ${Object.keys(backup.data).length} localStorage keys, ${Object.keys(backup.sessionData).length} sessionStorage keys`, 'success');
+        }
+
+        function downloadBackup() {
+            if (!emergencyBackupData) {
+                log('No backup data available. Create backup first.', 'error');
+                return;
+            }
+
+            const blob = new Blob([emergencyBackupData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nishen-workspace-emergency-backup-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log('Backup file downloaded', 'success');
+        }
+
+        function recoverFromSession() {
+            let recovered = 0;
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && key.includes('nishen-workspace') && !key.includes('_SESSION')) {
+                    const data = sessionStorage.getItem(key);
+                    if (data) {
+                        localStorage.setItem(key, data);
+                        recovered++;
+                    }
+                }
+            }
+            log(`Session storage recovery: ${recovered} items restored`, recovered > 0 ? 'success' : 'error');
+        }
+
+        function recoverFromBulletproof() {
+            let recovered = 0;
+            // Try backup keys
+            ['nishen-workspace-notes_BACKUP', 'nishen-workspace-prod_BACKUP'].forEach(backupKey => {
+                const data = localStorage.getItem(backupKey);
+                if (data) {
+                    const primaryKey = backupKey.replace('_BACKUP', '');
+                    localStorage.setItem(primaryKey, data);
+                    recovered++;
+                    log(`Recovered ${primaryKey} from backup`, 'success');
+                }
+            });
+
+            // Try redundant keys
+            ['nishen-workspace-notes_REDUNDANT', 'nishen-workspace-prod_REDUNDANT'].forEach(redundantKey => {
+                const data = localStorage.getItem(redundantKey);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const primaryKey = redundantKey.replace('_REDUNDANT', '');
+                        localStorage.setItem(primaryKey, JSON.stringify(parsed.data || parsed));
+                        recovered++;
+                        log(`Recovered ${primaryKey} from redundant storage`, 'success');
+                    } catch (e) {
+                        log(`Failed to recover from ${redundantKey}: ${e.message}`, 'error');
+                    }
+                }
+            });
+
+            log(`Bulletproof recovery completed: ${recovered} items restored`, 'success');
+        }
+
+        function recoverFromAutoBackup() {
+            let latestBackup = null;
+            let latestTimestamp = 0;
+
+            // Find latest auto-backup
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('WORKSPACE_BACKUP_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key) || '{}');
+                        const timestamp = new Date(data.metadata?.timestamp || 0).getTime();
+                        if (timestamp > latestTimestamp) {
+                            latestTimestamp = timestamp;
+                            latestBackup = data;
+                        }
+                    } catch (e) {
+                        log(`Corrupted backup found: ${key}`, 'error');
+                    }
+                }
+            }
+
+            if (latestBackup && latestBackup.data) {
+                let restored = 0;
+                Object.entries(latestBackup.data).forEach(([key, value]) => {
+                    if (value) {
+                        localStorage.setItem(key, JSON.stringify(value));
+                        restored++;
+                    }
+                });
+                log(`Auto-backup recovery: ${restored} items restored from ${new Date(latestTimestamp).toLocaleString()}`, 'success');
+            } else {
+                log('No auto-backups found', 'error');
+            }
+        }
+
+        function importBackup() {
+            const importData = document.getElementById('importData').value;
+            if (!importData.trim()) {
+                log('No import data provided', 'error');
+                return;
+            }
+
+            try {
+                const backup = JSON.parse(importData);
+                let imported = 0;
+
+                if (backup.data) {
+                    Object.entries(backup.data).forEach(([key, value]) => {
+                        localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+                        imported++;
+                    });
+                }
+
+                if (backup.sessionData) {
+                    Object.entries(backup.sessionData).forEach(([key, value]) => {
+                        sessionStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+                    });
+                }
+
+                log(`Import completed: ${imported} items imported`, 'success');
+            } catch (e) {
+                log(`Import failed: ${e.message}`, 'error');
+            }
+        }
+
+        function validateImport() {
+            const importData = document.getElementById('importData').value;
+            if (!importData.trim()) {
+                log('No data to validate', 'error');
+                return;
+            }
+
+            try {
+                const backup = JSON.parse(importData);
+                const dataCount = backup.data ? Object.keys(backup.data).length : 0;
+                const sessionCount = backup.sessionData ? Object.keys(backup.sessionData).length : 0;
+                
+                log(`Validation successful: ${dataCount} localStorage items, ${sessionCount} sessionStorage items, created ${backup.timestamp || 'unknown'}`, 'success');
+            } catch (e) {
+                log(`Validation failed: ${e.message}`, 'error');
+            }
+        }
+
+        function showAllStorageKeys() {
+            log('=== ALL STORAGE KEYS ===');
+            log(`localStorage (${localStorage.length} items):`);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const size = new Blob([localStorage.getItem(key) || '']).size;
+                log(`  ${key}: ${size} bytes`);
+            }
+            
+            log(`sessionStorage (${sessionStorage.length} items):`);
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                const size = new Blob([sessionStorage.getItem(key) || '']).size;
+                log(`  ${key}: ${size} bytes`);
+            }
+        }
+
+        function exportAllStorage() {
+            const allData = {
+                timestamp: new Date().toISOString(),
+                localStorage: {},
+                sessionStorage: {}
+            };
+
+            // Export all localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                allData.localStorage[key] = localStorage.getItem(key);
+            }
+
+            // Export all sessionStorage
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                allData.sessionStorage[key] = sessionStorage.getItem(key);
+            }
+
+            const exportData = JSON.stringify(allData, null, 2);
+            const blob = new Blob([exportData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `complete-storage-export-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log('Complete storage exported', 'success');
+        }
+
+        function clearCorruptedData() {
+            const confirmed = confirm('⚠️ This will remove all corrupted storage entries. Continue?');
+            if (!confirmed) return;
+
+            let cleared = 0;
+            const keysToCheck = [...WORKSPACE_KEYS];
+            
+            keysToCheck.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        JSON.parse(data);
+                    } catch (e) {
+                        localStorage.removeItem(key);
+                        cleared++;
+                        log(`Cleared corrupted data: ${key}`, 'success');
+                    }
+                }
+            });
+
+            log(`Cleared ${cleared} corrupted entries`, 'success');
+        }
+
+        function resetToDemo() {
+            const confirmed = confirm('⚠️ This will reset ALL workspace data to demo state. This cannot be undone. Continue?');
+            if (!confirmed) return;
+
+            WORKSPACE_KEYS.forEach(key => {
+                localStorage.removeItem(key);
+            });
+
+            log('All workspace data cleared. Please refresh the application to load demo data.', 'success');
+        }
+
+        // Initialize
+        log('Emergency Recovery System loaded. Click "Scan Storage" to begin.', 'success');
+    </script>
+</body>
+</html>

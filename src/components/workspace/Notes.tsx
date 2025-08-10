@@ -871,21 +871,32 @@ npm run dev
   }, [])
 
   // BULLETPROOF SAVE - ENTERPRISE GRADE
-  const saveToLocalStorage = () => {
+  const saveToLocalStorage = (notesToSave = notes, categoriesToSave = categories) => {
     try {
-      bulletproofStorage.saveData(notes, 'USER_SAVE')
-      localStorage.setItem('nishen-workspace-categories', JSON.stringify(categories))
+      console.log(`🛡️ SAVING NOTES: ${notesToSave.length} notes, ${categoriesToSave.length} categories`)
+      bulletproofStorage.saveData(notesToSave, 'USER_SAVE')
+      localStorage.setItem('nishen-workspace-categories', JSON.stringify(categoriesToSave))
+      console.log('✅ Notes and categories saved successfully')
     } catch (error) {
-      console.error('Error saving notes:', error)
+      console.error('❌ Error saving notes:', error)
     }
   }
 
-  // Auto-save whenever notes or categories change
+  // Auto-save whenever notes change
   useEffect(() => {
-    if (notes.length > 0 || categories.length > 0) {
-      saveToLocalStorage()
+    if (notes.length > 0) {
+      console.log('🔄 Notes changed, triggering save...')
+      saveToLocalStorage(notes, categories)
     }
-  }, [notes, categories])
+  }, [notes])
+
+  // Auto-save whenever categories change  
+  useEffect(() => {
+    if (categories.length > 0) {
+      console.log('🔄 Categories changed, triggering save...')
+      saveToLocalStorage(notes, categories)
+    }
+  }, [categories])
 
   // Update category counts
   useEffect(() => {

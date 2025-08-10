@@ -310,10 +310,12 @@ Use creative thinking methods like:
   // Save data to localStorage
   const saveToLocalStorage = (promptsData: Prompt[], categoriesData: PromptCategory[]) => {
     try {
+      console.log(`🛡️ PROMPTS SAVE: ${promptsData.length} prompts, ${categoriesData.length} categories`)
       localStorage.setItem('nishen-workspace-prompts', JSON.stringify(promptsData))
       localStorage.setItem('nishen-workspace-prompt-categories', JSON.stringify(categoriesData))
+      console.log('✅ Prompts saved successfully')
     } catch (error) {
-      console.error('Error saving prompt data:', error)
+      console.error('❌ Error saving prompt data:', error)
     }
   }
 

@@ -234,9 +234,11 @@ export default function Files() {
   // BULLETPROOF SAVE - ENTERPRISE GRADE
   const saveToLocalStorage = (projectsData: Project[]) => {
     try {
+      console.log(`🛡️ FILES SAVE: ${projectsData.length} projects`)
       bulletproofStorage.saveData(projectsData, 'USER_SAVE')
+      console.log('✅ Files saved successfully')
     } catch (error) {
-      console.error('Error saving data:', error)
+      console.error('❌ Error saving files data:', error)
     }
   }
 

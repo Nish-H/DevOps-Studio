@@ -30,20 +30,28 @@ export class AutoBackupManager {
   private readonly MAX_BACKUPS = 50 // Keep last 50 backups
   private readonly BACKUP_INTERVAL = 5 * 60 * 1000 // 5 minutes
   
-  // Workspace storage keys to backup
+  // Workspace storage keys to backup (ACTUAL KEYS USED IN COMPONENTS)
   private readonly WORKSPACE_KEYS = [
     'nishen-workspace-settings',
-    'nishen-workspace-notes',
-    'nishen-workspace-note-categories',
-    'nishen-workspace-dev', // Files/Dev
-    'nishen-workspace-prod', // Production
-    'nishen-workspace-file-browser',
-    'nishen-workspace-prompts',
-    'nishen-workspace-prompt-categories',
-    'nishen-workspace-url-links',
-    'nishen-workspace-url-categories',
+    'nishen-workspace-notes',           // Notes data (bulletproof storage)
+    'nishen-workspace-categories',      // Note categories  
+    'nishen-workspace-dev',            // Files/Dev
+    'nishen-workspace-prod',           // Production (bulletproof storage)
+    'nishen-workspace-files',          // Legacy files support
+    'nishen-workspace-file-browser',   // File browser data
+    'nishen-workspace-prompts',        // Prompt engineering data
+    'nishen-workspace-prompt-categories', // Prompt categories
+    'devops-studio-url-links',         // URL links (different prefix!)
+    'devops-studio-url-categories',    // URL categories (different prefix!)
     'nishen-workspace-tools-data',
-    'nishen-workspace-terminal-history'
+    'nishen-workspace-terminal-history',
+    // Bulletproof storage backup keys
+    'nishen-workspace-notes_BACKUP',
+    'nishen-workspace-notes_REDUNDANT', 
+    'nishen-workspace-notes_SESSION',
+    'nishen-workspace-prod_BACKUP',
+    'nishen-workspace-prod_REDUNDANT',
+    'nishen-workspace-prod_SESSION'
   ]
 
   private constructor() {

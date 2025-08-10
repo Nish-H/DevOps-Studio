@@ -129,16 +129,18 @@ export default function URLLinks() {
   // Save links whenever they change (but only after initial load)
   useEffect(() => {
     if (isLoaded) {
-      console.log('💾 URLLinks: Saving', links.length, 'links to localStorage...');
+      console.log(`🛡️ URLLinks SAVE: ${links.length} links`);
       localStorage.setItem('devops-studio-url-links', JSON.stringify(links));
+      console.log('✅ URL links saved successfully');
     }
   }, [links, isLoaded]);
 
   // Save categories whenever they change (but only after initial load)
   useEffect(() => {
     if (isLoaded) {
-      console.log('💾 URLLinks: Saving categories to localStorage...');
+      console.log(`🛡️ URLLinks SAVE: ${categories.length} categories`);
       localStorage.setItem('devops-studio-url-categories', JSON.stringify(categories));
+      console.log('✅ URL categories saved successfully');
     }
   }, [categories, isLoaded]);
 

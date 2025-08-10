@@ -21,7 +21,8 @@
       "Bash(powershell:*)",
       "Bash(npm run db:migrate:*)",
       "Bash(psql:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
