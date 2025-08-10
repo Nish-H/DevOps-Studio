@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Storage Configuration Test - Nishen's AI Workspace</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(139, 148, 153, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #8B9499;
+        }
+        .test-pass {
+            border-left-color: #00CC33;
+            background: rgba(0, 204, 51, 0.1);
+        }
+        .test-fail {
+            border-left-color: #ff073a;
+            background: rgba(255, 7, 58, 0.1);
+        }
+        .test-warning {
+            border-left-color: #ffa500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+        button {
+            background: #ff073a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #d00530;
+        }
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+        .pass { background: #00CC33; color: white; }
+        .fail { background: #ff073a; color: white; }
+        .warn { background: #ffa500; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Storage Configuration Test Suite</h1>
+        <p>Comprehensive test of localStorage persistence and configuration</p>
+        
+        <button onclick="runAllTests()">▶️ Run All Tests</button>
+        <button onclick="clearLog()">🗑️ Clear Log</button>
+        
+        <div id="testResults" class="log"></div>
+
+        <div class="test-section">
+            <h3>🔍 Test 1: Storage Availability</h3>
+            <p>Check if localStorage is available and functional</p>
+            <button onclick="testStorageAvailability()">Run Test</button>
+            <div id="test1-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💾 Test 2: Basic Read/Write Operations</h3>
+            <p>Test basic localStorage operations with error handling</p>
+            <button onclick="testBasicOperations()">Run Test</button>
+            <div id="test2-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Test 3: Persistence Across Refresh</h3>
+            <p>Test if data persists after page refresh (manual test)</p>
+            <button onclick="testPersistence()">Set Test Data</button>
+            <button onclick="checkPersistence()">Check After Refresh</button>
+            <div id="test3-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test 4: Storage Quota Limits</h3>
+            <p>Test storage quota and large data handling</p>
+            <button onclick="testQuotaLimits()">Run Test</button>
+            <div id="test4-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🛡️ Test 5: Error Handling</h3>
+            <p>Test error scenarios and recovery mechanisms</p>
+            <button onclick="testErrorHandling()">Run Test</button>
+            <div id="test5-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test 6: Workspace Keys</h3>
+            <p>Verify all workspace localStorage keys are working</p>
+            <button onclick="testWorkspaceKeys()">Run Test</button>
+            <div id="test6-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test workspace keys used by the application
+        const WORKSPACE_KEYS = [
+            'nishen-workspace-settings',
+            'nishen-workspace-notes',
+            'nishen-workspace-categories',
+            'nishen-workspace-dev',
+            'nishen-workspace-prod',
+            'nishen-workspace-files',
+            'nishen-workspace-file-browser',
+            'nishen-workspace-prompts',
+            'nishen-workspace-prompt-categories',
+            'devops-studio-url-links',
+            'devops-studio-url-categories'
+        ];
+
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff073a' : type === 'success' ? '#00CC33' : type === 'warning' ? '#ffa500' : '#8B9499';
+            logDiv.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function setTestResult(testId, status, message) {
+            const resultDiv = document.getElementById(`${testId}-result`);
+            const statusClass = status === 'pass' ? 'pass' : status === 'fail' ? 'fail' : 'warn';
+            const statusText = status === 'pass' ? '✅ PASS' : status === 'fail' ? '❌ FAIL' : '⚠️ WARNING';
+            resultDiv.innerHTML = `<span class="status ${statusClass}">${statusText}</span> ${message}`;
+            
+            testResults.push({ test: testId, status, message });
+        }
+
+        function clearLog() {
+            document.getElementById('testResults').innerHTML = '';
+            log('Test log cleared', 'info');
+        }
+
+        function testStorageAvailability() {
+            log('Testing storage availability...', 'info');
+            
+            if (typeof Storage === "undefined") {
+                setTestResult('test1', 'fail', 'Browser does not support localStorage');
+                log('❌ localStorage not supported by browser', 'error');
+                return false;
+            }
+
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, 'test');
+                const result = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (result === 'test') {
+                    setTestResult('test1', 'pass', 'localStorage is available and functional');
+                    log('✅ localStorage is available and functional', 'success');
+                    return true;
+                } else {
+                    setTestResult('test1', 'fail', 'localStorage read/write failed');
+                    log('❌ localStorage read/write failed', 'error');
+                    return false;
+                }
+            } catch (error) {
+                setTestResult('test1', 'fail', `localStorage error: ${error.message}`);
+                log(`❌ localStorage error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        function testBasicOperations() {
+            log('Testing basic localStorage operations...', 'info');
+            
+            const testData = {
+                string: 'test string',
+                number: 12345,
+                boolean: true,
+                array: [1, 2, 3],
+                object: { key: 'value', nested: { data: 'test' } }
+            };
+
+            try {
+                // Test write
+                localStorage.setItem('test_basic_ops', JSON.stringify(testData));
+                log('✅ Write operation successful', 'success');
+
+                // Test read
+                const retrieved = JSON.parse(localStorage.getItem('test_basic_ops'));
+                
+                // Verify data integrity
+                if (JSON.stringify(retrieved) === JSON.stringify(testData)) {
+                    setTestResult('test2', 'pass', 'Basic read/write operations working correctly');
+                    log('✅ Data integrity verified', 'success');
+                } else {
+                    setTestResult('test2', 'fail', 'Data integrity check failed');
+                    log('❌ Data integrity check failed', 'error');
+                }
+
+                // Cleanup
+                localStorage.removeItem('test_basic_ops');
+                log('✅ Cleanup completed', 'success');
+
+            } catch (error) {
+                setTestResult('test2', 'fail', `Basic operations failed: ${error.message}`);
+                log(`❌ Basic operations failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testPersistence() {
+            log('Setting persistence test data...', 'info');
+            
+            const testData = {
+                timestamp: new Date().toISOString(),
+                testValue: Math.random().toString(36).substring(7),
+                persistenceTest: true
+            };
+
+            try {
+                localStorage.setItem('persistence_test', JSON.stringify(testData));
+                setTestResult('test3', 'warn', `Test data set. Refresh page and click "Check After Refresh"`);
+                log('✅ Persistence test data saved. Please refresh the page and check again.', 'warning');
+            } catch (error) {
+                setTestResult('test3', 'fail', `Failed to set test data: ${error.message}`);
+                log(`❌ Failed to set test data: ${error.message}`, 'error');
+            }
+        }
+
+        function checkPersistence() {
+            log('Checking persistence after refresh...', 'info');
+            
+            try {
+                const testData = localStorage.getItem('persistence_test');
+                if (testData) {
+                    const parsed = JSON.parse(testData);
+                    if (parsed.persistenceTest === true) {
+                        setTestResult('test3', 'pass', `Data persisted correctly from ${parsed.timestamp}`);
+                        log(`✅ Data persisted correctly from ${parsed.timestamp}`, 'success');
+                        
+                        // Cleanup
+                        localStorage.removeItem('persistence_test');
+                    } else {
+                        setTestResult('test3', 'fail', 'Data exists but is corrupted');
+                        log('❌ Data exists but is corrupted', 'error');
+                    }
+                } else {
+                    setTestResult('test3', 'fail', 'No persistence test data found');
+                    log('❌ No persistence test data found', 'error');
+                }
+            } catch (error) {
+                setTestResult('test3', 'fail', `Persistence check failed: ${error.message}`);
+                log(`❌ Persistence check failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testQuotaLimits() {
+            log('Testing storage quota limits...', 'info');
+            
+            // Calculate current usage
+            let currentUsage = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                currentUsage += (key?.length || 0) + (value?.length || 0);
+            }
+
+            log(`Current storage usage: ${Math.round(currentUsage / 1024)}KB`, 'info');
+
+            // Test with increasingly large data
+            const testSizes = [1, 10, 100, 1000]; // KB
+            let maxSize = 0;
+
+            for (const size of testSizes) {
+                try {
+                    const testData = 'x'.repeat(size * 1024); // Create data of specified size
+                    localStorage.setItem(`quota_test_${size}`, testData);
+                    maxSize = size;
+                    log(`✅ Successfully stored ${size}KB`, 'success');
+                    localStorage.removeItem(`quota_test_${size}`);
+                } catch (error) {
+                    log(`❌ Failed to store ${size}KB: ${error.name}`, 'error');
+                    break;
+                }
+            }
+
+            if (maxSize >= 100) {
+                setTestResult('test4', 'pass', `Storage can handle at least ${maxSize}KB`);
+            } else if (maxSize >= 10) {
+                setTestResult('test4', 'warn', `Storage limited to ${maxSize}KB - may cause issues with large datasets`);
+            } else {
+                setTestResult('test4', 'fail', `Storage severely limited (${maxSize}KB) - data loss likely`);
+            }
+        }
+
+        function testErrorHandling() {
+            log('Testing error handling scenarios...', 'info');
+            
+            let errorsHandled = 0;
+            let totalTests = 0;
+
+            // Test 1: Invalid JSON parsing
+            totalTests++;
+            try {
+                localStorage.setItem('invalid_json_test', '{invalid json}');
+                const result = JSON.parse(localStorage.getItem('invalid_json_test') || '{}');
+                log('❌ Invalid JSON should have thrown error', 'error');
+            } catch (error) {
+                errorsHandled++;
+                log('✅ Invalid JSON error properly caught', 'success');
+            }
+            localStorage.removeItem('invalid_json_test');
+
+            // Test 2: Non-existent key
+            totalTests++;
+            try {
+                const result = localStorage.getItem('non_existent_key_12345');
+                if (result === null) {
+                    errorsHandled++;
+                    log('✅ Non-existent key returned null correctly', 'success');
+                } else {
+                    log('❌ Non-existent key should return null', 'error');
+                }
+            } catch (error) {
+                log(`❌ Unexpected error for non-existent key: ${error.message}`, 'error');
+            }
+
+            // Test 3: Empty string handling
+            totalTests++;
+            try {
+                localStorage.setItem('empty_test', '');
+                const result = localStorage.getItem('empty_test');
+                if (result === '') {
+                    errorsHandled++;
+                    log('✅ Empty string handled correctly', 'success');
+                } else {
+                    log('❌ Empty string not handled correctly', 'error');
+                }
+                localStorage.removeItem('empty_test');
+            } catch (error) {
+                log(`❌ Empty string test failed: ${error.message}`, 'error');
+            }
+
+            const successRate = Math.round((errorsHandled / totalTests) * 100);
+            if (successRate === 100) {
+                setTestResult('test5', 'pass', `All error scenarios handled correctly (${errorsHandled}/${totalTests})`);
+            } else if (successRate >= 75) {
+                setTestResult('test5', 'warn', `Most errors handled correctly (${errorsHandled}/${totalTests})`);
+            } else {
+                setTestResult('test5', 'fail', `Poor error handling (${errorsHandled}/${totalTests})`);
+            }
+        }
+
+        function testWorkspaceKeys() {
+            log('Testing workspace localStorage keys...', 'info');
+            
+            let workingKeys = 0;
+            let totalKeys = WORKSPACE_KEYS.length;
+
+            WORKSPACE_KEYS.forEach(key => {
+                try {
+                    // Test write
+                    const testData = { test: true, timestamp: Date.now() };
+                    localStorage.setItem(key, JSON.stringify(testData));
+                    
+                    // Test read
+                    const retrieved = JSON.parse(localStorage.getItem(key) || '{}');
+                    
+                    if (retrieved.test === true) {
+                        workingKeys++;
+                        log(`✅ ${key}: OK`, 'success');
+                    } else {
+                        log(`❌ ${key}: Data corruption`, 'error');
+                    }
+                    
+                    // Cleanup
+                    localStorage.removeItem(key);
+                    
+                } catch (error) {
+                    log(`❌ ${key}: Error - ${error.message}`, 'error');
+                }
+            });
+
+            const successRate = Math.round((workingKeys / totalKeys) * 100);
+            if (successRate === 100) {
+                setTestResult('test6', 'pass', `All workspace keys working (${workingKeys}/${totalKeys})`);
+            } else if (successRate >= 90) {
+                setTestResult('test6', 'warn', `Most workspace keys working (${workingKeys}/${totalKeys})`);
+            } else {
+                setTestResult('test6', 'fail', `Many workspace keys failing (${workingKeys}/${totalKeys})`);
+            }
+        }
+
+        function runAllTests() {
+            log('🚀 Starting comprehensive storage test suite...', 'info');
+            testResults = [];
+            
+            // Run all tests in sequence
+            setTimeout(() => testStorageAvailability(), 100);
+            setTimeout(() => testBasicOperations(), 500);
+            setTimeout(() => testQuotaLimits(), 1000);
+            setTimeout(() => testErrorHandling(), 1500);
+            setTimeout(() => testWorkspaceKeys(), 2000);
+            
+            // Generate summary
+            setTimeout(() => {
+                log('📊 TEST SUITE COMPLETE', 'info');
+                const passed = testResults.filter(r => r.status === 'pass').length;
+                const failed = testResults.filter(r => r.status === 'fail').length;
+                const warned = testResults.filter(r => r.status === 'warn').length;
+                
+                log(`Results: ${passed} passed, ${warned} warnings, ${failed} failed`, 
+                     failed === 0 ? 'success' : 'error');
+                
+                if (failed === 0 && warned === 0) {
+                    log('🎉 ALL TESTS PASSED - Storage is fully functional!', 'success');
+                } else if (failed === 0) {
+                    log('⚠️ Tests passed with warnings - check configuration', 'warning');
+                } else {
+                    log('❌ CRITICAL ISSUES FOUND - Storage may not work properly', 'error');
+                }
+            }, 2500);
+        }
+
+        // Auto-run basic availability test on load
+        window.onload = () => {
+            log('Storage Configuration Test Suite loaded', 'info');
+            log('Click "Run All Tests" to perform comprehensive testing', 'info');
+        };
+    </script>
+</body>
+</html>

@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use static export only for production build
-  ...(process.env.NODE_ENV === 'production' && {
-    output: 'export',
-    trailingSlash: true,
-  }),
+  // STORAGE FIX: Remove static export to preserve localStorage functionality
+  // Static export causes hydration issues that break persistent storage
+  // ...(process.env.NODE_ENV === 'production' && {
+  //   output: 'export',
+  //   trailingSlash: true,
+  // }),
+  
+  // Enable server-side rendering for proper localStorage hydration
+  reactStrictMode: true,
+  
   images: {
     unoptimized: true
   },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSettings } from '../../contexts/SettingsContext'
+import { safeGetItem, safeSetItem, getStorageStats } from '../../lib/storageUtils'
 import { 
   Settings as SettingsIcon, 
   Palette, 

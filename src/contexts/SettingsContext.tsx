@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { safeGetItem, safeSetItem, safeRemoveItem, isStorageAvailable } from '../lib/storageUtils'
 
 export interface WorkspaceSettings {
   // Appearance
@@ -109,17 +110,21 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<WorkspaceSettings>(defaultSettings)
 
-  // Load settings from localStorage on mount
+  // Load settings from localStorage on mount - SAFE STORAGE
   useEffect(() => {
-    const savedSettings = localStorage.getItem('nishen-workspace-settings')
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings)
-        setSettings({ ...defaultSettings, ...parsed })
-      } catch (error) {
-        console.error('Error loading settings:', error)
-      }
+    if (!isStorageAvailable()) {
+      console.warn('Storage not available, using default settings')
+      return
     }
+
+    const savedSettings = safeGetItem('nishen-workspace-settings', null)
+    if (savedSettings) {
+      console.log('🔧 Settings loaded from localStorage')
+      setSettings({ ...defaultSettings, ...savedSettings })
+    } else {
+      console.log('🔧 Using default settings (no saved settings found)')
+    }
+    
     // Apply initial theme
     setTimeout(() => {
       applyTheme()
@@ -213,17 +218,20 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }
 
-  // Save settings to localStorage whenever they change
+  // Save settings to localStorage whenever they change - SAFE STORAGE
   useEffect(() => {
-    try {
-      localStorage.setItem('nishen-workspace-settings', JSON.stringify(settings))
-      applyTheme()
-      applyFontSize()
-      applyCustomCSS()
-      applyAnimations()
-    } catch (error) {
-      console.error('Error saving settings:', error)
+    const success = safeSetItem('nishen-workspace-settings', settings)
+    if (success) {
+      console.log('🛡️ Settings saved successfully')
+    } else {
+      console.error('❌ Settings save failed - storage not available')
     }
+    
+    // Always apply UI changes regardless of storage success
+    applyTheme()
+    applyFontSize()
+    applyCustomCSS()
+    applyAnimations()
   }, [settings])
 
   const updateSetting = (key: string, value: any) => {
@@ -244,7 +252,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const resetSettings = () => {
     setSettings(defaultSettings)
-    localStorage.removeItem('nishen-workspace-settings')
+    safeRemoveItem('nishen-workspace-settings')
     // Force page reload to ensure all changes apply
     setTimeout(() => window.location.reload(), 100)
   }
