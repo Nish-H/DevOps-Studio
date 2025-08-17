@@ -75,7 +75,7 @@ export function safeSetItem(key: string, value: any): boolean {
     console.error(`Failed to save localStorage item "${key}":`, error);
     
     // Handle quota exceeded error
-    if (error.name === 'QuotaExceededError') {
+    if (error instanceof Error && error.name === 'QuotaExceededError') {
       console.error('Storage quota exceeded! Consider cleaning up old data.');
       // Could trigger cleanup here
     }

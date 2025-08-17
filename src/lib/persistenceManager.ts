@@ -310,7 +310,13 @@ export class SafeStorage {
 
 // Browser console access for emergency operations
 if (typeof window !== 'undefined') {
-  (window as any).emergencyDataExport = () => persistenceManager.emergencyExport()
-  (window as any).emergencyDataImport = (data: string) => persistenceManager.emergencyImport(data)
-  (window as any).storageStats = () => persistenceManager.getStorageStats()
+  (window as any).emergencyDataExport = () => {
+    return persistenceManager.emergencyExport()
+  }
+  (window as any).emergencyDataImport = (data: string) => {
+    return persistenceManager.emergencyImport(data)
+  }
+  (window as any).storageStats = () => {
+    return persistenceManager.getStorageStats()
+  }
 }
