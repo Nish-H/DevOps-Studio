@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '../auth/AuthProvider'
 import { autoBackupManager } from '../../lib/autoBackup'
 import { dailyAutoBackup } from '../../lib/dailyAutoBackup'
 import Terminal from './Terminal'
@@ -17,6 +18,7 @@ import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
 export default function SimpleWorkspace() {
+  const { logout } = useAuth()
   const [activeSection, setActiveSection] = useState('claude-ai')
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([
@@ -218,8 +220,19 @@ export default function SimpleWorkspace() {
       {/* Sidebar */}
       <div className="w-64 lg:w-64 md:w-56 sm:w-48 bg-gray-900 border-r border-gray-800 flex-shrink-0">
         <div className="p-4 border-b border-gray-800">
-          <h1 className="text-xl font-bold" style={{ color: 'var(--primary-accent)' }}>DevOps Studio</h1>
-          <p className="text-sm text-gray-400">Professional Workspace</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold" style={{ color: 'var(--primary-accent)' }}>DevOps Studio</h1>
+              <p className="text-sm text-gray-400">Professional Workspace</p>
+            </div>
+            <button
+              onClick={logout}
+              className="text-gray-400 hover:text-red-400 text-sm p-2 rounded transition-colors"
+              title="Secure Logout"
+            >
+              🔐
+            </button>
+          </div>
         </div>
         
         <nav className="p-4">

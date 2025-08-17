@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SettingsProvider } from "../contexts/SettingsContext";
+import { AuthProvider } from "../components/auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Nishen's AI Workspace",
@@ -19,11 +20,13 @@ export default function RootLayout({
       <body
         className="antialiased bg-black text-white min-h-screen"
       >
-        <SettingsProvider>
-          <div className="h-screen overflow-hidden">
-            {children}
-          </div>
-        </SettingsProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <div className="h-screen overflow-hidden">
+              {children}
+            </div>
+          </SettingsProvider>
+        </AuthProvider>
       </body>
     </html>
   );
