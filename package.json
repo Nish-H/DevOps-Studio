@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@types/ws": "^8.18.1",
+    "@vercel/kv": "^3.0.0",
     "clsx": "2.0.0",
     "lucide-react": "0.263.1",
     "next": "^14.2.30",
     "node-powershell": "^5.0.1",
     "node.js": "^0.0.1-security",
+    "parse": "^6.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "ws": "^8.18.3"

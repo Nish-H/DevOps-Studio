@@ -14,6 +14,7 @@ import Tools from './Tools'
 import Settings from './Settings'
 import PromptEngineering from './PromptEngineering'
 import URLLinks from './URLLinks'
+import TaskTracker from './TaskTracker'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -208,6 +209,7 @@ export default function SimpleWorkspace() {
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
     { id: 'file-browser', name: 'File Browser', icon: '🗂️' },
+    { id: 'tasks', name: 'Task Tracker', icon: '✅' },
     { id: 'notes', name: 'Notes', icon: '📝' },
     { id: 'prompts', name: 'Prompts', icon: '🧠' },
     { id: 'links', name: 'Links', icon: '🔗' },
@@ -408,6 +410,8 @@ export default function SimpleWorkspace() {
           <Prod />
         ) : activeSection === 'file-browser' ? (
           <FileBrowserSimple />
+        ) : activeSection === 'tasks' ? (
+          <TaskTracker />
         ) : activeSection === 'notes' ? (
           <Notes />
         ) : activeSection === 'prompts' ? (
