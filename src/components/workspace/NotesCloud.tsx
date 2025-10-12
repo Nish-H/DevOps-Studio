@@ -10,6 +10,7 @@ import {
   getNoteCategories,
   deleteNoteCategory,
   getCurrentUser,
+  handleSessionError,
   Note as NoteType,
   NoteCategory as NoteCategoryType
 } from '@/lib/back4appService'
@@ -105,6 +106,15 @@ export default function NotesCloud() {
       }
     } catch (error: any) {
       console.error('Error loading data:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to load notes: ${error.message}`)
     } finally {
       setLoading(false)
@@ -235,6 +245,15 @@ Start writing your note here...`
       setShowNewNoteModal(false)
     } catch (error: any) {
       console.error('Error creating note:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to create note: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -257,6 +276,15 @@ Start writing your note here...`
       setShowNewCategoryModal(false)
     } catch (error: any) {
       console.error('Error creating category:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to create category: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -285,6 +313,15 @@ Start writing your note here...`
       }
     } catch (error: any) {
       console.error('Error deleting category:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to delete category: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -308,6 +345,15 @@ Start writing your note here...`
       setIsEditing(false)
     } catch (error: any) {
       console.error('Error saving note:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to save note: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -327,6 +373,15 @@ Start writing your note here...`
       }
     } catch (error: any) {
       console.error('Error deleting note:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Failed to delete note: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -341,6 +396,14 @@ Start writing your note here...`
       setNotes(notes.map(n => n.id === updated.id ? updated : n))
     } catch (error: any) {
       console.error('Error toggling pin:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
     }
   }
 
@@ -393,6 +456,15 @@ Start writing your note here...`
       alert(`Successfully imported ${data.notes.length} notes!`)
     } catch (error: any) {
       console.error('Error importing:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Import failed: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -443,6 +515,15 @@ Start writing your note here...`
       alert(`Successfully migrated ${imported} notes from localStorage!`)
     } catch (error: any) {
       console.error('Migration error:', error)
+
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
+
       alert(`Migration failed: ${error.message}`)
     } finally {
       setSyncing(false)

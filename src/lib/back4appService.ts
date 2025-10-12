@@ -90,6 +90,31 @@ export function getCurrentUser(): User | null {
   }
 }
 
+/**
+ * Check if error is an invalid session token error
+ */
+export function isSessionError(error: any): boolean {
+  return error?.code === 209 ||
+         error?.message?.includes('invalid session') ||
+         error?.message?.includes('Invalid session token')
+}
+
+/**
+ * Handle session errors - logout and return true if session error
+ */
+export async function handleSessionError(error: any): Promise<boolean> {
+  if (isSessionError(error)) {
+    console.warn('⚠️ Invalid session detected, logging out...')
+    try {
+      await logoutUser()
+    } catch (logoutError) {
+      console.error('Error during logout:', logoutError)
+    }
+    return true
+  }
+  return false
+}
+
 // ==================== TASKS ====================
 
 export interface Task {

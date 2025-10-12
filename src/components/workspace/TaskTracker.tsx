@@ -7,6 +7,7 @@ import {
   updateTask,
   deleteTask,
   getCurrentUser,
+  handleSessionError,
   Task
 } from '@/lib/back4appService'
 import AuthModal from '../auth/AuthModal'
@@ -54,6 +55,13 @@ export default function TaskTracker() {
       setTasks(fetchedTasks)
     } catch (error: any) {
       console.error('Error loading tasks:', error)
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
       alert(`Failed to load tasks: ${error.message}`)
     } finally {
       setLoading(false)
@@ -105,6 +113,13 @@ export default function TaskTracker() {
       setEditingTask(null)
     } catch (error: any) {
       console.error('Error saving task:', error)
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
       alert(`Failed to save task: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -120,6 +135,13 @@ export default function TaskTracker() {
       setTasks(tasks.filter(t => t.id !== taskId))
     } catch (error: any) {
       console.error('Error deleting task:', error)
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
       alert(`Failed to delete task: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -147,6 +169,13 @@ export default function TaskTracker() {
       setTasks(tasks.map(t => t.id === updated.id ? updated : t))
     } catch (error: any) {
       console.error('Error updating status:', error)
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
       alert(`Failed to update status: ${error.message}`)
     } finally {
       setSyncing(false)
@@ -203,6 +232,13 @@ export default function TaskTracker() {
       alert(`Successfully imported ${imported} tasks!`)
     } catch (error: any) {
       console.error('Error importing:', error)
+      // Handle session errors
+      const wasSessionError = await handleSessionError(error)
+      if (wasSessionError) {
+        setCurrentUser(null)
+        alert('Your session has expired. Please log in again.')
+        return
+      }
       alert(`Import failed: ${error.message}`)
     } finally {
       setSyncing(false)
