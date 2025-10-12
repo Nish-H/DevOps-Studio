@@ -13,7 +13,7 @@ import Notes from './Notes'
 import Tools from './Tools'
 import Settings from './Settings'
 import PromptEngineering from './PromptEngineering'
-import URLLinks from './URLLinks'
+import URLLinksCloud from './URLLinksCloud'
 import TaskTracker from './TaskTracker'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
@@ -274,7 +274,7 @@ export default function SimpleWorkspace() {
         ) : activeSection === 'prompts' ? (
           <PromptEngineering />
         ) : activeSection === 'links' ? (
-          <URLLinks />
+          <URLLinksCloud />
         ) : activeSection === 'tools' ? (
           <Tools />
         ) : activeSection === 'settings' ? (
