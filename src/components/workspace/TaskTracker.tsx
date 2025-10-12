@@ -9,6 +9,7 @@ import {
   getCurrentUser,
   Task
 } from '@/lib/back4appService'
+import AuthModal from '../auth/AuthModal'
 
 export default function TaskTracker() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -20,6 +21,7 @@ export default function TaskTracker() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -183,13 +185,34 @@ export default function TaskTracker() {
 
   if (!currentUser) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Task Tracker</h2>
-          <p className="text-gray-400 mb-6">Please log in to access your tasks</p>
-          <p className="text-sm text-gray-500">Cloud sync powered by Back4App</p>
+      <>
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="text-center">
+            <div className="text-6xl mb-6">✅</div>
+            <h2 className="text-2xl font-bold mb-4">Task Tracker</h2>
+            <p className="text-gray-400 mb-6">Manage your tasks with cloud sync across all devices</p>
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="px-6 py-3 bg-[var(--primary-accent)] text-white rounded-lg hover:opacity-80 transition-opacity font-medium"
+            >
+              Login / Sign Up
+            </button>
+            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
+          </div>
         </div>
-      </div>
+
+        {showAuthModal && (
+          <AuthModal
+            onClose={() => setShowAuthModal(false)}
+            onSuccess={() => {
+              setShowAuthModal(false)
+              const user = getCurrentUser()
+              setCurrentUser(user)
+              loadTasks()
+            }}
+          />
+        )}
+      </>
     )
   }
 
