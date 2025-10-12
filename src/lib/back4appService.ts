@@ -3,7 +3,7 @@
  * Handles all Parse/Back4App operations for cloud data sync
  */
 
-import Parse from 'parse/dist/parse.min.js'
+import Parse from 'parse'
 
 // Initialize Parse
 const initializeParse = () => {
