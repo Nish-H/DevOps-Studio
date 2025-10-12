@@ -353,6 +353,129 @@ function parsePanelConfigObject(obj: Parse.Object): PanelConfig {
   }
 }
 
+// ==================== URL LINKS ====================
+
+export interface URLLink {
+  id?: string
+  title: string
+  url: string
+  category: string
+  tags?: string[]
+  description?: string
+  favicon?: string
+  isPinned?: boolean
+  clickCount?: number
+  lastVisited?: Date
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+/**
+ * Create a new URL link
+ */
+export async function createURLLink(link: URLLink): Promise<URLLink> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const URLLinkClass = Parse.Object.extend('URLLink')
+  const newLink = new URLLinkClass()
+
+  newLink.set('title', link.title)
+  newLink.set('url', link.url)
+  newLink.set('category', link.category || 'General')
+  newLink.set('tags', link.tags || [])
+  newLink.set('description', link.description || '')
+  newLink.set('favicon', link.favicon || '')
+  newLink.set('isPinned', link.isPinned || false)
+  newLink.set('clickCount', link.clickCount || 0)
+  newLink.set('lastVisited', link.lastVisited)
+  newLink.set('userId', user.id || '')
+
+  const result = await newLink.save()
+  return parseURLLinkObject(result)
+}
+
+/**
+ * Get all URL links for current user
+ */
+export async function getURLLinks(): Promise<URLLink[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const URLLinkClass = Parse.Object.extend('URLLink')
+  const query = new Parse.Query(URLLinkClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('createdAt')
+
+  const results = await query.find()
+  return results.map(parseURLLinkObject)
+}
+
+/**
+ * Update a URL link
+ */
+export async function updateURLLink(id: string, updates: Partial<URLLink>): Promise<URLLink> {
+  const URLLinkClass = Parse.Object.extend('URLLink')
+  const query = new Parse.Query(URLLinkClass)
+  const link = await query.get(id)
+
+  if (updates.title !== undefined) link.set('title', updates.title)
+  if (updates.url !== undefined) link.set('url', updates.url)
+  if (updates.category !== undefined) link.set('category', updates.category)
+  if (updates.tags !== undefined) link.set('tags', updates.tags)
+  if (updates.description !== undefined) link.set('description', updates.description)
+  if (updates.favicon !== undefined) link.set('favicon', updates.favicon)
+  if (updates.isPinned !== undefined) link.set('isPinned', updates.isPinned)
+  if (updates.clickCount !== undefined) link.set('clickCount', updates.clickCount)
+  if (updates.lastVisited !== undefined) link.set('lastVisited', updates.lastVisited)
+
+  const result = await link.save()
+  return parseURLLinkObject(result)
+}
+
+/**
+ * Delete a URL link
+ */
+export async function deleteURLLink(id: string): Promise<void> {
+  const URLLinkClass = Parse.Object.extend('URLLink')
+  const query = new Parse.Query(URLLinkClass)
+  const link = await query.get(id)
+  await link.destroy()
+}
+
+/**
+ * Increment click count for a URL link
+ */
+export async function incrementLinkClickCount(id: string): Promise<void> {
+  const URLLinkClass = Parse.Object.extend('URLLink')
+  const query = new Parse.Query(URLLinkClass)
+  const link = await query.get(id)
+
+  link.increment('clickCount')
+  link.set('lastVisited', new Date())
+  await link.save()
+}
+
+/**
+ * Helper to parse Parse URL link object
+ */
+function parseURLLinkObject(obj: Parse.Object): URLLink {
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    url: obj.get('url'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    description: obj.get('description') || '',
+    favicon: obj.get('favicon') || '',
+    isPinned: obj.get('isPinned') || false,
+    clickCount: obj.get('clickCount') || 0,
+    lastVisited: obj.get('lastVisited'),
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
 // ==================== SYNC STATUS ====================
 
 export interface SyncStatus {
@@ -390,6 +513,13 @@ export default {
   getNotes,
   updateNote,
   deleteNote,
+
+  // URL Links
+  createURLLink,
+  getURLLinks,
+  updateURLLink,
+  deleteURLLink,
+  incrementLinkClickCount,
 
   // Panel Configs
   savePanelConfig,
