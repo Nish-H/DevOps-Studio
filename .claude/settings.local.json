@@ -27,7 +27,8 @@
       "Bash(pkill:*)",
       "Bash(true)",
       "Bash(npm install:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd Notes module Back4App cloud migration with Indigo theme\n\nFeatures implemented:\n- Complete CRUD operations for notes and categories\n- Category management with custom colors\n- Pin/unpin, archive, tag support\n- Multiple note types (Markdown, HTML, Code, Document, Other)\n- Live preview for Markdown and HTML notes\n- Search and filtering functionality\n- Migration utility from localStorage to Back4App\n- Export/Import JSON functionality\n- Real-time cloud sync with loading indicators\n- Indigo/purple theme matching URLLinks module\n\nTechnical changes:\n- Extended back4appService.ts with Note and NoteCategory APIs\n- Created NotesCloud.tsx component with full feature parity\n- Integrated NotesCloud into SimpleWorkspace.tsx\n- Added comprehensive migration guide documentation\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": []
   }

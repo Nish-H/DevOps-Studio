@@ -22,6 +22,7 @@ export default function TaskTracker() {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showImportExport, setShowImportExport] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -152,6 +153,62 @@ export default function TaskTracker() {
     }
   }
 
+  const exportTasks = () => {
+    const exportData = {
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      tasks: tasks
+    }
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tasks-backup-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importTasks = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+
+      if (!data.tasks || !Array.isArray(data.tasks)) {
+        alert('Invalid import file format')
+        return
+      }
+
+      setSyncing(true)
+      let imported = 0
+
+      // Import tasks one by one
+      for (const task of data.tasks) {
+        await createTask({
+          title: task.title,
+          description: task.description || '',
+          priority: task.priority || 'medium',
+          status: task.status || 'pending',
+          category: task.category || 'General',
+          dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+          timerMinutes: task.timerMinutes || 0
+        })
+        imported++
+      }
+
+      await loadTasks()
+      alert(`Successfully imported ${imported} tasks!`)
+    } catch (error: any) {
+      console.error('Error importing:', error)
+      alert(`Import failed: ${error.message}`)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   const getFilteredTasks = () => {
     return tasks.filter(task => {
       if (filterStatus !== 'all' && task.status !== filterStatus) return false
@@ -232,6 +289,12 @@ export default function TaskTracker() {
               <span className="text-xs text-blue-400 animate-pulse">Syncing...</span>
             )}
             <button
+              onClick={() => setShowImportExport(!showImportExport)}
+              className="px-3 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors text-sm"
+            >
+              📥 Import/Export
+            </button>
+            <button
               onClick={() => {
                 setEditingTask(null)
                 setFormData({
@@ -258,6 +321,33 @@ export default function TaskTracker() {
             </button>
           </div>
         </div>
+
+        {/* Import/Export Menu */}
+        {showImportExport && (
+          <div className="mt-3 p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-medium mb-3 text-white">Import/Export Tasks</h3>
+            <div className="flex gap-3 flex-wrap">
+              <button
+                onClick={exportTasks}
+                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors text-sm"
+              >
+                📤 Export to JSON
+              </button>
+              <label className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors text-sm cursor-pointer">
+                📥 Import from JSON
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={importTasks}
+                  className="hidden"
+                />
+              </label>
+              <p className="text-xs text-gray-400 w-full mt-2">
+                💡 Import your JSON backup file to restore tasks to the cloud
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex gap-3 mt-4">
