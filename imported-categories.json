@@ -1,0 +1,50 @@
+[
+  {
+    "id": "infrastructure",
+    "name": "Infrastructure Audit",
+    "color": "#ff073a",
+    "icon": "🏗️",
+    "description": "System infrastructure monitoring and audit scripts",
+    "count": 4
+  },
+  {
+    "id": "data-management",
+    "name": "Data Management",
+    "color": "#8B9499",
+    "icon": "📊",
+    "description": "Data export, import, and manipulation scripts",
+    "count": 3
+  },
+  {
+    "id": "system-admin",
+    "name": "System Administration",
+    "color": "#00CC33",
+    "icon": "⚙️",
+    "description": "Daily system administration tasks",
+    "count": 0
+  },
+  {
+    "id": "backup-recovery",
+    "name": "Backup & Recovery",
+    "color": "#FF6B35",
+    "icon": "💾",
+    "description": "Backup and recovery operations",
+    "count": 4
+  },
+  {
+    "id": "monitoring",
+    "name": "Monitoring & Alerts",
+    "color": "#4ECDC4",
+    "icon": "📊",
+    "description": "System monitoring and alerting scripts",
+    "count": 0
+  },
+  {
+    "id": "deployment",
+    "name": "Deployment & CI/CD",
+    "color": "#45B7D1",
+    "icon": "🚀",
+    "description": "Deployment and continuous integration scripts",
+    "count": 0
+  }
+]

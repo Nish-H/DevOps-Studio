@@ -122,7 +122,7 @@ export async function createTask(task: Task): Promise<Task> {
   newTask.set('dueDate', task.dueDate)
   newTask.set('category', task.category || 'General')
   newTask.set('timerMinutes', task.timerMinutes || 0)
-  newTask.set('userId', user.id)
+  newTask.set('userId', user.id || '')
 
   const result = await newTask.save()
 
@@ -138,7 +138,7 @@ export async function getTasks(): Promise<Task[]> {
 
   const TaskClass = Parse.Object.extend('Task')
   const query = new Parse.Query(TaskClass)
-  query.equalTo('userId', user.id)
+  query.equalTo('userId', user.id || '')
   query.descending('createdAt')
 
   const results = await query.find()
@@ -180,7 +180,7 @@ export async function deleteTask(id: string): Promise<void> {
  */
 function parseTaskObject(obj: Parse.Object): Task {
   return {
-    id: obj.id,
+    id: obj.id || '',
     title: obj.get('title'),
     description: obj.get('description'),
     priority: obj.get('priority'),
@@ -221,7 +221,7 @@ export async function createNote(note: Note): Promise<Note> {
   newNote.set('category', note.category || 'General')
   newNote.set('tags', note.tags || [])
   newNote.set('isPinned', note.isPinned || false)
-  newNote.set('userId', user.id)
+  newNote.set('userId', user.id || '')
 
   const result = await newNote.save()
   return parseNoteObject(result)
@@ -236,7 +236,7 @@ export async function getNotes(): Promise<Note[]> {
 
   const NoteClass = Parse.Object.extend('Note')
   const query = new Parse.Query(NoteClass)
-  query.equalTo('userId', user.id)
+  query.equalTo('userId', user.id || '')
   query.descending('updatedAt')
 
   const results = await query.find()
@@ -276,7 +276,7 @@ export async function deleteNote(id: string): Promise<void> {
  */
 function parseNoteObject(obj: Parse.Object): Note {
   return {
-    id: obj.id,
+    id: obj.id || '',
     title: obj.get('title'),
     content: obj.get('content'),
     category: obj.get('category'),
@@ -309,17 +309,13 @@ export async function savePanelConfig(config: PanelConfig): Promise<PanelConfig>
 
   // Check if config already exists for this panel index
   const query = new Parse.Query(PanelConfigClass)
-  query.equalTo('userId', user.id)
+  query.equalTo('userId', user.id || '')
   query.equalTo('panelIndex', config.panelIndex)
 
-  let panelConfig = await query.first()
+  let panelConfig: Parse.Object = await query.first() || new PanelConfigClass()
 
-  if (!panelConfig) {
-    panelConfig = new PanelConfigClass()
-    panelConfig.set('userId', user.id)
-    panelConfig.set('panelIndex', config.panelIndex)
-  }
-
+  panelConfig.set('userId', user.id || '')
+  panelConfig.set('panelIndex', config.panelIndex)
   panelConfig.set('title', config.title)
   panelConfig.set('path', config.path)
 
@@ -336,7 +332,7 @@ export async function getPanelConfigs(): Promise<PanelConfig[]> {
 
   const PanelConfigClass = Parse.Object.extend('PanelConfig')
   const query = new Parse.Query(PanelConfigClass)
-  query.equalTo('userId', user.id)
+  query.equalTo('userId', user.id || '')
   query.ascending('panelIndex')
 
   const results = await query.find()
@@ -348,7 +344,7 @@ export async function getPanelConfigs(): Promise<PanelConfig[]> {
  */
 function parsePanelConfigObject(obj: Parse.Object): PanelConfig {
   return {
-    id: obj.id,
+    id: obj.id || '',
     title: obj.get('title'),
     path: obj.get('path'),
     panelIndex: obj.get('panelIndex'),

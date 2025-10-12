@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Merged Production Data</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #3a3a3a;
+        }
+        h1 {
+            color: #ff073a;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ff073a;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #ff073a;
+        }
+        button {
+            background: #ff073a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #e5062f;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #1a1a1a;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: #2d5a27;
+            color: #90ee90;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #5a2727;
+            color: #ffb3b3;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #1e3a5f;
+            color: #87ceeb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Load Merged Production Data</h1>
+
+        <div class="info">
+            <strong>Purpose:</strong> This tool loads your merged production data into localStorage for local testing before deployment.
+        </div>
+
+        <div class="step">
+            <h3>Step 1: Verify Merged Data File</h3>
+            <p>First, make sure you have the <code>merged-workspace-data.json</code> file in your project directory.</p>
+            <button onclick="checkFile()">Check File Status</button>
+            <div id="fileStatus"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Copy Merged Data</h3>
+            <p>Copy the contents of your <code>merged-workspace-data.json</code> file and paste it in the textarea below:</p>
+            <textarea id="mergedData" placeholder="Paste your merged-workspace-data.json contents here..."></textarea>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Load Data into LocalStorage</h3>
+            <p>This will load all your production data plus the Scripts Repository into localStorage for testing.</p>
+            <button onclick="loadData()">Load Merged Data</button>
+            <button onclick="clearData()" style="background: #666;">Clear All Data</button>
+            <div id="loadStatus"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Verify Data</h3>
+            <p>Check what data is currently in localStorage:</p>
+            <button onclick="showCurrentData()">Show Current Data</button>
+            <div id="currentData"></div>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Test Workspace</h3>
+            <p>After loading the data, go to your local development server and verify:</p>
+            <ul>
+                <li>✅ All your existing notes, files, prompts are intact</li>
+                <li>✅ Scripts Repository tab appears and works</li>
+                <li>✅ PowerShell Manager tab functions</li>
+                <li>✅ No data loss anywhere</li>
+            </ul>
+            <button onclick="openWorkspace()">Open Local Workspace</button>
+        </div>
+    </div>
+
+    <script>
+        function checkFile() {
+            const status = document.getElementById('fileStatus');
+            status.innerHTML = `
+                <div class="info">
+                    <strong>Manual Check Required:</strong><br>
+                    1. Look for <code>merged-workspace-data.json</code> in your project directory<br>
+                    2. If it exists, copy its contents to the textarea above<br>
+                    3. If not, run: <code>node merge-production-data.js</code>
+                </div>
+            `;
+        }
+
+        function loadData() {
+            const textarea = document.getElementById('mergedData');
+            const status = document.getElementById('loadStatus');
+
+            if (!textarea.value.trim()) {
+                status.innerHTML = '<div class="error">❌ Please paste the merged data first!</div>';
+                return;
+            }
+
+            try {
+                const data = JSON.parse(textarea.value);
+                let loadedCount = 0;
+                let errors = [];
+
+                // Clear existing workspace data first
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('nishen-workspace')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                // Load merged data
+                Object.keys(data).forEach(key => {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(data[key]));
+                        loadedCount++;
+                    } catch (error) {
+                        errors.push(`${key}: ${error.message}`);
+                    }
+                });
+
+                if (errors.length === 0) {
+                    status.innerHTML = `
+                        <div class="success">
+                            ✅ Successfully loaded ${loadedCount} data keys!<br>
+                            🎯 Your production data + Scripts Repository are now ready for testing.<br>
+                            🔄 Refresh your workspace page to see the changes.
+                        </div>
+                    `;
+                } else {
+                    status.innerHTML = `
+                        <div class="error">
+                            ⚠️ Loaded ${loadedCount} keys with ${errors.length} errors:<br>
+                            ${errors.join('<br>')}
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Invalid JSON: ${error.message}</div>`;
+            }
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to clear all workspace data? This cannot be undone!')) {
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('nishen-workspace')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                document.getElementById('loadStatus').innerHTML = `
+                    <div class="success">🗑️ All workspace data cleared</div>
+                `;
+
+                showCurrentData();
+            }
+        }
+
+        function showCurrentData() {
+            const status = document.getElementById('currentData');
+            const workspaceKeys = Object.keys(localStorage).filter(key =>
+                key.startsWith('nishen-workspace')
+            );
+
+            if (workspaceKeys.length === 0) {
+                status.innerHTML = '<div class="info">No workspace data found in localStorage</div>';
+                return;
+            }
+
+            let report = '<div class="success"><strong>Current localStorage data:</strong><br>';
+            workspaceKeys.forEach(key => {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    const size = Array.isArray(data) ? data.length : Object.keys(data).length;
+                    report += `<code>${key}</code>: ${size} items<br>`;
+                } catch (e) {
+                    report += `<code>${key}</code>: string value<br>`;
+                }
+            });
+            report += '</div>';
+
+            status.innerHTML = report;
+        }
+
+        function openWorkspace() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        // Auto-check data on page load
+        window.onload = function() {
+            showCurrentData();
+        };
+    </script>
+</body>
+</html>

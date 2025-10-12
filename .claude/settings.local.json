@@ -22,7 +22,12 @@
       "Bash(npm run db:migrate:*)",
       "Bash(psql:*)",
       "Bash(docker compose:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:dev-ops-studio-jwre.vercel.app)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npm install:*)",
+      "WebSearch"
     ],
     "deny": []
   }
