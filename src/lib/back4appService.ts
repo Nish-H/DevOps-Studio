@@ -41,7 +41,7 @@ export async function registerUser(username: string, email: string, password: st
 
     const result = await user.signUp()
     return {
-      id: result.id,
+      id: result.id || '',
       username: result.get('username'),
       email: result.get('email'),
       createdAt: result.createdAt
@@ -58,7 +58,7 @@ export async function loginUser(username: string, password: string): Promise<Use
   try {
     const user = await Parse.User.logIn(username, password)
     return {
-      id: user.id,
+      id: user.id || '',
       username: user.get('username'),
       email: user.get('email'),
       createdAt: user.createdAt
@@ -83,7 +83,7 @@ export function getCurrentUser(): User | null {
   if (!user) return null
 
   return {
-    id: user.id,
+    id: user.id || '',
     username: user.get('username'),
     email: user.get('email'),
     createdAt: user.createdAt
