@@ -44,7 +44,7 @@ export async function registerUser(username: string, email: string, password: st
       id: result.id || '',
       username: result.get('username'),
       email: result.get('email'),
-      createdAt: result.createdAt
+      createdAt: result.createdAt || new Date()
     }
   } catch (error: any) {
     throw new Error(`Registration failed: ${error.message}`)
@@ -61,7 +61,7 @@ export async function loginUser(username: string, password: string): Promise<Use
       id: user.id || '',
       username: user.get('username'),
       email: user.get('email'),
-      createdAt: user.createdAt
+      createdAt: user.createdAt || new Date()
     }
   } catch (error: any) {
     throw new Error(`Login failed: ${error.message}`)
@@ -86,7 +86,7 @@ export function getCurrentUser(): User | null {
     id: user.id || '',
     username: user.get('username'),
     email: user.get('email'),
-    createdAt: user.createdAt
+    createdAt: user.createdAt || new Date()
   }
 }
 
