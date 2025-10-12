@@ -202,6 +202,19 @@ export interface Note {
   category?: string
   tags?: string[]
   isPinned?: boolean
+  isArchived?: boolean
+  type?: 'markdown' | 'html' | 'document' | 'code' | 'other'
+  created?: Date
+  modified?: Date
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface NoteCategory {
+  id?: string
+  name: string
+  color: string
+  count?: number
   createdAt?: Date
   updatedAt?: Date
 }
@@ -221,6 +234,8 @@ export async function createNote(note: Note): Promise<Note> {
   newNote.set('category', note.category || 'General')
   newNote.set('tags', note.tags || [])
   newNote.set('isPinned', note.isPinned || false)
+  newNote.set('isArchived', note.isArchived || false)
+  newNote.set('type', note.type || 'markdown')
   newNote.set('userId', user.id || '')
 
   const result = await newNote.save()
@@ -256,6 +271,8 @@ export async function updateNote(id: string, updates: Partial<Note>): Promise<No
   if (updates.category !== undefined) note.set('category', updates.category)
   if (updates.tags !== undefined) note.set('tags', updates.tags)
   if (updates.isPinned !== undefined) note.set('isPinned', updates.isPinned)
+  if (updates.isArchived !== undefined) note.set('isArchived', updates.isArchived)
+  if (updates.type !== undefined) note.set('type', updates.type)
 
   const result = await note.save()
   return parseNoteObject(result)
@@ -275,6 +292,9 @@ export async function deleteNote(id: string): Promise<void> {
  * Helper to parse Parse note object
  */
 function parseNoteObject(obj: Parse.Object): Note {
+  const createdAt = obj.createdAt || new Date()
+  const updatedAt = obj.updatedAt || new Date()
+
   return {
     id: obj.id || '',
     title: obj.get('title'),
@@ -282,6 +302,85 @@ function parseNoteObject(obj: Parse.Object): Note {
     category: obj.get('category'),
     tags: obj.get('tags') || [],
     isPinned: obj.get('isPinned') || false,
+    isArchived: obj.get('isArchived') || false,
+    type: obj.get('type') || 'markdown',
+    created: createdAt,
+    modified: updatedAt,
+    createdAt: createdAt,
+    updatedAt: updatedAt
+  }
+}
+
+// ==================== NOTE CATEGORIES ====================
+
+/**
+ * Create a new note category
+ */
+export async function createNoteCategory(category: NoteCategory): Promise<NoteCategory> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const NoteCategoryClass = Parse.Object.extend('NoteCategory')
+  const newCategory = new NoteCategoryClass()
+
+  newCategory.set('name', category.name)
+  newCategory.set('color', category.color)
+  newCategory.set('userId', user.id || '')
+
+  const result = await newCategory.save()
+  return parseNoteCategoryObject(result)
+}
+
+/**
+ * Get all note categories for current user
+ */
+export async function getNoteCategories(): Promise<NoteCategory[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const NoteCategoryClass = Parse.Object.extend('NoteCategory')
+  const query = new Parse.Query(NoteCategoryClass)
+  query.equalTo('userId', user.id || '')
+  query.ascending('name')
+
+  const results = await query.find()
+  return results.map(parseNoteCategoryObject)
+}
+
+/**
+ * Update a note category
+ */
+export async function updateNoteCategory(id: string, updates: Partial<NoteCategory>): Promise<NoteCategory> {
+  const NoteCategoryClass = Parse.Object.extend('NoteCategory')
+  const query = new Parse.Query(NoteCategoryClass)
+  const category = await query.get(id)
+
+  if (updates.name !== undefined) category.set('name', updates.name)
+  if (updates.color !== undefined) category.set('color', updates.color)
+
+  const result = await category.save()
+  return parseNoteCategoryObject(result)
+}
+
+/**
+ * Delete a note category
+ */
+export async function deleteNoteCategory(id: string): Promise<void> {
+  const NoteCategoryClass = Parse.Object.extend('NoteCategory')
+  const query = new Parse.Query(NoteCategoryClass)
+  const category = await query.get(id)
+  await category.destroy()
+}
+
+/**
+ * Helper to parse Parse note category object
+ */
+function parseNoteCategoryObject(obj: Parse.Object): NoteCategory {
+  return {
+    id: obj.id || '',
+    name: obj.get('name'),
+    color: obj.get('color'),
+    count: 0, // Will be calculated client-side
     createdAt: obj.createdAt,
     updatedAt: obj.updatedAt
   }
@@ -513,6 +612,12 @@ export default {
   getNotes,
   updateNote,
   deleteNote,
+
+  // Note Categories
+  createNoteCategory,
+  getNoteCategories,
+  updateNoteCategory,
+  deleteNoteCategory,
 
   // URL Links
   createURLLink,

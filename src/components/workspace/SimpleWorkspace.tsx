@@ -14,6 +14,7 @@ import Tools from './Tools'
 import Settings from './Settings'
 import PromptEngineering from './PromptEngineering'
 import URLLinksCloud from './URLLinksCloud'
+import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
@@ -270,7 +271,7 @@ export default function SimpleWorkspace() {
         ) : activeSection === 'tasks' ? (
           <TaskTracker />
         ) : activeSection === 'notes' ? (
-          <Notes />
+          <NotesCloud />
         ) : activeSection === 'prompts' ? (
           <PromptEngineering />
         ) : activeSection === 'links' ? (
