@@ -1,16 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  Zap, 
-  Monitor, 
-  Network, 
-  Shield, 
-  HardDrive, 
-  Cpu, 
-  Wifi, 
-  Lock, 
-  Activity, 
+import {
+  Zap,
+  Monitor,
+  Network,
+  Shield,
+  HardDrive,
+  Cpu,
+  Wifi,
+  Lock,
+  Activity,
   Terminal as TerminalIcon,
   Server,
   Database,
@@ -32,7 +32,9 @@ import {
   Key,
   Scan,
   Bug,
-  Wrench
+  Wrench,
+  Menu,
+  X
 } from 'lucide-react'
 import ScreenshotWidget from '../ui/ScreenshotWidget'
 
@@ -70,6 +72,7 @@ export default function Tools() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [runningTools, setRunningTools] = useState<Set<string>>(new Set())
   const [showSystemMonitor, setShowSystemMonitor] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Mobile sidebar state
 
   // Simulate system monitoring
   useEffect(() => {
@@ -332,8 +335,38 @@ export default function Tools() {
 
   return (
     <div className="flex h-full bg-black text-white">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-all"
+        style={{
+          backgroundColor: isSidebarOpen ? 'var(--primary-accent)' : undefined,
+        }}
+      >
+        {isSidebarOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <Menu className="w-6 h-6" />
+        )}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar - Categories & System Monitor */}
-      <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
+      <div
+        className={`
+          fixed lg:static inset-y-0 left-0 z-40
+          w-80 lg:w-80 bg-gray-900 border-r border-gray-800 flex-shrink-0 flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
           {/* Version Info */}
@@ -363,10 +396,13 @@ export default function Tools() {
               {categories.map(category => (
                 <button
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => {
+                    setSelectedCategory(category.id)
+                    setIsSidebarOpen(false) // Close drawer on mobile after selection
+                  }}
                   className={`w-full flex items-center justify-between p-2 rounded text-sm transition-colors ${
-                    selectedCategory === category.id 
-                      ? 'bg-neon-green/20 text-neon-green border border-neon-green/40' 
+                    selectedCategory === category.id
+                      ? 'bg-neon-green/20 text-neon-green border border-neon-green/40'
                       : 'text-gray-300 hover:bg-gray-800 border border-transparent'
                   }`}
                 >
@@ -487,7 +523,7 @@ export default function Tools() {
       </div>
 
       {/* Main Content - Tools Grid */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-gray-800 bg-gray-900">
           <div className="flex items-center justify-center">

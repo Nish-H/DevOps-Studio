@@ -600,6 +600,355 @@ function parseURLLinkObject(obj: Parse.Object): URLLink {
   }
 }
 
+// ==================== FILES & PROJECTS ====================
+
+export interface FileVersion {
+  id?: string
+  content: string
+  timestamp: Date
+  description: string
+}
+
+export interface ProjectFile {
+  id?: string
+  name: string
+  type: 'script' | 'html' | 'document' | 'code' | 'markdown' | 'other'
+  category: string
+  content: string
+  versions: FileVersion[]
+  created: Date
+  modified: Date
+  timeSpent: number
+}
+
+export interface Project {
+  id?: string
+  name: string
+  description: string
+  files: ProjectFile[]
+  totalTimeSpent: number
+  created: Date
+  isTimerRunning: boolean
+  timerStartTime?: Date
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+/**
+ * Create a new project
+ */
+export async function createProject(project: Project): Promise<Project> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ProjectClass = Parse.Object.extend('Project')
+  const newProject = new ProjectClass()
+
+  newProject.set('name', project.name)
+  newProject.set('description', project.description)
+  newProject.set('files', JSON.stringify(project.files))
+  newProject.set('totalTimeSpent', project.totalTimeSpent || 0)
+  newProject.set('created', project.created || new Date())
+  newProject.set('isTimerRunning', project.isTimerRunning || false)
+  if (project.timerStartTime) newProject.set('timerStartTime', project.timerStartTime)
+  newProject.set('userId', user.id || '')
+
+  const result = await newProject.save()
+  return parseProjectObject(result)
+}
+
+/**
+ * Get all projects for current user
+ */
+export async function getProjects(): Promise<Project[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const ProjectClass = Parse.Object.extend('Project')
+  const query = new Parse.Query(ProjectClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('createdAt')
+
+  const results = await query.find()
+  return results.map(parseProjectObject)
+}
+
+/**
+ * Update a project
+ */
+export async function updateProject(id: string, updates: Partial<Project>): Promise<Project> {
+  const ProjectClass = Parse.Object.extend('Project')
+  const query = new Parse.Query(ProjectClass)
+  const project = await query.get(id)
+
+  if (updates.name !== undefined) project.set('name', updates.name)
+  if (updates.description !== undefined) project.set('description', updates.description)
+  if (updates.files !== undefined) project.set('files', JSON.stringify(updates.files))
+  if (updates.totalTimeSpent !== undefined) project.set('totalTimeSpent', updates.totalTimeSpent)
+  if (updates.isTimerRunning !== undefined) project.set('isTimerRunning', updates.isTimerRunning)
+  if (updates.timerStartTime !== undefined) project.set('timerStartTime', updates.timerStartTime)
+
+  const result = await project.save()
+  return parseProjectObject(result)
+}
+
+/**
+ * Delete a project
+ */
+export async function deleteProject(id: string): Promise<void> {
+  const ProjectClass = Parse.Object.extend('Project')
+  const query = new Parse.Query(ProjectClass)
+  const project = await query.get(id)
+  await project.destroy()
+}
+
+/**
+ * Helper to parse Parse project object
+ */
+function parseProjectObject(obj: Parse.Object): Project {
+  const filesData = obj.get('files')
+  let files: ProjectFile[] = []
+
+  if (typeof filesData === 'string') {
+    try {
+      files = JSON.parse(filesData).map((f: any) => ({
+        ...f,
+        created: new Date(f.created),
+        modified: new Date(f.modified),
+        versions: (f.versions || []).map((v: any) => ({
+          ...v,
+          timestamp: new Date(v.timestamp)
+        }))
+      }))
+    } catch (error) {
+      console.error('Error parsing project files:', error)
+      files = []
+    }
+  }
+
+  return {
+    id: obj.id || '',
+    name: obj.get('name'),
+    description: obj.get('description'),
+    files: files,
+    totalTimeSpent: obj.get('totalTimeSpent') || 0,
+    created: obj.get('created') || obj.createdAt || new Date(),
+    isTimerRunning: obj.get('isTimerRunning') || false,
+    timerStartTime: obj.get('timerStartTime'),
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
+// ==================== PROMPTS ====================
+
+export interface Prompt {
+  id?: string
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  created: Date
+  modified: Date
+  isPinned: boolean
+  isArchived: boolean
+  type: 'system' | 'user' | 'assistant' | 'creative' | 'technical' | 'other'
+  difficulty: 'beginner' | 'intermediate' | 'advanced'
+  usageCount: number
+  rating: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface PromptCategory {
+  id?: string
+  name: string
+  color: string
+  count?: number
+  description: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+/**
+ * Create a new prompt
+ */
+export async function createPrompt(prompt: Prompt): Promise<Prompt> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const PromptClass = Parse.Object.extend('Prompt')
+  const newPrompt = new PromptClass()
+
+  newPrompt.set('title', prompt.title)
+  newPrompt.set('content', prompt.content)
+  newPrompt.set('category', prompt.category)
+  newPrompt.set('tags', prompt.tags || [])
+  newPrompt.set('isPinned', prompt.isPinned || false)
+  newPrompt.set('isArchived', prompt.isArchived || false)
+  newPrompt.set('type', prompt.type)
+  newPrompt.set('difficulty', prompt.difficulty)
+  newPrompt.set('usageCount', prompt.usageCount || 0)
+  newPrompt.set('rating', prompt.rating || 0)
+  newPrompt.set('userId', user.id || '')
+
+  const result = await newPrompt.save()
+  return parsePromptObject(result)
+}
+
+/**
+ * Get all prompts for current user
+ */
+export async function getPrompts(): Promise<Prompt[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const PromptClass = Parse.Object.extend('Prompt')
+  const query = new Parse.Query(PromptClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('updatedAt')
+
+  const results = await query.find()
+  return results.map(parsePromptObject)
+}
+
+/**
+ * Update a prompt
+ */
+export async function updatePrompt(id: string, updates: Partial<Prompt>): Promise<Prompt> {
+  const PromptClass = Parse.Object.extend('Prompt')
+  const query = new Parse.Query(PromptClass)
+  const prompt = await query.get(id)
+
+  if (updates.title !== undefined) prompt.set('title', updates.title)
+  if (updates.content !== undefined) prompt.set('content', updates.content)
+  if (updates.category !== undefined) prompt.set('category', updates.category)
+  if (updates.tags !== undefined) prompt.set('tags', updates.tags)
+  if (updates.isPinned !== undefined) prompt.set('isPinned', updates.isPinned)
+  if (updates.isArchived !== undefined) prompt.set('isArchived', updates.isArchived)
+  if (updates.type !== undefined) prompt.set('type', updates.type)
+  if (updates.difficulty !== undefined) prompt.set('difficulty', updates.difficulty)
+  if (updates.usageCount !== undefined) prompt.set('usageCount', updates.usageCount)
+  if (updates.rating !== undefined) prompt.set('rating', updates.rating)
+
+  const result = await prompt.save()
+  return parsePromptObject(result)
+}
+
+/**
+ * Delete a prompt
+ */
+export async function deletePrompt(id: string): Promise<void> {
+  const PromptClass = Parse.Object.extend('Prompt')
+  const query = new Parse.Query(PromptClass)
+  const prompt = await query.get(id)
+  await prompt.destroy()
+}
+
+/**
+ * Helper to parse Parse prompt object
+ */
+function parsePromptObject(obj: Parse.Object): Prompt {
+  const createdAt = obj.createdAt || new Date()
+  const updatedAt = obj.updatedAt || new Date()
+
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    content: obj.get('content'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    created: obj.get('created') || createdAt,
+    modified: obj.get('modified') || updatedAt,
+    isPinned: obj.get('isPinned') || false,
+    isArchived: obj.get('isArchived') || false,
+    type: obj.get('type'),
+    difficulty: obj.get('difficulty'),
+    usageCount: obj.get('usageCount') || 0,
+    rating: obj.get('rating') || 0,
+    createdAt: createdAt,
+    updatedAt: updatedAt
+  }
+}
+
+// ==================== PROMPT CATEGORIES ====================
+
+/**
+ * Create a new prompt category
+ */
+export async function createPromptCategory(category: PromptCategory): Promise<PromptCategory> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const PromptCategoryClass = Parse.Object.extend('PromptCategory')
+  const newCategory = new PromptCategoryClass()
+
+  newCategory.set('name', category.name)
+  newCategory.set('color', category.color)
+  newCategory.set('description', category.description || '')
+  newCategory.set('userId', user.id || '')
+
+  const result = await newCategory.save()
+  return parsePromptCategoryObject(result)
+}
+
+/**
+ * Get all prompt categories for current user
+ */
+export async function getPromptCategories(): Promise<PromptCategory[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const PromptCategoryClass = Parse.Object.extend('PromptCategory')
+  const query = new Parse.Query(PromptCategoryClass)
+  query.equalTo('userId', user.id || '')
+  query.ascending('name')
+
+  const results = await query.find()
+  return results.map(parsePromptCategoryObject)
+}
+
+/**
+ * Update a prompt category
+ */
+export async function updatePromptCategory(id: string, updates: Partial<PromptCategory>): Promise<PromptCategory> {
+  const PromptCategoryClass = Parse.Object.extend('PromptCategory')
+  const query = new Parse.Query(PromptCategoryClass)
+  const category = await query.get(id)
+
+  if (updates.name !== undefined) category.set('name', updates.name)
+  if (updates.color !== undefined) category.set('color', updates.color)
+  if (updates.description !== undefined) category.set('description', updates.description)
+
+  const result = await category.save()
+  return parsePromptCategoryObject(result)
+}
+
+/**
+ * Delete a prompt category
+ */
+export async function deletePromptCategory(id: string): Promise<void> {
+  const PromptCategoryClass = Parse.Object.extend('PromptCategory')
+  const query = new Parse.Query(PromptCategoryClass)
+  const category = await query.get(id)
+  await category.destroy()
+}
+
+/**
+ * Helper to parse Parse prompt category object
+ */
+function parsePromptCategoryObject(obj: Parse.Object): PromptCategory {
+  return {
+    id: obj.id || '',
+    name: obj.get('name'),
+    color: obj.get('color'),
+    description: obj.get('description') || '',
+    count: 0, // Will be calculated client-side
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
 // ==================== SYNC STATUS ====================
 
 export interface SyncStatus {
@@ -625,6 +974,8 @@ export default {
   loginUser,
   logoutUser,
   getCurrentUser,
+  isSessionError,
+  handleSessionError,
 
   // Tasks
   createTask,
@@ -654,6 +1005,24 @@ export default {
   // Panel Configs
   savePanelConfig,
   getPanelConfigs,
+
+  // Projects & Files
+  createProject,
+  getProjects,
+  updateProject,
+  deleteProject,
+
+  // Prompts
+  createPrompt,
+  getPrompts,
+  updatePrompt,
+  deletePrompt,
+
+  // Prompt Categories
+  createPromptCategory,
+  getPromptCategories,
+  updatePromptCategory,
+  deletePromptCategory,
 
   // Sync
   getSyncStatus

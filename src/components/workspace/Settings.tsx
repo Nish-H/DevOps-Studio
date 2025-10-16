@@ -3,16 +3,16 @@
 import { useState, useEffect } from 'react'
 import { useSettings } from '../../contexts/SettingsContext'
 import { safeGetItem, safeSetItem, getStorageStats } from '../../lib/storageUtils'
-import { 
-  Settings as SettingsIcon, 
-  Palette, 
-  Monitor, 
-  Bell, 
-  Shield, 
-  Database, 
-  Download, 
-  Upload, 
-  Trash2, 
+import {
+  Settings as SettingsIcon,
+  Palette,
+  Monitor,
+  Bell,
+  Shield,
+  Database,
+  Download,
+  Upload,
+  Trash2,
   RefreshCw,
   Save,
   Eye,
@@ -37,7 +37,9 @@ import {
   ToggleRight,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  Menu,
+  X
 } from 'lucide-react'
 import StorageManager from '../ui/StorageManager'
 
@@ -56,6 +58,7 @@ export default function Settings() {
   const [showExportModal, setShowExportModal] = useState(false)
   const [showDataBackupModal, setShowDataBackupModal] = useState(false)
   const [showStorageManager, setShowStorageManager] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Mobile sidebar state
 
   const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -731,8 +734,38 @@ export default function Settings() {
 
   return (
     <div className="flex h-full bg-black text-white">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-all"
+        style={{
+          backgroundColor: isSidebarOpen ? 'var(--primary-accent)' : undefined,
+        }}
+      >
+        {isSidebarOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <Menu className="w-6 h-6" />
+        )}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar - Settings Categories */}
-      <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
+      <div
+        className={`
+          fixed lg:static inset-y-0 left-0 z-40
+          w-64 lg:w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0 flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
         <div className="p-4 border-b border-gray-800">
           <h2 className="text-lg font-semibold flex items-center" style={{ color: 'var(--accent-primary)' }}>
             <SettingsIcon className="w-5 h-5 mr-2 neon-pulse" style={{ color: 'var(--neon-green)' }} />
@@ -746,7 +779,10 @@ export default function Settings() {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id)
+                  setIsSidebarOpen(false) // Close drawer on mobile after selection
+                }}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg text-left transition-colors ${
                   activeTab === tab.id
                     ? 'bg-neon-green/20 text-neon-green border border-neon-green/40'
@@ -773,7 +809,7 @@ export default function Settings() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-gray-800 bg-gray-900">
           <div className="flex items-center justify-between">

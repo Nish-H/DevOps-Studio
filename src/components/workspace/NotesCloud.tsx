@@ -33,7 +33,9 @@ import {
   Cloud,
   RefreshCw,
   Download,
-  Upload
+  Upload,
+  Menu,
+  X
 } from 'lucide-react'
 
 const DEFAULT_CATEGORIES: NoteCategoryType[] = [
@@ -59,6 +61,7 @@ export default function NotesCloud() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Mobile sidebar state
 
   // Modals
   const [showNewNoteModal, setShowNewNoteModal] = useState(false)
@@ -650,10 +653,37 @@ Start writing your note here...`
   }
 
   return (
-    <div className="flex flex-col h-full text-white" style={{ backgroundColor: '#0f0d15' }}>
+    <div className="flex flex-col h-full text-white overflow-hidden" style={{ backgroundColor: '#0f0d15' }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-all"
+        style={{
+          backgroundColor: isSidebarOpen ? '#6366f1' : undefined,
+        }}
+      >
+        {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex h-full">
         {/* Sidebar - Categories & Notes */}
-        <div className="w-80 border-r border-gray-800 flex flex-col" style={{ backgroundColor: '#1a1625' }}>
+        <div
+          className={`
+            fixed lg:static inset-y-0 left-0 z-40
+            w-80 lg:w-80 border-r border-gray-800 flex-shrink-0 flex-col
+            transform transition-transform duration-300 ease-in-out
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}
+          style={{ backgroundColor: '#1a1625', display: 'flex' }}
+        >
           {/* Header */}
           <div className="p-4 border-b border-gray-800">
             <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
@@ -838,6 +868,7 @@ Start writing your note here...`
                       setEditTitle(note.title)
                       setEditContent(note.content)
                       setIsEditing(false)
+                      setIsSidebarOpen(false) // Close sidebar on mobile after selection
                     }}
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -895,7 +926,7 @@ Start writing your note here...`
         </div>
 
         {/* Main Content - Note Editor */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
           {selectedNoteData ? (
             <>
               {/* Note Header */}

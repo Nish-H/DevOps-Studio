@@ -7,12 +7,15 @@ import { dailyAutoBackup } from '../../lib/dailyAutoBackup'
 import Terminal from './Terminal'
 import PowerShell from './PowerShell'
 import Files from './Files'
+import FilesCloud from './FilesCloud'
+import FilesCloudMobile from './FilesCloudMobile'
 import FileBrowserSimple from './FileBrowserSimple'
 import Prod from './Prod'
 import Notes from './Notes'
 import Tools from './Tools'
 import Settings from './Settings'
 import PromptEngineering from './PromptEngineering'
+import PromptEngineeringCloud from './PromptEngineeringCloud'
 import URLLinksCloud from './URLLinksCloud'
 import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
@@ -33,6 +36,7 @@ export default function SimpleWorkspace() {
   ])
   const [isElectron, setIsElectron] = useState<boolean | null>(null)
   const [activeClaudeProcess, setActiveClaudeProcess] = useState<number | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // Fix hydration by setting timestamp after mount
   useEffect(() => {
@@ -217,9 +221,41 @@ export default function SimpleWorkspace() {
   ]
 
   return (
-    <div className="flex h-screen bg-black text-white">
-      {/* Sidebar */}
-      <div className="w-64 lg:w-64 md:w-56 sm:w-48 bg-gray-900 border-r border-gray-800 flex-shrink-0">
+    <div className="flex h-screen bg-black text-white overflow-hidden">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-all"
+        style={{
+          backgroundColor: isSidebarOpen ? 'var(--primary-accent)' : undefined,
+        }}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isSidebarOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Drawer on mobile, static on desktop */}
+      <div
+        className={`
+          fixed lg:static inset-y-0 left-0 z-40
+          w-64 lg:w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between">
             <div>
@@ -235,15 +271,18 @@ export default function SimpleWorkspace() {
             </button>
           </div>
         </div>
-        
-        <nav className="p-4">
+
+        <nav className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 80px)' }}>
           {menuItems.map(item => (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center space-x-3 p-3 rounded-lg mb-2 transition-colors ${
-                activeSection === item.id 
-                  ? 'text-white font-semibold' 
+              onClick={() => {
+                setActiveSection(item.id)
+                setIsSidebarOpen(false) // Close drawer on mobile after selection
+              }}
+              className={`w-full flex items-center space-x-3 p-3 rounded-lg mb-2 transition-all duration-200 ${
+                activeSection === item.id
+                  ? 'text-white font-semibold shadow-lg'
                   : 'text-gray-300 hover:bg-gray-800'
               }`}
               style={{
@@ -259,11 +298,11 @@ export default function SimpleWorkspace() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
         {activeSection === 'powershell' ? (
           <PowerShell />
         ) : activeSection === 'dev' ? (
-          <Files />
+          <FilesCloudMobile />
         ) : activeSection === 'prod' ? (
           <Prod />
         ) : activeSection === 'file-browser' ? (
@@ -273,7 +312,7 @@ export default function SimpleWorkspace() {
         ) : activeSection === 'notes' ? (
           <NotesCloud />
         ) : activeSection === 'prompts' ? (
-          <PromptEngineering />
+          <PromptEngineeringCloud />
         ) : activeSection === 'links' ? (
           <URLLinksCloud />
         ) : activeSection === 'tools' ? (
