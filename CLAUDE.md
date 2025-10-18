@@ -295,14 +295,76 @@ if (savedData) {
 - **Collaboration Features**: Multi-user workspace support
 - **Plugin System**: Extensible architecture for third-party integrations
 
+## 📌 Version Management & Deployment Verification
+
+**CRITICAL INSTRUCTION**: Every time you push updates to Vercel, increment the version number across ALL workspace modules. This allows the user to verify that changes have been successfully deployed.
+
+### Current Version: **v0.1.2**
+
+### Version Update Process (MANDATORY FOR EVERY DEPLOYMENT):
+
+1. **Update Version Number**: Use sed to update all modules at once:
+   ```bash
+   for file in src/components/workspace/*.tsx; do
+     sed -i 's/v0\.1\.X/v0.1.Y/g' "$file"
+   done
+   ```
+   Replace X with current version, Y with new version.
+
+2. **Add Version Headers to New Modules**: If a module doesn't have a version header, add it:
+   ```tsx
+   {/* Version Info */}
+   <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
+     <span>DevOps Studio v0.1.2</span>
+     <span>Module Name</span>
+   </div>
+   ```
+
+3. **Verify All Modules**: Check that all modules display the new version:
+   ```bash
+   grep -rn "v0\." src/components/workspace/ --include="*.tsx"
+   ```
+
+4. **Commit Version Update**: Create a dedicated commit for version changes:
+   ```bash
+   git add src/components/workspace/*.tsx
+   git commit -m "Update workspace version to vX.X.X with version headers"
+   ```
+
+5. **Push to Vercel**: After committing, push to trigger deployment:
+   ```bash
+   git push origin master
+   ```
+
+6. **User Verification**: User can check version in top-right corner of any module to confirm deployment.
+
+### Version Header Placement:
+- **Location**: Top-right corner of each module header
+- **Format**: "DevOps Studio vX.X.X" + "Module Name"
+- **Style**: `text-xs text-gray-400` for subtle display
+- **Consistency**: All modules should show same version number
+
+### Modules with Version Headers (as of v0.1.2):
+- FileBrowserSimple, Files, FilesCloud, FilesCloudMobile
+- Notes, NotesCloud
+- PowerShellManager, Terminal
+- PromptEngineering, PromptEngineeringCloud
+- ScriptsRepository, Tools
+- URLLinks, URLLinksCloud
+
+### Version History:
+- **v0.1.2** (Current) - Mobile-friendly drawer interface + version headers
+- **v0.1.1** - UI enhancements with version headers
+- **v0.1.0** - Initial release with core modules
+
 ## 🆕 Recent UI Enhancements (July 10, 2025)
 
 ### Implemented Improvements
 
 **1. Version Headers Across All Modules**
-- Added "Nishen's AI Workspace v0.1.1" + module name to top of each component
+- Added "DevOps Studio" + version number + module name to top of each component
 - Consistent placement in Files, Notes, Tools, Settings, Terminal components
-- Improves brand recognition and version tracking
+- Improves brand recognition and deployment verification
 
 **2. Content Area Scrolling**
 - Implemented `maxHeight: 'calc(100vh - 200px)'` for all content areas
