@@ -298,7 +298,7 @@ export default function SimpleWorkspace() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
+      <div className="flex-1 flex flex-col w-full lg:w-auto overflow-y-auto">
         {activeSection === 'powershell' ? (
           <PowerShell />
         ) : activeSection === 'dev' ? (

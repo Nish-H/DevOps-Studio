@@ -25,13 +25,22 @@ export default function TaskTracker() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
 
+  // Predefined categories matching Notes module
+  const PREDEFINED_CATEGORIES = [
+    { name: 'Work', color: '#ff073a' },
+    { name: 'Personal', color: '#00CC33' },
+    { name: 'Project', color: '#8B9499' },
+    { name: 'Ideas', color: '#0ea5e9' },
+    { name: 'Documentation', color: '#cc5500' }
+  ]
+
   // Form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: 'medium' as 'high' | 'medium' | 'low',
     status: 'pending' as 'pending' | 'in-progress' | 'completed' | 'overdue',
-    category: 'General',
+    category: 'Work',
     dueDate: '',
     timerMinutes: 0
   })
@@ -105,7 +114,7 @@ export default function TaskTracker() {
         description: '',
         priority: 'medium',
         status: 'pending',
-        category: 'General',
+        category: 'Work',
         dueDate: '',
         timerMinutes: 0
       })
@@ -155,7 +164,7 @@ export default function TaskTracker() {
       description: task.description || '',
       priority: task.priority,
       status: task.status,
-      category: task.category || 'General',
+      category: task.category || 'Work',
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
       timerMinutes: task.timerMinutes || 0
     })
@@ -221,7 +230,7 @@ export default function TaskTracker() {
           description: task.description || '',
           priority: task.priority || 'medium',
           status: task.status || 'pending',
-          category: task.category || 'General',
+          category: task.category || 'Work',
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
           timerMinutes: task.timerMinutes || 0
         })
@@ -272,7 +281,12 @@ export default function TaskTracker() {
     }
   }
 
-  const categories = Array.from(new Set(tasks.map(t => t.category || 'General')))
+  const getCategoryColor = (category: string) => {
+    const cat = PREDEFINED_CATEGORIES.find(c => c.name === category)
+    return cat ? cat.color : '#6b7280' // Default gray if not found
+  }
+
+  const categories = Array.from(new Set(tasks.map(t => t.category || 'Work')))
 
   const filteredTasks = getFilteredTasks()
 
@@ -338,7 +352,7 @@ export default function TaskTracker() {
                   description: '',
                   priority: 'medium',
                   status: 'pending',
-                  category: 'General',
+                  category: 'Work',
                   dueDate: '',
                   timerMinutes: 0
                 })
@@ -416,8 +430,8 @@ export default function TaskTracker() {
             className="px-3 py-1.5 bg-gray-800 text-white rounded border border-gray-700 text-sm"
           >
             <option value="all">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {PREDEFINED_CATEGORIES.map(cat => (
+              <option key={cat.name} value={cat.name}>{cat.name}</option>
             ))}
           </select>
         </div>
@@ -432,36 +446,23 @@ export default function TaskTracker() {
             No tasks found. Click "Add Task" to create one.
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredTasks.map(task => (
               <div
                 key={task.id}
-                className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors"
+                className="bg-gray-900 border-2 rounded-lg p-4 hover:shadow-lg transition-all"
+                style={{ borderColor: getCategoryColor(task.category || 'Work') }}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-white mb-1">{task.title}</h3>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-white mb-1 truncate">{task.title}</h3>
                     {task.description && (
-                      <p className="text-sm text-gray-400 mb-2">{task.description}</p>
+                      <p className="text-sm text-gray-400 mb-2 line-clamp-2">{task.description}</p>
                     )}
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <button
-                      onClick={() => handleEdit(task)}
-                      className="px-2 py-1 text-xs bg-gray-800 text-white rounded hover:bg-gray-700"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => task.id && handleDelete(task.id)}
-                      className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-sm">
+                <div className="flex flex-wrap items-center gap-2 text-sm mb-3">
                   <span className={`font-semibold ${getPriorityColor(task.priority)}`}>
                     {task.priority.toUpperCase()}
                   </span>
@@ -469,35 +470,61 @@ export default function TaskTracker() {
                     {task.status}
                   </span>
                   {task.category && (
-                    <span className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">
+                    <span
+                      className="px-2 py-0.5 rounded text-xs font-medium"
+                      style={{
+                        backgroundColor: `${getCategoryColor(task.category)}20`,
+                        color: getCategoryColor(task.category)
+                      }}
+                    >
                       {task.category}
                     </span>
                   )}
-                  {task.dueDate && (
-                    <span className="text-gray-500 text-xs">
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
-                    </span>
-                  )}
-                  {task.timerMinutes !== undefined && task.timerMinutes > 0 && (
-                    <span className="text-gray-500 text-xs">⏱️ {task.timerMinutes}m</span>
-                  )}
                 </div>
 
+                {(task.dueDate || (task.timerMinutes !== undefined && task.timerMinutes > 0)) && (
+                  <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                    {task.dueDate && (
+                      <span>📅 {new Date(task.dueDate).toLocaleDateString()}</span>
+                    )}
+                    {task.timerMinutes !== undefined && task.timerMinutes > 0 && (
+                      <span>⏱️ {task.timerMinutes}m</span>
+                    )}
+                  </div>
+                )}
+
                 {/* Quick Status Change */}
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mb-3">
                   {['pending', 'in-progress', 'completed'].map(status => (
                     <button
                       key={status}
                       onClick={() => task.id && handleStatusChange(task.id, status as Task['status'])}
-                      className={`px-2 py-1 text-xs rounded ${
+                      className={`px-2 py-1 text-xs rounded flex-1 ${
                         task.status === status
                           ? 'bg-[var(--primary-accent)] text-white'
                           : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
+                      title={status === 'in-progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}
                     >
-                      {status === 'in-progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}
+                      {status === 'in-progress' ? 'Progress' : status === 'pending' ? 'Pending' : 'Done'}
                     </button>
                   ))}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEdit(task)}
+                    className="flex-1 px-2 py-1 text-xs bg-gray-800 text-white rounded hover:bg-gray-700"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => task.id && handleDelete(task.id)}
+                    className="flex-1 px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
@@ -566,12 +593,15 @@ export default function TaskTracker() {
 
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
-                <input
-                  type="text"
+                <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-[var(--primary-accent)] outline-none"
-                />
+                >
+                  {PREDEFINED_CATEGORIES.map(cat => (
+                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

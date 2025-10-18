@@ -29,7 +29,24 @@
       "Bash(npm install:*)",
       "WebSearch",
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd Notes module Back4App cloud migration with Indigo theme\n\nFeatures implemented:\n- Complete CRUD operations for notes and categories\n- Category management with custom colors\n- Pin/unpin, archive, tag support\n- Multiple note types (Markdown, HTML, Code, Document, Other)\n- Live preview for Markdown and HTML notes\n- Search and filtering functionality\n- Migration utility from localStorage to Back4App\n- Export/Import JSON functionality\n- Real-time cloud sync with loading indicators\n- Indigo/purple theme matching URLLinks module\n\nTechnical changes:\n- Extended back4appService.ts with Note and NoteCategory APIs\n- Created NotesCloud.tsx component with full feature parity\n- Integrated NotesCloud into SimpleWorkspace.tsx\n- Added comprehensive migration guide documentation\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(if [ -f .env.local ])",
+      "Bash(then echo \"✓ .env.local exists\")",
+      "Bash(else echo \"⚠️ .env.local not found\")",
+      "Bash(fi)",
+      "Bash(for file in src/components/workspace/FileBrowserSimple.tsx src/components/workspace/Files.tsx src/components/workspace/FilesCloud.tsx src/components/workspace/FilesCloudMobile.tsx src/components/workspace/Notes.tsx src/components/workspace/NotesCloud.tsx src/components/workspace/PowerShellManager.tsx src/components/workspace/PromptEngineering.tsx src/components/workspace/PromptEngineeringCloud.tsx src/components/workspace/ScriptsRepository.tsx src/components/workspace/Terminal.tsx src/components/workspace/Tools.tsx src/components/workspace/URLLinks.tsx)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(for module in TaskTracker URLLinksCloud Settings PowerShell Prod)",
+      "Bash(do if [ -f \"src/components/workspace/$module.tsx\" ])",
+      "Bash(then echo \"=== $module.tsx ===\" grep -n \"v0\\.\" \"src/components/workspace/$module.tsx\")",
+      "Bash(for file in TaskTracker Prod PowerShell)",
+      "Bash(do echo \"=== $file.tsx ===\" grep -n \"Nishen.*Workspace.*v0\\|DevOps.*Studio.*v0\" \"src/components/workspace/$file.tsx\")",
+      "Bash(for file in src/components/workspace/*.tsx)",
+      "Bash(do basename \"$file\")",
+      "Bash(while read module)",
+      "Bash(do if ! grep -q \"DevOps Studio v0\\|Nishen.*Workspace v0\" \"src/components/workspace/$module.tsx\")",
+      "Bash(then echo \"$module\" fi done)"
     ],
     "deny": []
   }

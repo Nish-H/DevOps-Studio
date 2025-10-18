@@ -39,11 +39,11 @@ import {
 } from 'lucide-react'
 
 const DEFAULT_CATEGORIES: NoteCategoryType[] = [
-  { name: 'System Admin', color: '#ff073a' },
-  { name: 'Development', color: '#cc5500' },
-  { name: 'Documentation', color: '#0ea5e9' },
-  { name: 'Ideas', color: '#10b981' },
-  { name: 'Personal', color: '#8B9499' }
+  { name: 'Work', color: '#ff073a' },
+  { name: 'Personal', color: '#00CC33' },
+  { name: 'Project', color: '#8B9499' },
+  { name: 'Ideas', color: '#0ea5e9' },
+  { name: 'Documentation', color: '#cc5500' }
 ]
 
 export default function NotesCloud() {
@@ -925,14 +925,126 @@ Start writing your note here...`
           </div>
         </div>
 
-        {/* Main Content - Note Editor */}
+        {/* Main Content - Note Editor or Cards View */}
         <div className="flex-1 flex flex-col w-full lg:w-auto overflow-hidden">
-          {selectedNoteData ? (
+          {!selectedNoteData ? (
+            /* All Notes Grid View */
+            <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0d15' }}>
+              <div className="p-4 border-b border-gray-800" style={{ backgroundColor: '#1a1625' }}>
+                <h2 className="text-xl font-bold">
+                  {selectedCategory === 'all' ? 'All Notes' : `${selectedCategory} Notes`}
+                </h2>
+                <p className="text-sm text-gray-400">
+                  {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'}
+                </p>
+              </div>
+
+              <div className="flex-1 p-4 overflow-y-auto">
+                {loading ? (
+                  <div className="text-center text-gray-500 py-12">
+                    <RefreshCw className="w-12 h-12 mx-auto mb-2 animate-spin opacity-50" />
+                    <p>Loading notes...</p>
+                  </div>
+                ) : sortedNotes.length === 0 ? (
+                  <div className="text-center text-gray-500 py-12">
+                    <StickyNote className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>No notes found</p>
+                    <p className="text-xs mt-2">Create your first note!</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sortedNotes.map(note => (
+                      <div
+                        key={note.id}
+                        className="p-4 rounded-lg cursor-pointer transition-all hover:scale-[1.02] border border-gray-700 hover:border-indigo-500"
+                        style={{ backgroundColor: '#1a1625' }}
+                        onClick={() => {
+                          setSelectedNote(note.id || null)
+                          setEditTitle(note.title)
+                          setEditContent(note.content)
+                          setIsEditing(false)
+                        }}
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-1 line-clamp-1">{note.title}</h3>
+                            <div className="flex items-center space-x-2 text-xs text-gray-400">
+                              <span
+                                className="px-2 py-1 rounded"
+                                style={{
+                                  backgroundColor: categoriesWithCounts.find(c => c.name === note.category)?.color + '20',
+                                  color: categoriesWithCounts.find(c => c.name === note.category)?.color
+                                }}
+                              >
+                                {note.category}
+                              </span>
+                              <div className="flex items-center">
+                                {getFileTypeIcon(note.type || 'markdown')}
+                              </div>
+                            </div>
+                          </div>
+                          {note.isPinned && (
+                            <div className="text-yellow-400">
+                              <StickyNote className="w-5 h-5" />
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-sm text-gray-300 line-clamp-3 mb-3">
+                          {note.content.replace(/#+\s/g, '').replace(/[*_`]/g, '').substring(0, 150)}...
+                        </p>
+
+                        {note.tags && note.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {note.tags.slice(0, 4).map(tag => (
+                              <span key={tag} className="text-xs bg-gray-700 px-2 py-1 rounded">
+                                #{tag}
+                              </span>
+                            ))}
+                            {note.tags.length > 4 && (
+                              <span className="text-xs text-gray-500">+{note.tags.length - 4}</span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-700">
+                          <div className="flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {new Date(note.modified || note.updatedAt || '').toLocaleDateString()}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedNote(note.id || null)
+                              setEditTitle(note.title)
+                              setEditContent(note.content)
+                              setIsEditing(false)
+                            }}
+                            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                          >
+                            View →
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
             <>
+              {/* Note Editor View */}
               {/* Note Header */}
               <div className="p-4 border-b border-gray-800" style={{ backgroundColor: '#1a1625' }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setSelectedNote(null)}
+                      className="p-2 hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-white"
+                      title="Back to all notes"
+                    >
+                      ← Back
+                    </button>
                     <FileText className="w-5 h-5" style={{ color: '#6366f1' }} />
                     <div>
                       {isEditing ? (
@@ -1088,14 +1200,6 @@ Start writing your note here...`
                 </div>
               </div>
             </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <BookOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-gray-400">No Note Selected</h3>
-                <p className="text-gray-500">Select a note from the sidebar to view and edit</p>
-              </div>
-            </div>
           )}
         </div>
       </div>
