@@ -597,7 +597,7 @@ Write-Host "Starting ${filename}..." -ForegroundColor Green
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">DevOps Studio v0.1.1</span>
+            <span className="text-xs text-gray-400">DevOps Studio v0.1.2</span>
             <span className="text-xs text-gray-600">•</span>
             <span className="text-xs text-indigo-400">Files Cloud</span>
           </div>

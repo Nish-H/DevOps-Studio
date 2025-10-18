@@ -335,6 +335,12 @@ export default function URLLinksCloud() {
     <div className="flex-1 flex flex-col">
       {/* Header with Indigo theme */}
       <div className="p-4 border-b border-gray-800" style={{ backgroundColor: '#1a1625' }}>
+        {/* Version Info */}
+        <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
+          <span>DevOps Studio v0.1.2</span>
+          <span>Links Module</span>
+        </div>
+
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold flex items-center">

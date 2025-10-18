@@ -473,7 +473,7 @@ export default function PromptEngineeringCloud() {
         {/* Header */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>DevOps Studio v0.1.1</span>
+            <span>DevOps Studio v0.1.2</span>
             <span>Prompts Cloud</span>
           </div>
 
