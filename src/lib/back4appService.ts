@@ -949,6 +949,238 @@ function parsePromptCategoryObject(obj: Parse.Object): PromptCategory {
   }
 }
 
+// ==================== POWERSHELL SCRIPTS ====================
+
+export interface PowerShellScript {
+  id?: string
+  title: string
+  code: string
+  description: string
+  category: 'basics' | 'automation' | 'advanced' | 'networking' | 'system' | 'security' | 'other'
+  tags: string[]
+  isPinned: boolean
+  isPublic: boolean
+  copyCount: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+/**
+ * Create a new PowerShell script
+ */
+export async function createPowerShellScript(script: PowerShellScript): Promise<PowerShellScript> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptClass = Parse.Object.extend('PowerShellScript')
+  const newScript = new ScriptClass()
+
+  newScript.set('title', script.title)
+  newScript.set('code', script.code)
+  newScript.set('description', script.description)
+  newScript.set('category', script.category)
+  newScript.set('tags', script.tags || [])
+  newScript.set('isPinned', script.isPinned || false)
+  newScript.set('isPublic', script.isPublic || false)
+  newScript.set('copyCount', script.copyCount || 0)
+  newScript.set('userId', user.id || '')
+
+  const result = await newScript.save()
+  return parsePowerShellScriptObject(result)
+}
+
+/**
+ * Get all PowerShell scripts for current user
+ */
+export async function getPowerShellScripts(): Promise<PowerShellScript[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const ScriptClass = Parse.Object.extend('PowerShellScript')
+  const query = new Parse.Query(ScriptClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('updatedAt')
+
+  const results = await query.find()
+  return results.map(parsePowerShellScriptObject)
+}
+
+/**
+ * Update a PowerShell script
+ */
+export async function updatePowerShellScript(id: string, updates: Partial<PowerShellScript>): Promise<PowerShellScript> {
+  const ScriptClass = Parse.Object.extend('PowerShellScript')
+  const query = new Parse.Query(ScriptClass)
+  const script = await query.get(id)
+
+  if (updates.title !== undefined) script.set('title', updates.title)
+  if (updates.code !== undefined) script.set('code', updates.code)
+  if (updates.description !== undefined) script.set('description', updates.description)
+  if (updates.category !== undefined) script.set('category', updates.category)
+  if (updates.tags !== undefined) script.set('tags', updates.tags)
+  if (updates.isPinned !== undefined) script.set('isPinned', updates.isPinned)
+  if (updates.isPublic !== undefined) script.set('isPublic', updates.isPublic)
+  if (updates.copyCount !== undefined) script.set('copyCount', updates.copyCount)
+
+  const result = await script.save()
+  return parsePowerShellScriptObject(result)
+}
+
+/**
+ * Delete a PowerShell script
+ */
+export async function deletePowerShellScript(id: string): Promise<void> {
+  const ScriptClass = Parse.Object.extend('PowerShellScript')
+  const query = new Parse.Query(ScriptClass)
+  const script = await query.get(id)
+  await script.destroy()
+}
+
+/**
+ * Helper to parse Parse PowerShell script object
+ */
+function parsePowerShellScriptObject(obj: Parse.Object): PowerShellScript {
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    code: obj.get('code'),
+    description: obj.get('description'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    isPinned: obj.get('isPinned') || false,
+    isPublic: obj.get('isPublic') || false,
+    copyCount: obj.get('copyCount') || 0,
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
+// ==================== STANDARD OPERATING PROCEDURES (SOPs) ====================
+
+export interface SOP {
+  id?: string
+  title: string
+  content: string
+  category: 'incident' | 'maintenance' | 'deployment' | 'security' | 'monitoring' | 'backup' | 'other'
+  tags: string[]
+  steps: SOPStep[]
+  isPinned: boolean
+  isPublic: boolean
+  viewCount: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface SOPStep {
+  order: number
+  title: string
+  description: string
+  command?: string
+  notes?: string
+}
+
+/**
+ * Create a new SOP
+ */
+export async function createSOP(sop: SOP): Promise<SOP> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const SOPClass = Parse.Object.extend('SOP')
+  const newSOP = new SOPClass()
+
+  newSOP.set('title', sop.title)
+  newSOP.set('content', sop.content)
+  newSOP.set('category', sop.category)
+  newSOP.set('tags', sop.tags || [])
+  newSOP.set('steps', JSON.stringify(sop.steps || []))
+  newSOP.set('isPinned', sop.isPinned || false)
+  newSOP.set('isPublic', sop.isPublic || false)
+  newSOP.set('viewCount', sop.viewCount || 0)
+  newSOP.set('userId', user.id || '')
+
+  const result = await newSOP.save()
+  return parseSOPObject(result)
+}
+
+/**
+ * Get all SOPs for current user
+ */
+export async function getSOPs(): Promise<SOP[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const SOPClass = Parse.Object.extend('SOP')
+  const query = new Parse.Query(SOPClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('updatedAt')
+
+  const results = await query.find()
+  return results.map(parseSOPObject)
+}
+
+/**
+ * Update a SOP
+ */
+export async function updateSOP(id: string, updates: Partial<SOP>): Promise<SOP> {
+  const SOPClass = Parse.Object.extend('SOP')
+  const query = new Parse.Query(SOPClass)
+  const sop = await query.get(id)
+
+  if (updates.title !== undefined) sop.set('title', updates.title)
+  if (updates.content !== undefined) sop.set('content', updates.content)
+  if (updates.category !== undefined) sop.set('category', updates.category)
+  if (updates.tags !== undefined) sop.set('tags', updates.tags)
+  if (updates.steps !== undefined) sop.set('steps', JSON.stringify(updates.steps))
+  if (updates.isPinned !== undefined) sop.set('isPinned', updates.isPinned)
+  if (updates.isPublic !== undefined) sop.set('isPublic', updates.isPublic)
+  if (updates.viewCount !== undefined) sop.set('viewCount', updates.viewCount)
+
+  const result = await sop.save()
+  return parseSOPObject(result)
+}
+
+/**
+ * Delete a SOP
+ */
+export async function deleteSOP(id: string): Promise<void> {
+  const SOPClass = Parse.Object.extend('SOP')
+  const query = new Parse.Query(SOPClass)
+  const sop = await query.get(id)
+  await sop.destroy()
+}
+
+/**
+ * Helper to parse Parse SOP object
+ */
+function parseSOPObject(obj: Parse.Object): SOP {
+  const stepsData = obj.get('steps')
+  let steps: SOPStep[] = []
+
+  if (typeof stepsData === 'string') {
+    try {
+      steps = JSON.parse(stepsData)
+    } catch (error) {
+      console.error('Error parsing SOP steps:', error)
+      steps = []
+    }
+  }
+
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    content: obj.get('content'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    steps: steps,
+    isPinned: obj.get('isPinned') || false,
+    isPublic: obj.get('isPublic') || false,
+    viewCount: obj.get('viewCount') || 0,
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
 // ==================== SYNC STATUS ====================
 
 export interface SyncStatus {
@@ -1023,6 +1255,18 @@ export default {
   getPromptCategories,
   updatePromptCategory,
   deletePromptCategory,
+
+  // PowerShell Scripts
+  createPowerShellScript,
+  getPowerShellScripts,
+  updatePowerShellScript,
+  deletePowerShellScript,
+
+  // SOPs
+  createSOP,
+  getSOPs,
+  updateSOP,
+  deleteSOP,
 
   // Sync
   getSyncStatus

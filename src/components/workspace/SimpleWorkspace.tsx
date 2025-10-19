@@ -19,6 +19,7 @@ import PromptEngineeringCloud from './PromptEngineeringCloud'
 import URLLinksCloud from './URLLinksCloud'
 import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
+import PowerShellHub from './PowerShellHub'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -208,6 +209,7 @@ export default function SimpleWorkspace() {
   }
 
   const menuItems = [
+    { id: 'pshub', name: 'PS Hub', icon: '💻' },
     { id: 'powershell', name: 'PowerShell', icon: '🔷' },
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
@@ -299,7 +301,9 @@ export default function SimpleWorkspace() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full lg:w-auto overflow-y-auto">
-        {activeSection === 'powershell' ? (
+        {activeSection === 'pshub' ? (
+          <PowerShellHub />
+        ) : activeSection === 'powershell' ? (
           <PowerShell />
         ) : activeSection === 'dev' ? (
           <FilesCloudMobile />

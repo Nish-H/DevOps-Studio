@@ -46,7 +46,8 @@
       "Bash(do basename \"$file\")",
       "Bash(while read module)",
       "Bash(do if ! grep -q \"DevOps Studio v0\\|Nishen.*Workspace v0\" \"src/components/workspace/$module.tsx\")",
-      "Bash(then echo \"$module\" fi done)"
+      "Bash(then echo \"$module\" fi done)",
+      "WebFetch(domain:chimerical-fairy-c7173f.netlify.app)"
     ],
     "deny": []
   }
