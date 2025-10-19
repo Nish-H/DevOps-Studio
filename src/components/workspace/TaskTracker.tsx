@@ -39,7 +39,7 @@ export default function TaskTracker() {
     title: '',
     description: '',
     priority: 'medium' as 'high' | 'medium' | 'low',
-    status: 'pending' as 'pending' | 'in-progress' | 'completed' | 'overdue',
+    status: 'pending' as 'pending' | 'in-progress' | 'completed' | 'on-hold',
     category: 'Work',
     dueDate: '',
     timerMinutes: 0
@@ -265,18 +265,19 @@ export default function TaskTracker() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-500'
-      case 'medium': return 'text-yellow-500'
-      case 'low': return 'text-green-500'
-      default: return 'text-gray-400'
+      case 'high': return '#ef4444' // red-500
+      case 'medium': return '#eab308' // yellow-500
+      case 'low': return '#22c55e' // green-500
+      default: return '#9ca3af' // gray-400
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-500/20 text-green-400'
-      case 'in-progress': return 'bg-blue-500/20 text-blue-400'
-      case 'overdue': return 'bg-red-500/20 text-red-400'
+      case 'pending': return 'bg-yellow-500/20 text-yellow-400'
+      case 'in-progress': return 'bg-green-500/20 text-green-400'
+      case 'completed': return 'bg-blue-500/20 text-blue-400'
+      case 'on-hold': return 'bg-red-500/20 text-red-400'
       default: return 'bg-gray-500/20 text-gray-400'
     }
   }
@@ -408,9 +409,9 @@ export default function TaskTracker() {
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
+            <option value="in-progress">InProgress</option>
             <option value="completed">Completed</option>
-            <option value="overdue">Overdue</option>
+            <option value="on-hold">OnHold</option>
           </select>
 
           <select
@@ -451,7 +452,7 @@ export default function TaskTracker() {
               <div
                 key={task.id}
                 className="bg-gray-900 border-2 rounded-lg p-4 hover:shadow-lg transition-all"
-                style={{ borderColor: getCategoryColor(task.category || 'Work') }}
+                style={{ borderColor: getPriorityColor(task.priority) }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
@@ -463,11 +464,11 @@ export default function TaskTracker() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-sm mb-3">
-                  <span className={`font-semibold ${getPriorityColor(task.priority)}`}>
+                  <span className="font-semibold" style={{ color: getPriorityColor(task.priority) }}>
                     {task.priority.toUpperCase()}
                   </span>
                   <span className={`px-2 py-0.5 rounded text-xs ${getStatusColor(task.status)}`}>
-                    {task.status}
+                    {task.status === 'in-progress' ? 'InProgress' : task.status === 'on-hold' ? 'OnHold' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                   </span>
                   {task.category && (
                     <span
@@ -494,19 +495,24 @@ export default function TaskTracker() {
                 )}
 
                 {/* Quick Status Change */}
-                <div className="flex gap-2 mb-3">
-                  {['pending', 'in-progress', 'completed'].map(status => (
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {[
+                    { value: 'pending', label: 'Pending' },
+                    { value: 'in-progress', label: 'InProgress' },
+                    { value: 'completed', label: 'Completed' },
+                    { value: 'on-hold', label: 'OnHold' }
+                  ].map(status => (
                     <button
-                      key={status}
-                      onClick={() => task.id && handleStatusChange(task.id, status as Task['status'])}
-                      className={`px-2 py-1 text-xs rounded flex-1 ${
-                        task.status === status
+                      key={status.value}
+                      onClick={() => task.id && handleStatusChange(task.id, status.value as Task['status'])}
+                      className={`px-2 py-1 text-xs rounded ${
+                        task.status === status.value
                           ? 'bg-[var(--primary-accent)] text-white'
                           : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
-                      title={status === 'in-progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}
+                      title={status.label}
                     >
-                      {status === 'in-progress' ? 'Progress' : status === 'pending' ? 'Pending' : 'Done'}
+                      {status.label}
                     </button>
                   ))}
                 </div>
@@ -584,9 +590,9 @@ export default function TaskTracker() {
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-[var(--primary-accent)] outline-none"
                   >
                     <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
+                    <option value="in-progress">InProgress</option>
                     <option value="completed">Completed</option>
-                    <option value="overdue">Overdue</option>
+                    <option value="on-hold">OnHold</option>
                   </select>
                 </div>
               </div>

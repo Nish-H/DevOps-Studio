@@ -122,7 +122,7 @@ export interface Task {
   title: string
   description?: string
   priority: 'high' | 'medium' | 'low'
-  status: 'pending' | 'in-progress' | 'completed' | 'overdue'
+  status: 'pending' | 'in-progress' | 'completed' | 'on-hold'
   dueDate?: Date
   category?: string
   timerMinutes?: number
