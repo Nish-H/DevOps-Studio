@@ -53,6 +53,7 @@ export default function PowerShellHub() {
   const [filteredScripts, setFilteredScripts] = useState<PowerShellScript[]>([])
   const [scriptSearchTerm, setScriptSearchTerm] = useState('')
   const [scriptCategory, setScriptCategory] = useState<string>('all')
+  const [scriptSortOrder, setScriptSortOrder] = useState<'desc' | 'asc'>('desc')
   const [showScriptModal, setShowScriptModal] = useState(false)
   const [editingScript, setEditingScript] = useState<PowerShellScript | null>(null)
 
@@ -61,6 +62,7 @@ export default function PowerShellHub() {
   const [filteredSOPs, setFilteredSOPs] = useState<SOP[]>([])
   const [sopSearchTerm, setSOPSearchTerm] = useState('')
   const [sopCategory, setSOPCategory] = useState<string>('all')
+  const [sopSortOrder, setSOPSortOrder] = useState<'desc' | 'asc'>('desc')
   const [showSOPModal, setShowSOPModal] = useState(false)
   const [editingSOP, setEditingSOP] = useState<SOP | null>(null)
   const [selectedSOP, setSelectedSOP] = useState<SOP | null>(null)
@@ -148,8 +150,15 @@ export default function PowerShellHub() {
       )
     }
 
+    // Sort by created date
+    filtered.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return scriptSortOrder === 'desc' ? dateB - dateA : dateA - dateB
+    })
+
     setFilteredScripts(filtered)
-  }, [scripts, scriptSearchTerm, scriptCategory])
+  }, [scripts, scriptSearchTerm, scriptCategory, scriptSortOrder])
 
   // Filter SOPs
   useEffect(() => {
@@ -167,8 +176,15 @@ export default function PowerShellHub() {
       )
     }
 
+    // Sort by created date
+    filtered.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return sopSortOrder === 'desc' ? dateB - dateA : dateA - dateB
+    })
+
     setFilteredSOPs(filtered)
-  }, [sops, sopSearchTerm, sopCategory])
+  }, [sops, sopSearchTerm, sopCategory, sopSortOrder])
 
   // Copy to clipboard
   const copyToClipboard = async (text: string, type: string) => {
@@ -535,8 +551,8 @@ export default function PowerShellHub() {
           // SCRIPTS TAB
           <div className="space-y-6">
             {/* Search Bar */}
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
+            <div className="flex gap-3 flex-wrap">
+              <div className="flex-1 min-w-[200px] relative">
                 <Search
                   className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2"
                   style={{ color: 'rgb(0, 246, 255)' }}
@@ -571,32 +587,45 @@ export default function PowerShellHub() {
                 <option value="security">Security</option>
                 <option value="other">Other</option>
               </select>
+              <select
+                value={scriptSortOrder}
+                onChange={(e) => setScriptSortOrder(e.target.value as 'desc' | 'asc')}
+                className="px-4 py-2 rounded-lg border bg-gray-800 text-white focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'rgb(55, 65, 81)',
+                  '--tw-ring-color': 'rgb(123, 44, 191)'
+                } as any}
+              >
+                <option value="desc">📅 Newest First</option>
+                <option value="asc">📅 Oldest First</option>
+              </select>
             </div>
 
             {/* Scripts Grid - Category Cards Style */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredScripts.map(script => (
                 <div
                   key={script.id}
-                  className="rounded-xl border p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
+                  className="rounded-xl border p-4 backdrop-blur-sm transition-all duration-300 hover:shadow-lg"
                   style={{
                     borderColor: 'rgb(0, 246, 255)',
-                    backgroundColor: 'rgba(31, 41, 55, 0.5)'
+                    backgroundColor: 'rgba(31, 41, 55, 0.5)',
+                    maxHeight: '350px'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgb(123, 44, 191)'}
                   onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgb(0, 246, 255)'}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: 'rgb(0, 246, 255)' }}>
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-bold flex items-center gap-2 break-words" style={{ color: 'rgb(0, 246, 255)' }}>
                       {script.title}
-                      {script.isPinned && <Pin size={16} className="text-yellow-400" fill="currentColor" />}
+                      {script.isPinned && <Pin size={14} className="text-yellow-400" fill="currentColor" />}
                     </h3>
                   </div>
 
-                  <p className="text-gray-300 mb-4 text-sm">{script.description}</p>
+                  <p className="text-gray-300 mb-3 text-sm line-clamp-2 break-words">{script.description}</p>
 
                   {/* Code Block */}
-                  <div className="relative rounded-lg bg-gray-900 p-4 mb-3">
+                  <div className="relative rounded-lg bg-gray-900 p-3 mb-2">
                     <button
                       onClick={() => copyToClipboard(script.code, 'Script')}
                       className="absolute top-2 right-2 px-2 py-1 text-xs rounded transition-all hover:opacity-80"
@@ -604,7 +633,7 @@ export default function PowerShellHub() {
                     >
                       Copy
                     </button>
-                    <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap pr-16 max-h-32 overflow-y-auto">
+                    <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap break-words pr-16 max-h-24 overflow-y-auto">
                       {script.code}
                     </pre>
                   </div>
@@ -662,29 +691,53 @@ export default function PowerShellHub() {
                 <option value="backup">Backup & Recovery</option>
                 <option value="other">Other</option>
               </select>
+              <select
+                value={sopSortOrder}
+                onChange={(e) => setSOPSortOrder(e.target.value as 'desc' | 'asc')}
+                className="px-4 py-2 rounded-lg border bg-gray-800 text-white focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'rgb(55, 65, 81)',
+                  '--tw-ring-color': 'rgb(123, 44, 191)'
+                } as any}
+              >
+                <option value="desc">📅 Newest First</option>
+                <option value="asc">📅 Oldest First</option>
+              </select>
             </div>
 
             {/* SOPs Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSOPs.map(sop => (
                 <div
                   key={sop.id}
-                  className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-blue-500 transition-all cursor-pointer"
+                  className="rounded-xl border p-4 backdrop-blur-sm transition-all duration-300 hover:shadow-lg cursor-pointer"
+                  style={{
+                    borderColor: 'rgb(123, 44, 191)',
+                    backgroundColor: 'rgba(31, 41, 55, 0.5)',
+                    maxHeight: '350px'
+                  }}
                   onClick={() => setSelectedSOP(sop)}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgb(0, 246, 255)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgb(123, 44, 191)'}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
+                      <h3 className="text-lg font-bold flex items-center gap-2 break-words" style={{ color: 'rgb(123, 44, 191)' }}>
                         {sop.title}
-                        {sop.isPinned && <Pin size={14} className="text-yellow-400" />}
+                        {sop.isPinned && <Pin size={14} className="text-yellow-400" fill="currentColor" />}
                       </h3>
-                      <p className="text-xs text-gray-400 line-clamp-2">{sop.content}</p>
+                      <p className="text-gray-300 text-sm line-clamp-2 break-words mt-1">{sop.content}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 text-xs mb-3">
-                    <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded">{sop.category}</span>
-                    <span className="text-gray-500">{sop.steps.length} steps</span>
+                    <span
+                      className="px-2 py-1 rounded"
+                      style={{ backgroundColor: 'rgba(123, 44, 191, 0.2)', color: 'rgb(123, 44, 191)' }}
+                    >
+                      {sop.category}
+                    </span>
+                    <span className="text-gray-400">{sop.steps.length} steps</span>
                   </div>
 
                   <div className="flex gap-2">
@@ -693,7 +746,8 @@ export default function PowerShellHub() {
                         e.stopPropagation()
                         setSelectedSOP(sop)
                       }}
-                      className="flex-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm transition-colors"
+                      className="flex-1 px-3 py-1 text-white rounded text-sm transition-all hover:opacity-80"
+                      style={{ backgroundColor: 'rgb(123, 44, 191)' }}
                     >
                       View Steps <ChevronRight size={14} className="inline ml-1" />
                     </button>

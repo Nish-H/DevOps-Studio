@@ -19,6 +19,7 @@ export default function TaskTracker() {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterPriority, setFilterPriority] = useState<string>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
@@ -255,12 +256,21 @@ export default function TaskTracker() {
   }
 
   const getFilteredTasks = () => {
-    return tasks.filter(task => {
+    let filtered = tasks.filter(task => {
       if (filterStatus !== 'all' && task.status !== filterStatus) return false
       if (filterPriority !== 'all' && task.priority !== filterPriority) return false
       if (filterCategory !== 'all' && task.category !== filterCategory) return false
       return true
     })
+
+    // Sort by created date
+    filtered.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB
+    })
+
+    return filtered
   }
 
   const getPriorityColor = (priority: string) => {
@@ -401,7 +411,7 @@ export default function TaskTracker() {
         )}
 
         {/* Filters */}
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 mt-4 flex-wrap">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -434,6 +444,15 @@ export default function TaskTracker() {
             {PREDEFINED_CATEGORIES.map(cat => (
               <option key={cat.name} value={cat.name}>{cat.name}</option>
             ))}
+          </select>
+
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as 'desc' | 'asc')}
+            className="px-3 py-1.5 bg-gray-800 text-white rounded border border-gray-700 text-sm"
+          >
+            <option value="desc">📅 Newest First</option>
+            <option value="asc">📅 Oldest First</option>
           </select>
         </div>
       </div>
@@ -497,17 +516,17 @@ export default function TaskTracker() {
                 {/* Quick Status Change */}
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   {[
-                    { value: 'pending', label: 'Pending' },
-                    { value: 'in-progress', label: 'InProgress' },
-                    { value: 'completed', label: 'Completed' },
-                    { value: 'on-hold', label: 'OnHold' }
+                    { value: 'pending', label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' },
+                    { value: 'in-progress', label: 'InProgress', color: 'bg-green-500/20 text-green-400 hover:bg-green-500/30' },
+                    { value: 'completed', label: 'Completed', color: 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30' },
+                    { value: 'on-hold', label: 'OnHold', color: 'bg-red-500/20 text-red-400 hover:bg-red-500/30' }
                   ].map(status => (
                     <button
                       key={status.value}
                       onClick={() => task.id && handleStatusChange(task.id, status.value as Task['status'])}
                       className={`px-2 py-1 text-xs rounded ${
                         task.status === status.value
-                          ? 'bg-[var(--primary-accent)] text-white'
+                          ? status.color
                           : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
                       title={status.label}
