@@ -36,7 +36,8 @@ import {
   Shield,
   RefreshCw,
   Download,
-  Upload
+  Upload,
+  Menu
 } from 'lucide-react'
 
 export default function PowerShellHub() {
@@ -45,6 +46,7 @@ export default function PowerShellHub() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // Scripts state
   const [scripts, setScripts] = useState<PowerShellScript[]>([])
@@ -414,6 +416,26 @@ export default function PowerShellHub() {
 
   return (
     <div className="flex-1 flex flex-col relative" style={{ backgroundColor: 'rgb(26, 26, 46)', minHeight: '100vh' }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg border transition-all"
+        style={{
+          backgroundColor: isSidebarOpen ? 'rgb(0, 246, 255)' : 'rgb(31, 41, 55)',
+          borderColor: 'rgb(0, 246, 255)'
+        }}
+      >
+        {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Cyber Grid Background */}
       <div
         className="fixed top-0 left-0 w-full h-full pointer-events-none"
@@ -459,25 +481,46 @@ export default function PowerShellHub() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-6 mt-4">
-          {[
-            { id: 'scripts', label: 'PowerShell Scripts', icon: Code },
-            { id: 'sops', label: 'Standard Procedures', icon: BookOpen },
-            { id: 'admin', label: 'Admin Panel', icon: Shield }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === tab.id ? '' : 'text-gray-400 hover:text-gray-300'
-              }`}
-              style={activeTab === tab.id ? { color: 'rgb(0, 246, 255)' } : {}}
-            >
-              <tab.icon size={18} className="inline mr-2" />
-              {tab.label}
-            </button>
-          ))}
+        {/* Tabs - Mobile Sidebar / Desktop Horizontal */}
+        <div
+          className={`
+            fixed lg:static inset-y-0 left-0 z-40
+            w-64 lg:w-auto lg:flex lg:gap-6 lg:mt-4
+            transform transition-transform duration-300 ease-in-out
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            lg:bg-transparent rounded-r-lg lg:rounded-none
+            p-4 lg:p-0
+          `}
+          style={{
+            backgroundColor: isSidebarOpen ? 'rgba(26, 26, 46, 0.98)' : 'transparent',
+            borderRight: isSidebarOpen ? '1px solid rgb(0, 246, 255)' : 'none'
+          }}
+        >
+          <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 mt-16 lg:mt-0">
+            {[
+              { id: 'scripts', label: 'PowerShell Scripts', icon: Code },
+              { id: 'sops', label: 'Standard Procedures', icon: BookOpen },
+              { id: 'admin', label: 'Admin Panel', icon: Shield }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id as any)
+                  setIsSidebarOpen(false)
+                }}
+                className={`px-4 py-2 font-medium transition-colors rounded-lg lg:rounded-none text-left ${
+                  activeTab === tab.id ? '' : 'text-gray-400 hover:text-gray-300'
+                }`}
+                style={activeTab === tab.id ? {
+                  color: 'rgb(0, 246, 255)',
+                  backgroundColor: isSidebarOpen ? 'rgba(0, 246, 255, 0.1)' : 'transparent'
+                } : {}}
+              >
+                <tab.icon size={18} className="inline mr-2" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
