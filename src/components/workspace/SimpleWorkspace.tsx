@@ -20,6 +20,7 @@ import URLLinksCloud from './URLLinksCloud'
 import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
 import PowerShellHub from './PowerShellHub'
+import CustomSolutions from './CustomSolutions'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -211,6 +212,7 @@ export default function SimpleWorkspace() {
   const menuItems = [
     { id: 'pshub', name: 'PS Hub', icon: '💻' },
     { id: 'powershell', name: 'PowerShell', icon: '🔷' },
+    { id: 'solutions', name: 'Custom Solutions', icon: '📜' },
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
     { id: 'file-browser', name: 'File Browser', icon: '🗂️' },
@@ -305,6 +307,8 @@ export default function SimpleWorkspace() {
           <PowerShellHub />
         ) : activeSection === 'powershell' ? (
           <PowerShell />
+        ) : activeSection === 'solutions' ? (
+          <CustomSolutions />
         ) : activeSection === 'dev' ? (
           <FilesCloudMobile />
         ) : activeSection === 'prod' ? (
