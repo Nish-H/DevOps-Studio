@@ -1200,6 +1200,471 @@ export function getSyncStatus(): SyncStatus {
   }
 }
 
+// ==================== CUSTOM SOLUTIONS (PowerShell Scripts & Reports) ====================
+
+export interface Script {
+  id?: string
+  title: string
+  description: string
+  scriptContent: string // .ps1 file content
+  htmlReportContent: string // HTML report content
+  category: string
+  tags: string[]
+  version: string
+  created?: Date
+  modified?: Date
+  isPinned: boolean
+  usageCount: number
+  rating: number
+  currentVersion?: number
+  versions?: ScriptVersion[]
+}
+
+export interface ScriptCategory {
+  id?: string
+  name: string
+  color: string
+  count?: number
+  description: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface ScriptVersion {
+  id?: string
+  scriptId: string
+  versionNumber: number
+  versionLabel: string
+  scriptContent: string
+  htmlReportContent: string
+  changeDescription?: string
+  createdAt?: Date
+  createdBy?: string
+}
+
+/**
+ * Create a new script
+ */
+export async function createScript(script: Script): Promise<Script> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptClass = Parse.Object.extend('CustomScript')
+  const newScript = new ScriptClass()
+
+  newScript.set('title', script.title)
+  newScript.set('description', script.description)
+  newScript.set('scriptContent', script.scriptContent)
+  newScript.set('htmlReportContent', script.htmlReportContent)
+  newScript.set('category', script.category)
+  newScript.set('tags', script.tags || [])
+  newScript.set('version', script.version)
+  newScript.set('isPinned', script.isPinned || false)
+  newScript.set('usageCount', script.usageCount || 0)
+  newScript.set('rating', script.rating || 0)
+  newScript.set('currentVersion', 1)
+  newScript.set('userId', user.id || '')
+
+  const result = await newScript.save()
+
+  // Create initial version
+  await createScriptVersion({
+    scriptId: result.id || '',
+    versionNumber: 1,
+    versionLabel: script.version,
+    scriptContent: script.scriptContent,
+    htmlReportContent: script.htmlReportContent,
+    changeDescription: 'Initial version',
+    createdBy: user.get('username')
+  })
+
+  return parseScriptObject(result)
+}
+
+/**
+ * Get all scripts for current user
+ */
+export async function getScripts(): Promise<Script[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const ScriptClass = Parse.Object.extend('CustomScript')
+  const query = new Parse.Query(ScriptClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('updatedAt')
+
+  const results = await query.find()
+  return results.map(parseScriptObject)
+}
+
+/**
+ * Update a script
+ */
+export async function updateScript(id: string, updates: Partial<Script>): Promise<Script> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptClass = Parse.Object.extend('CustomScript')
+  const query = new Parse.Query(ScriptClass)
+  const script = await query.get(id)
+
+  if (script.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Check if content changed to create new version
+  const contentChanged =
+    (updates.scriptContent && updates.scriptContent !== script.get('scriptContent')) ||
+    (updates.htmlReportContent && updates.htmlReportContent !== script.get('htmlReportContent'))
+
+  if (contentChanged) {
+    const currentVersion = script.get('currentVersion') || 1
+    const newVersionNumber = currentVersion + 1
+
+    // Create new version
+    await createScriptVersion({
+      scriptId: id,
+      versionNumber: newVersionNumber,
+      versionLabel: updates.version || script.get('version'),
+      scriptContent: updates.scriptContent || script.get('scriptContent'),
+      htmlReportContent: updates.htmlReportContent || script.get('htmlReportContent'),
+      changeDescription: 'Updated script and/or report',
+      createdBy: user.get('username')
+    })
+
+    script.set('currentVersion', newVersionNumber)
+  }
+
+  if (updates.title !== undefined) script.set('title', updates.title)
+  if (updates.description !== undefined) script.set('description', updates.description)
+  if (updates.scriptContent !== undefined) script.set('scriptContent', updates.scriptContent)
+  if (updates.htmlReportContent !== undefined) script.set('htmlReportContent', updates.htmlReportContent)
+  if (updates.category !== undefined) script.set('category', updates.category)
+  if (updates.tags !== undefined) script.set('tags', updates.tags)
+  if (updates.version !== undefined) script.set('version', updates.version)
+  if (updates.isPinned !== undefined) script.set('isPinned', updates.isPinned)
+  if (updates.usageCount !== undefined) script.set('usageCount', updates.usageCount)
+  if (updates.rating !== undefined) script.set('rating', updates.rating)
+
+  const result = await script.save()
+  return parseScriptObject(result)
+}
+
+/**
+ * Delete a script
+ */
+export async function deleteScript(id: string): Promise<void> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptClass = Parse.Object.extend('CustomScript')
+  const query = new Parse.Query(ScriptClass)
+  const script = await query.get(id)
+
+  if (script.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Delete all versions
+  const versions = await getScriptVersions(id)
+  for (const version of versions) {
+    if (version.id) await deleteScriptVersion(version.id)
+  }
+
+  await script.destroy()
+}
+
+/**
+ * Helper to parse Parse Script object
+ */
+function parseScriptObject(obj: Parse.Object): Script {
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    description: obj.get('description'),
+    scriptContent: obj.get('scriptContent'),
+    htmlReportContent: obj.get('htmlReportContent'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    version: obj.get('version'),
+    created: obj.createdAt,
+    modified: obj.updatedAt,
+    isPinned: obj.get('isPinned') || false,
+    usageCount: obj.get('usageCount') || 0,
+    rating: obj.get('rating') || 0,
+    currentVersion: obj.get('currentVersion') || 1
+  }
+}
+
+// ==================== SCRIPT CATEGORIES ====================
+
+/**
+ * Create a new script category
+ */
+export async function createScriptCategory(category: ScriptCategory): Promise<ScriptCategory> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptCategoryClass = Parse.Object.extend('ScriptCategory')
+  const newCategory = new ScriptCategoryClass()
+
+  newCategory.set('name', category.name)
+  newCategory.set('color', category.color)
+  newCategory.set('description', category.description || '')
+  newCategory.set('userId', user.id || '')
+
+  const result = await newCategory.save()
+  return parseScriptCategoryObject(result)
+}
+
+/**
+ * Get all script categories for current user
+ */
+export async function getScriptCategories(): Promise<ScriptCategory[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const ScriptCategoryClass = Parse.Object.extend('ScriptCategory')
+  const query = new Parse.Query(ScriptCategoryClass)
+  query.equalTo('userId', user.id || '')
+
+  const results = await query.find()
+  return results.map(parseScriptCategoryObject)
+}
+
+/**
+ * Update a script category
+ */
+export async function updateScriptCategory(id: string, updates: Partial<ScriptCategory>): Promise<ScriptCategory> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptCategoryClass = Parse.Object.extend('ScriptCategory')
+  const query = new Parse.Query(ScriptCategoryClass)
+  const category = await query.get(id)
+
+  if (category.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  if (updates.name !== undefined) category.set('name', updates.name)
+  if (updates.color !== undefined) category.set('color', updates.color)
+  if (updates.description !== undefined) category.set('description', updates.description)
+
+  const result = await category.save()
+  return parseScriptCategoryObject(result)
+}
+
+/**
+ * Delete a script category
+ */
+export async function deleteScriptCategory(id: string): Promise<void> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptCategoryClass = Parse.Object.extend('ScriptCategory')
+  const query = new Parse.Query(ScriptCategoryClass)
+  const category = await query.get(id)
+
+  if (category.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  await category.destroy()
+}
+
+/**
+ * Helper to parse Parse ScriptCategory object
+ */
+function parseScriptCategoryObject(obj: Parse.Object): ScriptCategory {
+  return {
+    id: obj.id || '',
+    name: obj.get('name'),
+    color: obj.get('color'),
+    description: obj.get('description'),
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
+// ==================== SCRIPT VERSIONS ====================
+
+/**
+ * Create a new script version
+ */
+export async function createScriptVersion(version: ScriptVersion): Promise<ScriptVersion> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptVersionClass = Parse.Object.extend('ScriptVersion')
+  const newVersion = new ScriptVersionClass()
+
+  newVersion.set('scriptId', version.scriptId)
+  newVersion.set('versionNumber', version.versionNumber)
+  newVersion.set('versionLabel', version.versionLabel)
+  newVersion.set('scriptContent', version.scriptContent)
+  newVersion.set('htmlReportContent', version.htmlReportContent)
+  newVersion.set('changeDescription', version.changeDescription || '')
+  newVersion.set('createdBy', version.createdBy || user.get('username'))
+  newVersion.set('userId', user.id || '')
+
+  const result = await newVersion.save()
+  return parseScriptVersionObject(result)
+}
+
+/**
+ * Get all versions for a script
+ */
+export async function getScriptVersions(scriptId: string): Promise<ScriptVersion[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const ScriptVersionClass = Parse.Object.extend('ScriptVersion')
+  const query = new Parse.Query(ScriptVersionClass)
+  query.equalTo('scriptId', scriptId)
+  query.equalTo('userId', user.id || '')
+  query.descending('versionNumber')
+
+  const results = await query.find()
+  return results.map(parseScriptVersionObject)
+}
+
+/**
+ * Restore a script to a previous version
+ */
+export async function restoreScriptVersion(scriptId: string, versionId: string): Promise<Script> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptVersionClass = Parse.Object.extend('ScriptVersion')
+  const query = new Parse.Query(ScriptVersionClass)
+  const version = await query.get(versionId)
+
+  if (version.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Update script with version content
+  const updates: Partial<Script> = {
+    scriptContent: version.get('scriptContent'),
+    htmlReportContent: version.get('htmlReportContent'),
+    version: version.get('versionLabel')
+  }
+
+  return await updateScript(scriptId, updates)
+}
+
+/**
+ * Delete a script version
+ */
+export async function deleteScriptVersion(id: string): Promise<void> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const ScriptVersionClass = Parse.Object.extend('ScriptVersion')
+  const query = new Parse.Query(ScriptVersionClass)
+  const version = await query.get(id)
+
+  if (version.get('userId') !== user.id) {
+    throw new Error('Unauthorized')
+  }
+
+  await version.destroy()
+}
+
+/**
+ * Helper to parse Parse ScriptVersion object
+ */
+function parseScriptVersionObject(obj: Parse.Object): ScriptVersion {
+  return {
+    id: obj.id || '',
+    scriptId: obj.get('scriptId'),
+    versionNumber: obj.get('versionNumber'),
+    versionLabel: obj.get('versionLabel'),
+    scriptContent: obj.get('scriptContent'),
+    htmlReportContent: obj.get('htmlReportContent'),
+    changeDescription: obj.get('changeDescription'),
+    createdAt: obj.createdAt,
+    createdBy: obj.get('createdBy')
+  }
+}
+
+// ==================== EXPORT/IMPORT ====================
+
+/**
+ * Export all scripts and categories to JSON
+ */
+export async function exportScriptsToJSON(): Promise<string> {
+  const scripts = await getScripts()
+  const categories = await getScriptCategories()
+
+  const exportData = {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    scripts: scripts,
+    categories: categories
+  }
+
+  return JSON.stringify(exportData, null, 2)
+}
+
+/**
+ * Import scripts and categories from JSON
+ */
+export async function importScriptsFromJSON(jsonData: string): Promise<{ scriptsImported: number; categoriesImported: number }> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  try {
+    const data = JSON.parse(jsonData)
+    let scriptsImported = 0
+    let categoriesImported = 0
+
+    // Import categories first
+    if (data.categories && Array.isArray(data.categories)) {
+      for (const category of data.categories) {
+        try {
+          await createScriptCategory({
+            name: category.name,
+            color: category.color,
+            description: category.description || ''
+          })
+          categoriesImported++
+        } catch (error) {
+          console.error('Error importing category:', error)
+        }
+      }
+    }
+
+    // Import scripts
+    if (data.scripts && Array.isArray(data.scripts)) {
+      for (const script of data.scripts) {
+        try {
+          await createScript({
+            title: script.title,
+            description: script.description,
+            scriptContent: script.scriptContent,
+            htmlReportContent: script.htmlReportContent,
+            category: script.category,
+            tags: script.tags || [],
+            version: script.version,
+            isPinned: false,
+            usageCount: 0,
+            rating: script.rating || 0
+          })
+          scriptsImported++
+        } catch (error) {
+          console.error('Error importing script:', error)
+        }
+      }
+    }
+
+    return { scriptsImported, categoriesImported }
+  } catch (error: any) {
+    throw new Error(`Import failed: ${error.message}`)
+  }
+}
+
 export default {
   // Auth
   registerUser,
@@ -1267,6 +1732,28 @@ export default {
   getSOPs,
   updateSOP,
   deleteSOP,
+
+  // Custom Solutions (Scripts)
+  createScript,
+  getScripts,
+  updateScript,
+  deleteScript,
+
+  // Script Categories
+  createScriptCategory,
+  getScriptCategories,
+  updateScriptCategory,
+  deleteScriptCategory,
+
+  // Script Versions
+  createScriptVersion,
+  getScriptVersions,
+  restoreScriptVersion,
+  deleteScriptVersion,
+
+  // Export/Import
+  exportScriptsToJSON,
+  importScriptsFromJSON,
 
   // Sync
   getSyncStatus

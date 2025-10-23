@@ -20,7 +20,7 @@ import URLLinksCloud from './URLLinksCloud'
 import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
 import PowerShellHub from './PowerShellHub'
-import CustomSolutions from './CustomSolutions'
+import CustomSolutionsCloud from './CustomSolutionsCloud'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -308,7 +308,7 @@ export default function SimpleWorkspace() {
         ) : activeSection === 'powershell' ? (
           <PowerShell />
         ) : activeSection === 'solutions' ? (
-          <CustomSolutions />
+          <CustomSolutionsCloud />
         ) : activeSection === 'dev' ? (
           <FilesCloudMobile />
         ) : activeSection === 'prod' ? (
