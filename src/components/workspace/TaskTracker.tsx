@@ -6,13 +6,14 @@ import {
   getTasks,
   updateTask,
   deleteTask,
-  getCurrentUser,
   handleSessionError,
   Task
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
+import { RefreshCw, CloudOff } from 'lucide-react'
 
 export default function TaskTracker() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -22,8 +23,6 @@ export default function TaskTracker() {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
 
   // Predefined categories matching Notes module
@@ -46,17 +45,14 @@ export default function TaskTracker() {
     timerMinutes: 0
   })
 
-  // Load user and tasks on mount
+  // Load tasks when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadTasks()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadTasks = async () => {
     try {
@@ -68,8 +64,7 @@ export default function TaskTracker() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to load tasks: ${error.message}`)
@@ -126,8 +121,7 @@ export default function TaskTracker() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save task: ${error.message}`)
@@ -148,8 +142,7 @@ export default function TaskTracker() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete task: ${error.message}`)
@@ -182,8 +175,7 @@ export default function TaskTracker() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to update status: ${error.message}`)
@@ -245,8 +237,7 @@ export default function TaskTracker() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Import failed: ${error.message}`)
@@ -301,36 +292,43 @@ export default function TaskTracker() {
 
   const filteredTasks = getFilteredTasks()
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-center">
-            <div className="text-6xl mb-6">✅</div>
-            <h2 className="text-2xl font-bold mb-4">Task Tracker</h2>
-            <p className="text-gray-400 mb-6">Manage your tasks with cloud sync across all devices</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 bg-[var(--primary-accent)] text-white rounded-lg hover:opacity-80 transition-opacity font-medium"
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--primary-accent)' }}>
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-400">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadTasks()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--primary-accent)' }}>
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors"
+            style={{ backgroundColor: 'var(--primary-accent)', color: 'white' }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 

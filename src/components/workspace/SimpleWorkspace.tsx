@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../auth/AuthProvider'
+import { Back4AppAuthProvider } from '../../contexts/Back4AppAuthContext'
 import { autoBackupManager } from '../../lib/autoBackup'
 import { dailyAutoBackup } from '../../lib/dailyAutoBackup'
 import Terminal from './Terminal'
@@ -225,7 +226,8 @@ export default function SimpleWorkspace() {
   ]
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <Back4AppAuthProvider>
+      <div className="flex h-screen bg-black text-white overflow-hidden">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -342,5 +344,6 @@ export default function SimpleWorkspace() {
         )}
       </div>
     </div>
+    </Back4AppAuthProvider>
   )
 }

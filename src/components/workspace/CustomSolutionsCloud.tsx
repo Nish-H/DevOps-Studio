@@ -38,15 +38,15 @@ import {
   restoreScriptVersion,
   exportScriptsToJSON,
   importScriptsFromJSON,
-  getCurrentUser,
   handleSessionError,
   Script,
   ScriptCategory,
   ScriptVersion
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 
 export default function CustomSolutionsCloud() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [scripts, setScripts] = useState<Script[]>([])
   const [categories, setCategories] = useState<ScriptCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,8 +57,6 @@ export default function CustomSolutionsCloud() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'modified' | 'usage' | 'rating'>('modified')
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // Version history
   const [showVersionHistory, setShowVersionHistory] = useState(false)
@@ -95,17 +93,14 @@ export default function CustomSolutionsCloud() {
   // Export/Import
   const [importData, setImportData] = useState('')
 
-  // Load user and data on mount
+  // Load data when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadData()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadData = async () => {
     try {
@@ -120,8 +115,7 @@ export default function CustomSolutionsCloud() {
       console.error('Error loading data:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to load data: ${error.message}`)
@@ -198,8 +192,7 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
       console.error('Error creating script:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create script: ${error.message}`)
@@ -235,8 +228,7 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
       console.error('Error creating category:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create category: ${error.message}`)
@@ -269,8 +261,7 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
       console.error('Error saving script:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save script: ${error.message}`)
@@ -293,8 +284,7 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
       console.error('Error deleting script:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete script: ${error.message}`)
@@ -484,38 +474,46 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
     count: scripts.filter(s => s.category === cat.name).length
   }))
 
-  // Show auth modal if not logged in
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
       <div className="flex-1 flex flex-col bg-black text-white overflow-hidden">
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center max-w-md">
-            <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+            <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--primary-accent)' }}>
-              Sign In Required
+              Connecting to Cloud...
             </h2>
-            <p className="text-gray-400 mb-6">
-              Sign in to access Custom Solutions with cloud sync, version tracking, and export/import features.
+            <p className="text-gray-400">
+              Authenticating with Back4App cloud services...
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col bg-black text-white overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--primary-accent)' }}>
+              Cloud Connection Unavailable
+            </h2>
+            <p className="text-gray-400 mb-4">
+              {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
             </p>
             <button
-              onClick={() => setShowAuthModal(true)}
+              onClick={() => window.location.reload()}
               className="px-6 py-3 rounded transition-colors"
               style={{ backgroundColor: 'var(--primary-accent)', color: 'white' }}
             >
-              Sign In / Sign Up
+              Retry Connection
             </button>
           </div>
         </div>
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setCurrentUser(getCurrentUser())
-              setShowAuthModal(false)
-              loadData()
-            }}
-          />
-        )}
       </div>
     )
   }
@@ -1362,18 +1360,6 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
             </div>
           </div>
         </div>
-      )}
-
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onSuccess={() => {
-            setCurrentUser(getCurrentUser())
-            setShowAuthModal(false)
-            loadData()
-          }}
-        />
       )}
     </div>
   )

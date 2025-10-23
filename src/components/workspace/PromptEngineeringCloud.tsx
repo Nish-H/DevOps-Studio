@@ -10,12 +10,11 @@ import {
   getPromptCategories,
   updatePromptCategory,
   deletePromptCategory,
-  getCurrentUser,
   handleSessionError,
   Prompt,
   PromptCategory
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 import {
   Brain,
   Plus,
@@ -31,10 +30,13 @@ import {
   Lightbulb,
   File,
   Menu,
-  X
+  X,
+  RefreshCw,
+  CloudOff
 } from 'lucide-react'
 
 export default function PromptEngineeringCloud() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [prompts, setPrompts] = useState<Prompt[]>([])
   const [categories, setCategories] = useState<PromptCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,8 +47,6 @@ export default function PromptEngineeringCloud() {
   const [editTitle, setEditTitle] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Mobile sidebar state
 
   // Modals
@@ -63,17 +63,14 @@ export default function PromptEngineeringCloud() {
   const [newCategoryColor, setNewCategoryColor] = useState('#6366f1')
   const [newCategoryDescription, setNewCategoryDescription] = useState('')
 
-  // Load user and data on mount
+  // Load data when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadData()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadData = async () => {
     try {
@@ -94,8 +91,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error loading data:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to load data: ${error.message}`)
@@ -237,8 +233,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error creating prompt:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create prompt: ${error.message}`)
@@ -269,8 +264,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error creating category:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create category: ${error.message}`)
@@ -297,8 +291,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error saving prompt:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save prompt: ${error.message}`)
@@ -323,8 +316,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error deleting prompt:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete prompt: ${error.message}`)
@@ -344,8 +336,7 @@ export default function PromptEngineeringCloud() {
       console.error('Error toggling pin:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
     }
@@ -416,36 +407,42 @@ export default function PromptEngineeringCloud() {
     }
   }
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-center">
-            <div className="text-6xl mb-6">🧠</div>
-            <h2 className="text-2xl font-bold mb-4 text-indigo-300">Prompt Engineering Cloud</h2>
-            <p className="text-gray-400 mb-6">Manage your AI prompts with cloud sync across all devices</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2 text-indigo-400">
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-400">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadData()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2 text-indigo-400">
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors bg-indigo-600 text-white hover:bg-indigo-700"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 
