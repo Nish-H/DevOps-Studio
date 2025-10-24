@@ -7,10 +7,9 @@ import {
   updateURLLink,
   deleteURLLink,
   incrementLinkClickCount,
-  getCurrentUser,
   URLLink as URLLinkType
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 import {
   Link,
   Plus,
@@ -24,6 +23,7 @@ import {
   Download,
   Upload,
   Cloud,
+  CloudOff,
   RefreshCw
 } from 'lucide-react'
 
@@ -43,11 +43,10 @@ const defaultCategories: URLCategory[] = [
 ]
 
 export default function URLLinksCloud() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [links, setLinks] = useState<URLLinkType[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showPinnedOnly, setShowPinnedOnly] = useState(false)
@@ -64,17 +63,14 @@ export default function URLLinksCloud() {
     isPinned: false
   })
 
-  // Load user and links on mount
+  // Load links when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadLinks()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadLinks = async () => {
     try {
@@ -297,37 +293,43 @@ export default function URLLinksCloud() {
   const filteredLinks = getFilteredLinks()
   const categories = Array.from(new Set(links.map(l => l.category)))
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
-          <div className="text-center">
-            <div className="text-6xl mb-6">🔗</div>
-            <h2 className="text-2xl font-bold mb-4">URL Links</h2>
-            <p className="text-gray-400 mb-6">Bookmark and organize your links with cloud sync</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 rounded-lg hover:opacity-80 transition-opacity font-medium text-white"
-              style={{ backgroundColor: '#6366f1' }}
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#6366f1' }}>
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-400">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadLinks()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#6366f1' }}>
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors text-white"
+            style={{ backgroundColor: '#6366f1' }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 

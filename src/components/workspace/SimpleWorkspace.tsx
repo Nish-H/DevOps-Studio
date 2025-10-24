@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../auth/AuthProvider'
+import { Back4AppAuthProvider } from '../../contexts/Back4AppAuthContext'
 import { autoBackupManager } from '../../lib/autoBackup'
 import { dailyAutoBackup } from '../../lib/dailyAutoBackup'
 import Terminal from './Terminal'
@@ -20,6 +21,7 @@ import URLLinksCloud from './URLLinksCloud'
 import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
 import PowerShellHub from './PowerShellHub'
+import CustomSolutionsCloud from './CustomSolutionsCloud'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -211,6 +213,7 @@ export default function SimpleWorkspace() {
   const menuItems = [
     { id: 'pshub', name: 'PS Hub', icon: '💻' },
     { id: 'powershell', name: 'PowerShell', icon: '🔷' },
+    { id: 'solutions', name: 'Custom Solutions', icon: '📜' },
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
     { id: 'file-browser', name: 'File Browser', icon: '🗂️' },
@@ -223,7 +226,8 @@ export default function SimpleWorkspace() {
   ]
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <Back4AppAuthProvider>
+      <div className="flex h-screen bg-black text-white overflow-hidden">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -305,6 +309,8 @@ export default function SimpleWorkspace() {
           <PowerShellHub />
         ) : activeSection === 'powershell' ? (
           <PowerShell />
+        ) : activeSection === 'solutions' ? (
+          <CustomSolutionsCloud />
         ) : activeSection === 'dev' ? (
           <FilesCloudMobile />
         ) : activeSection === 'prod' ? (
@@ -338,5 +344,6 @@ export default function SimpleWorkspace() {
         )}
       </div>
     </div>
+    </Back4AppAuthProvider>
   )
 }

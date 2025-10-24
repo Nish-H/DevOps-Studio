@@ -6,12 +6,11 @@ import {
   getProjects,
   updateProject,
   deleteProject,
-  getCurrentUser,
   handleSessionError,
   Project,
   ProjectFile
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 import {
   FolderOpen,
   File,
@@ -33,7 +32,9 @@ import {
   BookOpen,
   Download,
   Upload,
-  Monitor
+  Monitor,
+  RefreshCw,
+  CloudOff
 } from 'lucide-react'
 
 interface TimerState {
@@ -43,6 +44,7 @@ interface TimerState {
 }
 
 export default function FilesCloud() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -55,8 +57,6 @@ export default function FilesCloud() {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // Modals
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
@@ -91,17 +91,14 @@ export default function FilesCloud() {
     }
   }, [timer.activeProject, timer.startTime])
 
-  // Load user and projects on mount
+  // Load projects when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadProjects()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadProjects = async () => {
     try {
@@ -120,8 +117,7 @@ export default function FilesCloud() {
       console.error('Error loading projects:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to load projects: ${error.message}`)
@@ -213,8 +209,7 @@ export default function FilesCloud() {
       console.error('Error creating project:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create project: ${error.message}`)
@@ -258,8 +253,7 @@ export default function FilesCloud() {
       console.error('Error creating file:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to create file: ${error.message}`)
@@ -294,8 +288,7 @@ export default function FilesCloud() {
       console.error('Error saving file:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save file: ${error.message}`)
@@ -319,8 +312,7 @@ export default function FilesCloud() {
       console.error('Error deleting project:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete project: ${error.message}`)
@@ -354,8 +346,7 @@ export default function FilesCloud() {
       console.error('Error deleting file:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete file: ${error.message}`)
@@ -474,8 +465,7 @@ export default function FilesCloud() {
       console.error('Error importing:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Import failed: ${error.message}`)
@@ -544,36 +534,42 @@ Write-Host "Starting ${filename}..." -ForegroundColor Green
   const selectedProjectData = projects.find(p => p.id === selectedProject)
   const selectedFileData = selectedProjectData?.files.find(f => f.id === selectedFile)
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-center">
-            <div className="text-6xl mb-6">📁</div>
-            <h2 className="text-2xl font-bold mb-4 text-indigo-300">Dev Files Cloud</h2>
-            <p className="text-gray-400 mb-6">Manage your development projects with cloud sync across all devices</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2 text-indigo-400">
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-400">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadProjects()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2 text-indigo-400">
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors bg-indigo-600 text-white hover:bg-indigo-700"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 

@@ -9,12 +9,11 @@ import {
   createNoteCategory,
   getNoteCategories,
   deleteNoteCategory,
-  getCurrentUser,
   handleSessionError,
   Note as NoteType,
   NoteCategory as NoteCategoryType
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 import {
   FileText,
   Plus,
@@ -31,6 +30,7 @@ import {
   Code,
   File,
   Cloud,
+  CloudOff,
   RefreshCw,
   Download,
   Upload,
@@ -47,12 +47,11 @@ const DEFAULT_CATEGORIES: NoteCategoryType[] = [
 ]
 
 export default function NotesCloud() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [notes, setNotes] = useState<NoteType[]>([])
   const [categories, setCategories] = useState<NoteCategoryType[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [selectedNote, setSelectedNote] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState('')
@@ -76,17 +75,14 @@ export default function NotesCloud() {
   const [newCategoryName, setNewCategoryName] = useState('')
   const [newCategoryColor, setNewCategoryColor] = useState('#6366f1')
 
-  // Load user and data on mount
+  // Load data when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadData()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadData = async () => {
     try {
@@ -113,8 +109,7 @@ export default function NotesCloud() {
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -252,8 +247,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -283,8 +277,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -320,8 +313,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -352,8 +344,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -380,8 +371,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -403,8 +393,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
     }
@@ -463,8 +452,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -522,8 +510,7 @@ Start writing your note here...`
       // Handle session errors
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
 
@@ -618,37 +605,43 @@ Start writing your note here...`
     count: notes.filter(n => n.category === cat.name && !n.isArchived).length
   }))
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
-          <div className="text-center">
-            <div className="text-6xl mb-6">📝</div>
-            <h2 className="text-2xl font-bold mb-4">Notes</h2>
-            <p className="text-gray-400 mb-6">Create and organize your notes with cloud sync</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 rounded-lg hover:opacity-80 transition-opacity font-medium text-white"
-              style={{ backgroundColor: '#6366f1' }}
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 text-gray-600 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#6366f1' }}>
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-400">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadData()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: '#1a1625' }}>
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: '#6366f1' }}>
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-400 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors text-white"
+            style={{ backgroundColor: '#6366f1' }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 

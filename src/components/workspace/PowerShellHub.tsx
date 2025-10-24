@@ -10,13 +10,12 @@ import {
   getSOPs,
   updateSOP,
   deleteSOP,
-  getCurrentUser,
   handleSessionError,
   PowerShellScript,
   SOP,
   SOPStep
 } from '@/lib/back4appService'
-import AuthModal from '../auth/AuthModal'
+import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
 import {
   Terminal,
   FileText,
@@ -35,15 +34,15 @@ import {
   BookOpen,
   Shield,
   RefreshCw,
+  CloudOff,
   Download,
   Upload,
   Menu
 } from 'lucide-react'
 
 export default function PowerShellHub() {
+  const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [activeTab, setActiveTab] = useState<'scripts' | 'sops' | 'admin'>('scripts')
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showAuthModal, setShowAuthModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -96,17 +95,14 @@ export default function PowerShellHub() {
     notes: ''
   })
 
-  // Load user and data
+  // Load data when user is authenticated
   useEffect(() => {
-    const user = getCurrentUser()
-    setCurrentUser(user)
-
-    if (user) {
+    if (currentUser && !authLoading) {
       loadData()
-    } else {
+    } else if (!authLoading) {
       setLoading(false)
     }
-  }, [])
+  }, [currentUser, authLoading])
 
   const loadData = async () => {
     try {
@@ -124,8 +120,7 @@ export default function PowerShellHub() {
       console.error('Error loading data:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to load data: ${error.message}`)
@@ -231,8 +226,7 @@ export default function PowerShellHub() {
       console.error('Error saving script:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save script: ${error.message}`)
@@ -252,8 +246,7 @@ export default function PowerShellHub() {
       console.error('Error deleting script:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete script: ${error.message}`)
@@ -309,8 +302,7 @@ export default function PowerShellHub() {
       console.error('Error saving SOP:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to save SOP: ${error.message}`)
@@ -331,8 +323,7 @@ export default function PowerShellHub() {
       console.error('Error deleting SOP:', error)
       const wasSessionError = await handleSessionError(error)
       if (wasSessionError) {
-        setCurrentUser(null)
-        alert('Your session has expired. Please log in again.')
+        alert('Your session has expired. Please refresh the page to re-authenticate.')
         return
       }
       alert(`Failed to delete SOP: ${error.message}`)
@@ -383,50 +374,43 @@ export default function PowerShellHub() {
     })
   }
 
-  if (!currentUser) {
+  // Show loading or error state
+  if (authLoading) {
     return (
-      <>
-        <div className="flex-1 flex flex-col items-center justify-center p-8 relative" style={{ backgroundColor: 'rgb(26, 26, 46)', minHeight: '100vh' }}>
-          {/* Cyber Grid Background */}
-          <div
-            className="fixed top-0 left-0 w-full h-full pointer-events-none"
-            style={{
-              backgroundImage: 'linear-gradient(to right, rgba(0, 246, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 246, 255, 0.1) 1px, transparent 1px)',
-              backgroundSize: '50px 50px',
-              zIndex: 0
-            }}
-          />
-
-          <div className="text-center relative z-10">
-            <Terminal className="w-16 h-16 mx-auto mb-6" style={{ color: 'rgb(0, 246, 255)' }} />
-            <h2 className="text-3xl font-bold mb-4">
-              <span style={{ color: 'rgb(0, 246, 255)' }}>PowerShell</span>
-              <span style={{ color: 'rgb(123, 44, 191)' }}>Hub</span>
-            </h2>
-            <p className="text-gray-300 mb-6">Your AI-powered companion for PowerShell commands and SOPs</p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 rounded-lg hover:opacity-80 transition-opacity font-medium"
-              style={{ backgroundColor: 'rgb(0, 246, 255)', color: 'rgb(26, 26, 46)' }}
-            >
-              Login / Sign Up
-            </button>
-            <p className="text-sm text-gray-500 mt-6">Cloud sync powered by Back4App</p>
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: 'rgb(26, 26, 46)' }}>
+        <div className="text-center">
+          <RefreshCw className="w-16 h-16 mx-auto mb-4 animate-spin" style={{ color: 'rgb(0, 246, 255)' }} />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'rgb(0, 246, 255)' }}>
+            Connecting to Cloud...
+          </h2>
+          <p className="text-gray-300">
+            Authenticating with Back4App cloud services...
+          </p>
         </div>
+      </div>
+    )
+  }
 
-        {showAuthModal && (
-          <AuthModal
-            onClose={() => setShowAuthModal(false)}
-            onSuccess={() => {
-              setShowAuthModal(false)
-              const user = getCurrentUser()
-              setCurrentUser(user)
-              loadData()
-            }}
-          />
-        )}
-      </>
+  if (authError || !currentUser) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8" style={{ backgroundColor: 'rgb(26, 26, 46)' }}>
+        <div className="text-center">
+          <CloudOff className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'rgb(0, 246, 255)' }}>
+            Cloud Connection Unavailable
+          </h2>
+          <p className="text-gray-300 mb-4">
+            {authError || 'Unable to connect to Back4App cloud services. Cloud features are currently unavailable.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 rounded transition-colors"
+            style={{ backgroundColor: 'rgb(0, 246, 255)', color: 'rgb(26, 26, 46)' }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
     )
   }
 
