@@ -6,18 +6,28 @@
 import Parse from 'parse'
 
 // Initialize Parse
-const initializeParse = () => {
+export const initializeParse = () => {
   if (typeof window !== 'undefined' && !Parse.applicationId) {
-    Parse.initialize(
-      process.env.NEXT_PUBLIC_BACK4APP_APP_ID!,
-      process.env.NEXT_PUBLIC_BACK4APP_JAVASCRIPT_KEY!
-    )
-    Parse.serverURL = process.env.NEXT_PUBLIC_BACK4APP_SERVER_URL!
-    console.log('✅ Back4App initialized')
+    try {
+      Parse.initialize(
+        process.env.NEXT_PUBLIC_BACK4APP_APP_ID!,
+        process.env.NEXT_PUBLIC_BACK4APP_JAVASCRIPT_KEY!
+      )
+      Parse.serverURL = process.env.NEXT_PUBLIC_BACK4APP_SERVER_URL!
+      console.log('✅ Back4App initialized successfully')
+    } catch (error) {
+      console.error('❌ Back4App initialization failed:', error)
+      throw error
+    }
   }
 }
 
-// Call initialization
+// Check if Parse is initialized
+export const isParseInitialized = (): boolean => {
+  return typeof window !== 'undefined' && !!Parse.applicationId
+}
+
+// Call initialization immediately
 initializeParse()
 
 // ==================== USER AUTHENTICATION ====================

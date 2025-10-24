@@ -1,7 +1,15 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { loginUser, registerUser, getCurrentUser, logoutUser, User } from '@/lib/back4appService'
+import {
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  logoutUser,
+  initializeParse,
+  isParseInitialized,
+  User
+} from '@/lib/back4appService'
 
 interface Back4AppAuthContextType {
   currentUser: User | null
@@ -31,6 +39,25 @@ export function Back4AppAuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       setError(null)
+
+      // Ensure Parse is initialized first
+      console.log('🔧 Back4App: Initializing Parse SDK...')
+      initializeParse()
+
+      // Wait for Parse to be ready (with retry logic)
+      let retries = 0
+      const maxRetries = 5
+      while (!isParseInitialized() && retries < maxRetries) {
+        console.log(`⏳ Back4App: Waiting for Parse initialization (attempt ${retries + 1}/${maxRetries})...`)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        retries++
+      }
+
+      if (!isParseInitialized()) {
+        throw new Error('Parse SDK failed to initialize after multiple attempts')
+      }
+
+      console.log('✅ Back4App: Parse SDK initialized successfully')
 
       // Check if already logged in to Back4App
       const existingUser = getCurrentUser()
@@ -81,7 +108,17 @@ export function Back4AppAuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     } catch (err: any) {
       console.error('❌ Back4App: Authentication failed:', err)
-      setError(err.message || 'Failed to authenticate with Back4App')
+
+      // Provide helpful error messages
+      let errorMessage = err.message || 'Failed to authenticate with Back4App'
+
+      if (err.message?.includes('Parse SDK failed to initialize')) {
+        errorMessage = 'Unable to connect to Back4App. Please check your internet connection and environment variables.'
+      } else if (err.message?.includes('Network request failed')) {
+        errorMessage = 'Network error. Please check your internet connection.'
+      }
+
+      setError(errorMessage)
       setLoading(false)
 
       // Don't block the app - cloud features will just be unavailable
