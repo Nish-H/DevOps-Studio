@@ -267,8 +267,27 @@ export default function CustomSolutionsCloud() {
       let successCount = 0
       for (const [title, group] of fileGroups) {
         try {
-          const scriptContent = group.script?.content || `# ${title}\n# No script file uploaded\n`
-          const reportContent = group.report?.content || `<!DOCTYPE html><html><head><title>${title}</title></head><body><h1>${title}</h1><p>No report file uploaded</p></body></html>`
+          const scriptContent = group.script?.content || `# ${title}
+# Author: Nishen Harichunder : RMS L4 Senior Technical Engineer
+# No script file uploaded
+`
+          const reportContent = group.report?.content || `<!DOCTYPE html>
+<html>
+<head>
+    <title>${title}</title>
+    <meta name="author" content="Nishen Harichunder : RMS L4 Senior Technical Engineer">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        h1 { color: #ff073a; }
+        .author { font-size: 12px; color: #8B9499; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>${title}</h1>
+    <p class="author">Author: Nishen Harichunder : RMS L4 Senior Technical Engineer</p>
+    <p>No report file uploaded</p>
+</body>
+</html>`
 
           const newScript: Script = {
             title: title,
@@ -338,6 +357,7 @@ export default function CustomSolutionsCloud() {
         scriptContent: `# ${newScriptTitle}
 # Version: ${newScriptVersion}
 # Description: ${newScriptDescription}
+# Author: Nishen Harichunder : RMS L4 Senior Technical Engineer
 
 param(
     [Parameter(Mandatory=$false)]
@@ -353,13 +373,16 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
 <html>
 <head>
     <title>${newScriptTitle} - Report</title>
+    <meta name="author" content="Nishen Harichunder : RMS L4 Senior Technical Engineer">
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
         h1 { color: #ff073a; }
+        .author { font-size: 12px; color: #8B9499; margin-top: 10px; }
     </style>
 </head>
 <body>
     <h1>${newScriptTitle} Report</h1>
+    <p class="author">Author: Nishen Harichunder : RMS L4 Senior Technical Engineer</p>
     <p>Report generated on: ${new Date().toLocaleString()}</p>
     <p>Add your report content here...</p>
 </body>
