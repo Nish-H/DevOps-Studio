@@ -68,6 +68,7 @@ export default function CustomSolutionsCloud() {
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false)
   const [showHtmlPreview, setShowHtmlPreview] = useState(false)
   const [showExportImport, setShowExportImport] = useState(false)
+  const [showFileUploadModal, setShowFileUploadModal] = useState(false)
 
   // Form states
   const [editTitle, setEditTitle] = useState('')
@@ -92,6 +93,19 @@ export default function CustomSolutionsCloud() {
 
   // Export/Import
   const [importData, setImportData] = useState('')
+
+  // File Upload states
+  interface UploadedFile {
+    name: string
+    type: 'script' | 'report'
+    content: string
+    size: number
+    suggestedCategory: string
+    suggestedTitle: string
+  }
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
 
   // Load data when user is authenticated
   useEffect(() => {
@@ -123,6 +137,186 @@ export default function CustomSolutionsCloud() {
       setLoading(false)
     }
   }
+
+  // ==================== FILE UPLOAD FUNCTIONALITY ====================
+
+  const suggestCategoryFromContent = (content: string, filename: string): string => {
+    const lowerContent = content.toLowerCase()
+    const lowerFilename = filename.toLowerCase()
+
+    // Analyze content and filename for category suggestions
+    if (lowerContent.includes('get-aduser') || lowerContent.includes('active directory') || lowerFilename.includes('ad-')) {
+      return categories.find(c => c.name.toLowerCase().includes('active'))?.name || categories[0]?.name || ''
+    }
+    if (lowerContent.includes('get-vm') || lowerContent.includes('hyper-v') || lowerFilename.includes('vm-')) {
+      return categories.find(c => c.name.toLowerCase().includes('virtual'))?.name || categories[0]?.name || ''
+    }
+    if (lowerContent.includes('test-connection') || lowerContent.includes('network') || lowerFilename.includes('network')) {
+      return categories.find(c => c.name.toLowerCase().includes('network'))?.name || categories[0]?.name || ''
+    }
+    if (lowerContent.includes('backup') || lowerFilename.includes('backup')) {
+      return categories.find(c => c.name.toLowerCase().includes('backup'))?.name || categories[0]?.name || ''
+    }
+    if (lowerContent.includes('report') || lowerContent.includes('export-csv')) {
+      return categories.find(c => c.name.toLowerCase().includes('report'))?.name || categories[0]?.name || ''
+    }
+
+    // Default to first category
+    return categories[0]?.name || ''
+  }
+
+  const extractTitleFromFilename = (filename: string): string => {
+    // Remove extension
+    let title = filename.replace(/\.(ps1|html)$/i, '')
+    // Replace dashes/underscores with spaces
+    title = title.replace(/[-_]/g, ' ')
+    // Capitalize first letter of each word
+    title = title.replace(/\b\w/g, char => char.toUpperCase())
+    return title
+  }
+
+  const handleFileSelection = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    await processFiles(Array.from(files))
+    // Reset input
+    event.target.value = ''
+  }
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setDragOver(false)
+
+    const files = Array.from(event.dataTransfer.files)
+    await processFiles(files)
+  }
+
+  const processFiles = async (files: File[]) => {
+    setUploading(true)
+    const newUploadedFiles: UploadedFile[] = []
+
+    for (const file of files) {
+      try {
+        // Check file type
+        const extension = file.name.split('.').pop()?.toLowerCase()
+        if (extension !== 'ps1' && extension !== 'html' && extension !== 'htm') {
+          alert(`Skipping ${file.name}: Only .ps1 and .html files are supported`)
+          continue
+        }
+
+        // Read file content
+        const content = await readFileContent(file)
+
+        const uploadedFile: UploadedFile = {
+          name: file.name,
+          type: extension === 'ps1' ? 'script' : 'report',
+          content: content,
+          size: file.size,
+          suggestedCategory: suggestCategoryFromContent(content, file.name),
+          suggestedTitle: extractTitleFromFilename(file.name)
+        }
+
+        newUploadedFiles.push(uploadedFile)
+      } catch (error) {
+        console.error(`Error reading ${file.name}:`, error)
+        alert(`Failed to read ${file.name}`)
+      }
+    }
+
+    setUploadedFiles(prev => [...prev, ...newUploadedFiles])
+    setUploading(false)
+
+    if (newUploadedFiles.length > 0) {
+      setShowFileUploadModal(true)
+    }
+  }
+
+  const readFileContent = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result as string)
+      reader.onerror = (e) => reject(e)
+      reader.readAsText(file)
+    })
+  }
+
+  const handleBatchUpload = async () => {
+    if (uploadedFiles.length === 0) return
+
+    try {
+      setSyncing(true)
+
+      // Group files by title (script + report pairs)
+      const fileGroups = new Map<string, { script?: UploadedFile; report?: UploadedFile }>()
+
+      uploadedFiles.forEach(file => {
+        const baseTitle = file.suggestedTitle
+        if (!fileGroups.has(baseTitle)) {
+          fileGroups.set(baseTitle, {})
+        }
+        const group = fileGroups.get(baseTitle)!
+        if (file.type === 'script') {
+          group.script = file
+        } else {
+          group.report = file
+        }
+      })
+
+      // Create scripts
+      let successCount = 0
+      for (const [title, group] of fileGroups) {
+        try {
+          const scriptContent = group.script?.content || `# ${title}\n# No script file uploaded\n`
+          const reportContent = group.report?.content || `<!DOCTYPE html><html><head><title>${title}</title></head><body><h1>${title}</h1><p>No report file uploaded</p></body></html>`
+
+          const newScript: Script = {
+            title: title,
+            description: `Uploaded from: ${group.script?.name || group.report?.name || 'Unknown'}`,
+            scriptContent: scriptContent,
+            htmlReportContent: reportContent,
+            category: group.script?.suggestedCategory || group.report?.suggestedCategory || categories[0]?.name || '',
+            tags: [],
+            version: '1.0',
+            isPinned: false,
+            usageCount: 0,
+            rating: 0
+          }
+
+          const created = await createScript(newScript)
+          setScripts(prev => [created, ...prev])
+          successCount++
+        } catch (error) {
+          console.error(`Error uploading ${title}:`, error)
+        }
+      }
+
+      alert(`Successfully uploaded ${successCount} script(s)!`)
+      setUploadedFiles([])
+      setShowFileUploadModal(false)
+    } catch (error: any) {
+      console.error('Error during batch upload:', error)
+      alert(`Batch upload failed: ${error.message}`)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const removeUploadedFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setDragOver(true)
+  }
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    setDragOver(false)
+  }
+
+  // ==================== END FILE UPLOAD FUNCTIONALITY ====================
 
   const handleCreateScript = async () => {
     if (!newScriptTitle.trim()) {
@@ -557,6 +751,18 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
               <Download size={16} />
               Export/Import
             </button>
+            <label className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors text-sm cursor-pointer">
+              <Upload size={16} />
+              Upload Files
+              <input
+                type="file"
+                multiple
+                accept=".ps1,.html,.htm"
+                onChange={handleFileSelection}
+                className="hidden"
+                disabled={syncing || uploading}
+              />
+            </label>
             <button
               onClick={() => setShowNewCategoryModal(true)}
               className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors text-sm"
@@ -1357,6 +1563,162 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
                   {syncing ? 'Importing...' : 'Import from JSON'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* File Upload Modal */}
+      {showFileUploadModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold" style={{ color: 'var(--primary-accent)' }}>
+                Upload Scripts & Reports
+              </h3>
+              <button
+                onClick={() => {
+                  setShowFileUploadModal(false)
+                  setUploadedFiles([])
+                }}
+                className="p-2 hover:bg-gray-800 rounded transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Drag and Drop Zone */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`border-2 border-dashed rounded-lg p-8 mb-4 text-center transition-colors ${
+                dragOver
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-gray-700 bg-gray-800/50'
+              }`}
+            >
+              <Upload className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="text-lg font-semibold mb-2">
+                {dragOver ? 'Drop files here' : 'Drag & Drop files here'}
+              </p>
+              <p className="text-sm text-gray-400 mb-4">
+                or click the button below to browse
+              </p>
+              <label className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors cursor-pointer">
+                <Upload size={16} />
+                Browse Files
+                <input
+                  type="file"
+                  multiple
+                  accept=".ps1,.html,.htm"
+                  onChange={handleFileSelection}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+              <p className="text-xs text-gray-500 mt-3">
+                Supported formats: .ps1 (PowerShell scripts) and .html (HTML reports)
+              </p>
+            </div>
+
+            {/* Uploaded Files List */}
+            {uploadedFiles.length > 0 && (
+              <div className="space-y-3 mb-4">
+                <h4 className="text-sm font-semibold text-gray-300">
+                  Files to Upload ({uploadedFiles.length})
+                </h4>
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {uploadedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-800 rounded border border-gray-700"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        {file.type === 'script' ? (
+                          <Code size={20} className="text-blue-400 flex-shrink-0" />
+                        ) : (
+                          <Globe size={20} className="text-purple-400 flex-shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{file.name}</p>
+                          <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                            <span>{file.type === 'script' ? 'PowerShell Script' : 'HTML Report'}</span>
+                            <span>•</span>
+                            <span>{(file.size / 1024).toFixed(1)} KB</span>
+                            <span>•</span>
+                            <span className="truncate">Category: {file.suggestedCategory}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1 truncate">
+                            Title: {file.suggestedTitle}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeUploadedFile(index)}
+                        className="ml-3 p-1 hover:bg-gray-700 rounded transition-colors flex-shrink-0"
+                        title="Remove"
+                      >
+                        <Trash2 size={16} className="text-red-400" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Info Box */}
+            {uploadedFiles.length > 0 && (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded p-4 mb-4">
+                <h5 className="text-sm font-semibold text-blue-400 mb-2">Smart Grouping</h5>
+                <p className="text-xs text-gray-300">
+                  Files with the same name will be automatically paired (e.g., "Report.ps1" + "Report.html"
+                  will create one solution with both script and report). Categories are auto-suggested based on content analysis.
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              {uploadedFiles.length > 0 && (
+                <>
+                  <button
+                    onClick={handleBatchUpload}
+                    className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded transition-colors flex items-center justify-center gap-2 font-semibold"
+                    disabled={syncing || uploading}
+                  >
+                    {syncing ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={16} />
+                        Upload {uploadedFiles.length} File{uploadedFiles.length !== 1 ? 's' : ''}
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setUploadedFiles([])}
+                    className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors"
+                    disabled={syncing}
+                  >
+                    Clear All
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => {
+                  setShowFileUploadModal(false)
+                  if (uploadedFiles.length === 0) {
+                    // Don't clear if user might want to come back
+                  }
+                }}
+                className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors"
+              >
+                {uploadedFiles.length > 0 ? 'Cancel' : 'Close'}
+              </button>
             </div>
           </div>
         </div>
