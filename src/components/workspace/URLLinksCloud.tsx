@@ -24,7 +24,9 @@ import {
   Upload,
   Cloud,
   CloudOff,
-  RefreshCw
+  RefreshCw,
+  List,
+  LayoutGrid
 } from 'lucide-react'
 
 interface URLCategory {
@@ -47,6 +49,7 @@ export default function URLLinksCloud() {
   const [links, setLinks] = useState<URLLinkType[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showPinnedOnly, setShowPinnedOnly] = useState(false)
@@ -69,6 +72,12 @@ export default function URLLinksCloud() {
       loadLinks()
     } else if (!authLoading) {
       setLoading(false)
+    }
+
+    // Load view mode preference
+    const savedViewMode = localStorage.getItem('devops-studio-urllinks-cloud-viewmode')
+    if (savedViewMode === 'list' || savedViewMode === 'compact') {
+      setViewMode(savedViewMode)
     }
   }, [currentUser, authLoading])
 
@@ -188,6 +197,11 @@ export default function URLLinksCloud() {
     } catch (error: any) {
       console.error('Error toggling pin:', error)
     }
+  }
+
+  const toggleViewMode = (mode: 'list' | 'compact') => {
+    setViewMode(mode)
+    localStorage.setItem('devops-studio-urllinks-cloud-viewmode', mode)
   }
 
   const exportLinks = () => {
@@ -360,6 +374,32 @@ export default function URLLinksCloud() {
                 Syncing...
               </span>
             )}
+            <div className="flex items-center bg-gray-800 rounded p-1">
+              <button
+                onClick={() => toggleViewMode('list')}
+                className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="List View"
+              >
+                <List className="h-4 w-4" />
+                List
+              </button>
+              <button
+                onClick={() => toggleViewMode('compact')}
+                className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                  viewMode === 'compact'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Compact View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Compact
+              </button>
+            </div>
             <button
               onClick={() => setShowImportExport(!showImportExport)}
               className="px-3 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors text-sm"
@@ -469,7 +509,7 @@ export default function URLLinksCloud() {
         </div>
       </div>
 
-      {/* Links Grid */}
+      {/* Links Grid/List */}
       <div className="flex-1 overflow-y-auto p-4" style={{ backgroundColor: '#0f0d15' }}>
         {loading ? (
           <div className="text-center text-gray-400 py-8">Loading links...</div>
@@ -477,7 +517,7 @@ export default function URLLinksCloud() {
           <div className="text-center text-gray-400 py-8">
             No links found. Click "Add Link" to create one.
           </div>
-        ) : (
+        ) : viewMode === 'compact' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredLinks.map(link => (
               <div
@@ -547,6 +587,81 @@ export default function URLLinksCloud() {
                   <button
                     onClick={() => link.id && handleDelete(link.id)}
                     className="flex-1 px-3 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"
+                  >
+                    <Trash2 size={12} className="inline mr-1" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // List View
+          <div className="space-y-3">
+            {filteredLinks.map(link => (
+              <div
+                key={link.id}
+                className="bg-gray-900 border rounded-lg p-4 hover:border-indigo-500 transition-colors flex items-center justify-between"
+                style={{ borderColor: '#374151' }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-semibold text-white flex items-center">
+                      <ExternalLink size={14} className="mr-2" style={{ color: '#6366f1' }} />
+                      {link.title}
+                    </h3>
+                    <button
+                      onClick={() => togglePin(link)}
+                      className="text-gray-400 hover:text-yellow-400 transition-colors"
+                    >
+                      {link.isPinned ? <Star size={16} fill="currentColor" /> : <StarOff size={16} />}
+                    </button>
+                    <span className="px-2 py-0.5 bg-gray-800 rounded text-xs" style={{ color: '#6366f1' }}>
+                      {link.category}
+                    </span>
+                  </div>
+                  <a
+                    href={link.url}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      link.id && handleLinkClick(link.id, link.url)
+                    }}
+                    className="text-xs text-indigo-400 hover:underline block truncate mb-2"
+                  >
+                    {link.url}
+                  </a>
+                  {link.description && (
+                    <p className="text-sm text-gray-400 mb-2">{link.description}</p>
+                  )}
+                  <div className="flex items-center gap-3 text-xs">
+                    {link.clickCount && link.clickCount > 0 && (
+                      <span className="text-gray-500">
+                        {link.clickCount} {link.clickCount === 1 ? 'click' : 'clicks'}
+                      </span>
+                    )}
+                    {link.tags && link.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {link.tags.map((tag, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-gray-800 text-gray-400 rounded">
+                            <Tag size={10} className="inline mr-1" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2 ml-4 flex-shrink-0">
+                  <button
+                    onClick={() => handleEdit(link)}
+                    className="px-3 py-1.5 text-xs bg-gray-800 text-white rounded hover:bg-gray-700"
+                  >
+                    <Edit2 size={12} className="inline mr-1" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => link.id && handleDelete(link.id)}
+                    className="px-3 py-1.5 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"
                   >
                     <Trash2 size={12} className="inline mr-1" />
                     Delete

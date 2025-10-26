@@ -35,7 +35,11 @@ import {
   Download,
   Upload,
   Menu,
-  X
+  X,
+  List,
+  LayoutGrid,
+  Star,
+  StarOff
 } from 'lucide-react'
 
 const DEFAULT_CATEGORIES: NoteCategoryType[] = [
@@ -52,6 +56,7 @@ export default function NotesCloud() {
   const [categories, setCategories] = useState<NoteCategoryType[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
   const [selectedNote, setSelectedNote] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState('')
@@ -81,6 +86,12 @@ export default function NotesCloud() {
       loadData()
     } else if (!authLoading) {
       setLoading(false)
+    }
+
+    // Load view mode preference
+    const savedViewMode = localStorage.getItem('devops-studio-notes-cloud-viewmode')
+    if (savedViewMode === 'list' || savedViewMode === 'compact') {
+      setViewMode(savedViewMode)
     }
   }, [currentUser, authLoading])
 
@@ -399,6 +410,11 @@ Start writing your note here...`
     }
   }
 
+  const toggleViewMode = (mode: 'list' | 'compact') => {
+    setViewMode(mode)
+    localStorage.setItem('devops-studio-notes-cloud-viewmode', mode)
+  }
+
   const exportNotes = () => {
     const exportData = {
       version: '1.0',
@@ -692,6 +708,30 @@ Start writing your note here...`
                     <Cloud size={14} className="inline" />
                   </span>
                 )}
+                <div className="flex items-center bg-gray-800 rounded p-0.5">
+                  <button
+                    onClick={() => toggleViewMode('list')}
+                    className={`p-1 rounded transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    title="List View"
+                  >
+                    <List className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={() => toggleViewMode('compact')}
+                    className={`p-1 rounded transition-colors ${
+                      viewMode === 'compact'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    title="Compact View"
+                  >
+                    <LayoutGrid className="w-3 h-3" />
+                  </button>
+                </div>
                 <button
                   onClick={() => setShowNewNoteModal(true)}
                   className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80 text-white"
@@ -845,8 +885,8 @@ Start writing your note here...`
                 <p>No notes found</p>
                 <p className="text-xs">Create your first note!</p>
               </div>
-            ) : (
-              <div className="space-y-3">
+            ) : viewMode === 'compact' ? (
+              <div className="grid grid-cols-2 gap-2">
                 {sortedNotes.map(note => (
                   <div
                     key={note.id}
@@ -869,6 +909,75 @@ Start writing your note here...`
                       {note.isPinned && (
                         <div className="text-yellow-400 ml-2">
                           <StickyNote className="w-3 h-3" />
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-gray-400 line-clamp-2 mb-2">
+                      {note.content.replace(/#+\s/g, '').substring(0, 100)}...
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className="text-xs px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: categoriesWithCounts.find(c => c.name === note.category)?.color + '20',
+                            color: categoriesWithCounts.find(c => c.name === note.category)?.color
+                          }}
+                        >
+                          {note.category}
+                        </span>
+                        <div className="flex items-center space-x-1">
+                          {getFileTypeIcon(note.type || 'markdown')}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {new Date(note.modified || note.updatedAt || '').toLocaleDateString()}
+                      </div>
+                    </div>
+
+                    {note.tags && note.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {note.tags.slice(0, 3).map(tag => (
+                          <span key={tag} className="text-xs bg-gray-700 px-2 py-1 rounded">
+                            #{tag}
+                          </span>
+                        ))}
+                        {note.tags.length > 3 && (
+                          <span className="text-xs text-gray-500">+{note.tags.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sortedNotes.map(note => (
+                  <div
+                    key={note.id}
+                    className={`p-3 rounded-lg cursor-pointer transition-colors border ${
+                      selectedNote === note.id
+                        ? 'border-indigo-500'
+                        : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                    }`}
+                    style={selectedNote === note.id ? { backgroundColor: '#6366f1' + '30' } : {}}
+                    onClick={() => {
+                      setSelectedNote(note.id || null)
+                      setEditTitle(note.title)
+                      setEditContent(note.content)
+                      setIsEditing(false)
+                      setIsSidebarOpen(false)
+                    }}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-medium text-sm line-clamp-1">{note.title}</h3>
+                      {note.isPinned && (
+                        <div className="text-yellow-400 ml-2">
+                          <Star className="w-3 h-3 fill-current" />
                         </div>
                       )}
                     </div>
