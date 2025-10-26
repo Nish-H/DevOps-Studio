@@ -6,20 +6,19 @@ const nextConfig = {
   //   output: 'export',
   //   trailingSlash: true,
   // }),
-  
+
   // Enable server-side rendering for proper localStorage hydration
   reactStrictMode: true,
-  
+
   images: {
     unoptimized: true
   },
-  // Disable all external optimizations
-  optimizeFonts: false,
-  swcMinify: false,
-  // Skip external network requests during build
-  experimental: {
-    forceSwcTransforms: false
+
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    root: process.cwd()
   },
+
   // Exclude backup files and folders from build
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Exclude backup directories and files from being processed

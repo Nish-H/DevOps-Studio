@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import ContactDetails from './ContactDetails';
-import { 
-  Link, 
-  Plus, 
-  Search, 
-  Filter, 
-  Copy, 
-  Edit2, 
-  Trash2, 
+import {
+  Link,
+  Plus,
+  Search,
+  Filter,
+  Copy,
+  Edit2,
+  Trash2,
   ExternalLink,
   Tag,
   Globe,
@@ -21,7 +21,9 @@ import {
   Zap,
   Shield,
   Star,
-  StarOff
+  StarOff,
+  List,
+  LayoutGrid
 } from 'lucide-react';
 
 interface URLLink {
@@ -64,7 +66,8 @@ export default function URLLinks() {
   const [links, setLinks] = useState<URLLink[]>([]);
   const [categories, setCategories] = useState<URLCategory[]>(defaultCategories);
   const [isLoaded, setIsLoaded] = useState(false);
-  
+  const [viewMode, setViewMode] = useState<'list' | 'compact'>('list');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -91,7 +94,7 @@ export default function URLLinks() {
   // Load data on component mount
   useEffect(() => {
     console.log('🔄 URLLinks: Loading data from localStorage...');
-    
+
     try {
       // Load links
       const savedLinks = localStorage.getItem('devops-studio-url-links');
@@ -117,12 +120,18 @@ export default function URLLinks() {
         });
         setCategories(mergedCategories);
       }
+
+      // Load view mode preference
+      const savedViewMode = localStorage.getItem('devops-studio-urllinks-viewmode');
+      if (savedViewMode === 'list' || savedViewMode === 'compact') {
+        setViewMode(savedViewMode);
+      }
     } catch (error) {
       console.error('❌ URLLinks: Error loading data:', error);
       setLinks([]);
       setCategories(defaultCategories);
     }
-    
+
     setIsLoaded(true);
   }, []);
 
@@ -249,6 +258,11 @@ export default function URLLinks() {
     return IconComponent;
   };
 
+  const toggleViewMode = (mode: 'list' | 'compact') => {
+    setViewMode(mode);
+    localStorage.setItem('devops-studio-urllinks-viewmode', mode);
+  };
+
   return (
     <div className="flex flex-col h-full bg-black text-white">
       <ContactDetails />
@@ -369,113 +383,203 @@ export default function URLLinks() {
                 <h2 className="text-xl font-semibold">
                   URL Links ({filteredLinks.length})
                 </h2>
-                <button
-                  onClick={() => setIsAddingLink(true)}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Link
-                </button>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center bg-gray-800 rounded-lg p-1">
+                    <button
+                      onClick={() => toggleViewMode('list')}
+                      className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                        viewMode === 'list'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      title="List View"
+                    >
+                      <List className="h-4 w-4" />
+                      List
+                    </button>
+                    <button
+                      onClick={() => toggleViewMode('compact')}
+                      className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                        viewMode === 'compact'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      title="Compact View"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                      Compact
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setIsAddingLink(true)}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Link
+                  </button>
+                </div>
               </div>
 
-              <div 
-                className="space-y-3 overflow-y-auto"
+              <div
+                className={viewMode === 'compact' ? 'grid grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto' : 'space-y-3 overflow-y-auto'}
                 style={{ maxHeight: 'calc(100vh - 300px)' }}
               >
-                {filteredLinks.map(link => {
-                  const category = categories.find((cat: any) => cat.id === link.category);
-                  const IconComponent = category ? getCategoryIcon(category.icon) : Tag;
-                  
-                  return (
-                    <div key={link.id} className="bg-gray-800 rounded-lg p-3 hover:bg-gray-750 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-base font-semibold text-white truncate">{link.title}</h3>
-                            <button
-                              onClick={() => toggleFavorite(link.id)}
-                              className={`p-1 rounded ${link.isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'}`}
-                            >
-                              {link.isFavorite ? <Star className="h-3 w-3 fill-current" /> : <StarOff className="h-3 w-3" />}
-                            </button>
-                            <div className="flex items-center gap-1 text-xs text-gray-400">
-                              <IconComponent className="h-3 w-3" style={{ color: category?.color }} />
-                              <span>{category?.name}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-2 text-sm">
-                            <Link className="h-3 w-3 text-blue-400 flex-shrink-0" />
-                            <span className="text-blue-400 font-mono truncate">{link.url}</span>
-                            {link.description && (
-                              <>
-                                <span className="text-gray-500">•</span>
-                                <span className="text-gray-300 truncate">{link.description}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <span>{link.accessCount}×</span>
-                            <span>{new Date(link.dateAdded).toLocaleDateString()}</span>
-                            {link.tags.length > 0 && (
-                              <div className="flex gap-1">
-                                {link.tags.slice(0, 2).map(tag => (
-                                  <span key={tag} className="px-1 py-0.5 bg-gray-700 rounded text-xs">
-                                    {tag}
-                                  </span>
-                                ))}
-                                {link.tags.length > 2 && (
-                                  <span className="text-gray-500">+{link.tags.length - 2}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => openURL(link)}
-                              className="p-1.5 bg-blue-600 hover:bg-blue-700 rounded text-white"
-                              title="Open URL"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => copyURL(link.url)}
-                              className="p-1.5 bg-gray-600 hover:bg-gray-700 rounded text-white"
-                              title="Copy URL"
-                            >
-                              <Copy className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => setEditingLink(link)}
-                              className="p-1.5 bg-yellow-600 hover:bg-yellow-700 rounded text-white"
-                              title="Edit Link"
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => deleteLink(link.id)}
-                              className="p-1.5 bg-red-600 hover:bg-red-700 rounded text-white"
-                              title="Delete Link"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-                
-                {filteredLinks.length === 0 && (
-                  <div className="text-center py-8 text-gray-400">
+                {filteredLinks.length === 0 ? (
+                  <div className="col-span-full text-center py-8 text-gray-400">
                     <Link className="h-16 w-16 mx-auto mb-4 opacity-50" />
                     <p>No links found matching your criteria.</p>
                     <p className="text-sm">Try adjusting your search or filters, or add a new link.</p>
                   </div>
+                ) : viewMode === 'compact' ? (
+                  // Compact Grid View
+                  filteredLinks.map(link => {
+                    const category = categories.find((cat: any) => cat.id === link.category);
+                    const IconComponent = category ? getCategoryIcon(category.icon) : Tag;
+
+                    return (
+                      <div key={link.id} className="bg-gray-800 rounded-lg p-3 hover:bg-gray-750 transition-colors flex flex-col">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-sm font-semibold text-white truncate flex-1">{link.title}</h3>
+                          <button
+                            onClick={() => toggleFavorite(link.id)}
+                            className={`p-1 rounded ml-1 flex-shrink-0 ${link.isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'}`}
+                          >
+                            {link.isFavorite ? <Star className="h-3 w-3 fill-current" /> : <StarOff className="h-3 w-3" />}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mb-2">
+                          <IconComponent className="h-3 w-3" style={{ color: category?.color }} />
+                          <span className="truncate">{category?.name}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs mb-3">
+                          <Link className="h-3 w-3 text-blue-400 flex-shrink-0" />
+                          <span className="text-blue-400 font-mono truncate text-xs">{link.url}</span>
+                        </div>
+
+                        <div className="mt-auto flex items-center justify-between gap-1">
+                          <button
+                            onClick={() => openURL(link)}
+                            className="flex-1 p-1.5 bg-blue-600 hover:bg-blue-700 rounded text-white text-xs"
+                            title="Open"
+                          >
+                            <ExternalLink className="h-3 w-3 mx-auto" />
+                          </button>
+                          <button
+                            onClick={() => copyURL(link.url)}
+                            className="flex-1 p-1.5 bg-gray-600 hover:bg-gray-700 rounded text-white text-xs"
+                            title="Copy"
+                          >
+                            <Copy className="h-3 w-3 mx-auto" />
+                          </button>
+                          <button
+                            onClick={() => setEditingLink(link)}
+                            className="flex-1 p-1.5 bg-yellow-600 hover:bg-yellow-700 rounded text-white text-xs"
+                            title="Edit"
+                          >
+                            <Edit2 className="h-3 w-3 mx-auto" />
+                          </button>
+                          <button
+                            onClick={() => deleteLink(link.id)}
+                            className="flex-1 p-1.5 bg-red-600 hover:bg-red-700 rounded text-white text-xs"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-3 w-3 mx-auto" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  // List View (Detailed)
+                  filteredLinks.map(link => {
+                    const category = categories.find((cat: any) => cat.id === link.category);
+                    const IconComponent = category ? getCategoryIcon(category.icon) : Tag;
+
+                    return (
+                      <div key={link.id} className="bg-gray-800 rounded-lg p-3 hover:bg-gray-750 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-base font-semibold text-white truncate">{link.title}</h3>
+                              <button
+                                onClick={() => toggleFavorite(link.id)}
+                                className={`p-1 rounded ${link.isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'}`}
+                              >
+                                {link.isFavorite ? <Star className="h-3 w-3 fill-current" /> : <StarOff className="h-3 w-3" />}
+                              </button>
+                              <div className="flex items-center gap-1 text-xs text-gray-400">
+                                <IconComponent className="h-3 w-3" style={{ color: category?.color }} />
+                                <span>{category?.name}</span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-sm">
+                              <Link className="h-3 w-3 text-blue-400 flex-shrink-0" />
+                              <span className="text-blue-400 font-mono truncate">{link.url}</span>
+                              {link.description && (
+                                <>
+                                  <span className="text-gray-500">•</span>
+                                  <span className="text-gray-300 truncate">{link.description}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                              <span>{link.accessCount}×</span>
+                              <span>{new Date(link.dateAdded).toLocaleDateString()}</span>
+                              {link.tags.length > 0 && (
+                                <div className="flex gap-1">
+                                  {link.tags.slice(0, 2).map(tag => (
+                                    <span key={tag} className="px-1 py-0.5 bg-gray-700 rounded text-xs">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {link.tags.length > 2 && (
+                                    <span className="text-gray-500">+{link.tags.length - 2}</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => openURL(link)}
+                                className="p-1.5 bg-blue-600 hover:bg-blue-700 rounded text-white"
+                                title="Open URL"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => copyURL(link.url)}
+                                className="p-1.5 bg-gray-600 hover:bg-gray-700 rounded text-white"
+                                title="Copy URL"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => setEditingLink(link)}
+                                className="p-1.5 bg-yellow-600 hover:bg-yellow-700 rounded text-white"
+                                title="Edit Link"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </button>
+                              <button
+                                onClick={() => deleteLink(link.id)}
+                                className="p-1.5 bg-red-600 hover:bg-red-700 rounded text-white"
+                                title="Delete Link"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
