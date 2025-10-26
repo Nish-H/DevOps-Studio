@@ -10,13 +10,14 @@ import {
   Task
 } from '@/lib/back4appService'
 import { useBack4AppAuth } from '@/contexts/Back4AppAuthContext'
-import { RefreshCw, CloudOff } from 'lucide-react'
+import { RefreshCw, CloudOff, List, LayoutGrid } from 'lucide-react'
 
 export default function TaskTracker() {
   const { currentUser, loading: authLoading, error: authError } = useBack4AppAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'compact'>('compact')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterPriority, setFilterPriority] = useState<string>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
@@ -51,6 +52,12 @@ export default function TaskTracker() {
       loadTasks()
     } else if (!authLoading) {
       setLoading(false)
+    }
+
+    // Load view mode preference
+    const savedViewMode = localStorage.getItem('devops-studio-tasks-viewmode')
+    if (savedViewMode === 'list' || savedViewMode === 'compact') {
+      setViewMode(savedViewMode)
     }
   }, [currentUser, authLoading])
 
@@ -288,6 +295,11 @@ export default function TaskTracker() {
     return cat ? cat.color : '#6b7280' // Default gray if not found
   }
 
+  const toggleViewMode = (mode: 'list' | 'compact') => {
+    setViewMode(mode)
+    localStorage.setItem('devops-studio-tasks-viewmode', mode)
+  }
+
   const categories = Array.from(new Set(tasks.map(t => t.category || 'Work')))
 
   const filteredTasks = getFilteredTasks()
@@ -347,6 +359,32 @@ export default function TaskTracker() {
             {syncing && (
               <span className="text-xs text-blue-400 animate-pulse">Syncing...</span>
             )}
+            <div className="flex items-center bg-gray-800 rounded p-1">
+              <button
+                onClick={() => toggleViewMode('list')}
+                className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="List View"
+              >
+                <List className="h-4 w-4" />
+                List
+              </button>
+              <button
+                onClick={() => toggleViewMode('compact')}
+                className={`px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
+                  viewMode === 'compact'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Compact View"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Compact
+              </button>
+            </div>
             <button
               onClick={() => setShowImportExport(!showImportExport)}
               className="px-3 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors text-sm"
@@ -463,8 +501,9 @@ export default function TaskTracker() {
           <div className="text-center text-gray-400 py-8">
             No tasks found. Click "Add Task" to create one.
           </div>
-        ) : (
+        ) : viewMode === 'compact' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Compact Grid View */}
             {filteredTasks.map(task => (
               <div
                 key={task.id}
@@ -548,6 +587,95 @@ export default function TaskTracker() {
                   >
                     Delete
                   </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // List View (Detailed)
+          <div className="space-y-3">
+            {filteredTasks.map(task => (
+              <div
+                key={task.id}
+                className="bg-gray-900 border-l-4 rounded-lg p-4 hover:shadow-lg transition-all flex items-center justify-between"
+                style={{ borderLeftColor: getPriorityColor(task.priority) }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white mb-1">{task.title}</h3>
+                      {task.description && (
+                        <p className="text-sm text-gray-400 mb-2">{task.description}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-semibold" style={{ color: getPriorityColor(task.priority) }}>
+                      {task.priority.toUpperCase()}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-xs ${getStatusColor(task.status)}`}>
+                      {task.status === 'in-progress' ? 'InProgress' : task.status === 'on-hold' ? 'OnHold' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                    </span>
+                    {task.category && (
+                      <span
+                        className="px-2 py-0.5 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: `${getCategoryColor(task.category)}20`,
+                          color: getCategoryColor(task.category)
+                        }}
+                      >
+                        {task.category}
+                      </span>
+                    )}
+                    {task.dueDate && (
+                      <span className="text-xs text-gray-500">📅 {new Date(task.dueDate).toLocaleDateString()}</span>
+                    )}
+                    {task.timerMinutes !== undefined && task.timerMinutes > 0 && (
+                      <span className="text-xs text-gray-500">⏱️ {task.timerMinutes}m</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                  {/* Quick Status Change */}
+                  <div className="flex gap-1">
+                    {[
+                      { value: 'pending', label: 'P', color: 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' },
+                      { value: 'in-progress', label: 'IP', color: 'bg-green-500/20 text-green-400 hover:bg-green-500/30' },
+                      { value: 'completed', label: 'C', color: 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30' },
+                      { value: 'on-hold', label: 'H', color: 'bg-red-500/20 text-red-400 hover:bg-red-500/30' }
+                    ].map(status => (
+                      <button
+                        key={status.value}
+                        onClick={() => task.id && handleStatusChange(task.id, status.value as Task['status'])}
+                        className={`px-2 py-1 text-xs rounded ${
+                          task.status === status.value
+                            ? status.color
+                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        }`}
+                        title={status.label}
+                      >
+                        {status.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleEdit(task)}
+                      className="px-3 py-1 text-xs bg-gray-800 text-white rounded hover:bg-gray-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => task.id && handleDelete(task.id)}
+                      className="px-3 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

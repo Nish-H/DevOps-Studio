@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react'
 import { createDataManager, DATA_VERSIONS } from '../../lib/dataManager'
 import { createBulletproofStorage } from '../../lib/bulletproofStorage'
 import ContactDetails from './ContactDetails'
-import { 
-  FileText, 
-  Plus, 
-  Edit3, 
-  Save, 
-  Search, 
-  Calendar, 
+import {
+  FileText,
+  Plus,
+  Edit3,
+  Save,
+  Search,
+  Calendar,
   Tag,
   Trash2,
   Eye,
@@ -21,7 +21,9 @@ import {
   Monitor,
   Globe,
   Code,
-  File
+  File,
+  List,
+  LayoutGrid
 } from 'lucide-react'
 import ScreenshotWidget from '../ui/ScreenshotWidget'
 
@@ -364,7 +366,8 @@ export default function Notes() {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState('')
   const [editTitle, setEditTitle] = useState('')
-  
+  const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
+
   // BULLETPROOF STORAGE - ENTERPRISE GRADE
   const bulletproofStorage = createBulletproofStorage('NOTES', 'nishen-workspace-notes')
   const [searchTerm, setSearchTerm] = useState('')
@@ -389,7 +392,13 @@ export default function Notes() {
     // Load with automatic recovery from multiple storage layers
     const loadedNotes = bulletproofStorage.loadData(DEMO_NOTES)
     const savedCategories = localStorage.getItem('nishen-workspace-categories')
-    
+
+    // Load view mode preference
+    const savedViewMode = localStorage.getItem('devops-studio-notes-viewmode')
+    if (savedViewMode === 'list' || savedViewMode === 'compact') {
+      setViewMode(savedViewMode)
+    }
+
     if (loadedNotes && savedCategories) {
       try {
         const parsedNotes = loadedNotes.map((n: any) => ({
@@ -1143,9 +1152,14 @@ Start writing your note here...`
   }
 
   const togglePin = (noteId: string) => {
-    setNotes(prev => prev.map(note => 
+    setNotes(prev => prev.map(note =>
       note.id === noteId ? { ...note, isPinned: !note.isPinned } : note
     ))
+  }
+
+  const toggleViewMode = (mode: 'list' | 'compact') => {
+    setViewMode(mode)
+    localStorage.setItem('devops-studio-notes-viewmode', mode)
   }
 
   // Filter notes based on search and category
@@ -1187,14 +1201,40 @@ Start writing your note here...`
           
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold" style={{ color: 'var(--primary-accent)' }}>Notes</h2>
-            <button
-              onClick={() => setShowNewNoteModal(true)}
-              className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
-              style={{ backgroundColor: 'var(--primary-accent)' }}
-            >
-              <Plus className="w-4 h-4 inline mr-1" />
-              Note
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-gray-800 rounded p-0.5">
+                <button
+                  onClick={() => toggleViewMode('list')}
+                  className={`p-1 rounded transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="List View"
+                >
+                  <List className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => toggleViewMode('compact')}
+                  className={`p-1 rounded transition-colors ${
+                    viewMode === 'compact'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="Compact View"
+                >
+                  <LayoutGrid className="w-3 h-3" />
+                </button>
+              </div>
+              <button
+                onClick={() => setShowNewNoteModal(true)}
+                className="px-3 py-1 rounded text-sm font-medium transition-colors hover:opacity-80"
+                style={{ backgroundColor: 'var(--primary-accent)' }}
+              >
+                <Plus className="w-4 h-4 inline mr-1" />
+                Note
+              </button>
+            </div>
           </div>
           
           {/* Search */}
@@ -1289,14 +1329,64 @@ Start writing your note here...`
               <p>No notes found</p>
               <p className="text-xs">Create your first note!</p>
             </div>
+          ) : viewMode === 'compact' ? (
+            // Compact Grid View
+            <div className="grid grid-cols-2 gap-2">
+              {sortedNotes.map(note => (
+                <div
+                  key={note.id}
+                  className={`p-2 rounded-lg cursor-pointer transition-colors border ${
+                    selectedNote === note.id
+                      ? 'bg-neon-red/20 border-neon-red/40'
+                      : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                  }`}
+                  onClick={() => {
+                    setSelectedNote(note.id)
+                    setEditTitle(note.title)
+                    setEditContent(note.content)
+                    setIsEditing(false)
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-medium text-xs line-clamp-1 flex-1">{note.title}</h3>
+                    {note.isPinned && (
+                      <div className="text-burnt-orange ml-1 flex-shrink-0">
+                        <StickyNote className="w-2.5 h-2.5" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-1 mb-1">
+                    <span
+                      className="text-xs px-1.5 py-0.5 rounded truncate"
+                      style={{
+                        backgroundColor: categories.find(c => c.name === note.category)?.color + '20',
+                        color: categories.find(c => c.name === note.category)?.color
+                      }}
+                    >
+                      {note.category}
+                    </span>
+                    <div className="flex items-center space-x-0.5 flex-shrink-0">
+                      {getFileTypeIcon(note.type)}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Clock className="w-2.5 h-2.5 mr-1" />
+                    {note.modified.toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
+            // List View (Detailed)
             <div className="space-y-3">
               {sortedNotes.map(note => (
                 <div
                   key={note.id}
                   className={`p-3 rounded-lg cursor-pointer transition-colors border ${
-                    selectedNote === note.id 
-                      ? 'bg-neon-red/20 border-neon-red/40' 
+                    selectedNote === note.id
+                      ? 'bg-neon-red/20 border-neon-red/40'
                       : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
                   }`}
                   onClick={() => {
@@ -1314,16 +1404,16 @@ Start writing your note here...`
                       </div>
                     )}
                   </div>
-                  
+
                   <p className="text-xs text-gray-400 line-clamp-2 mb-2">
                     {note.content.replace(/#+\s/g, '').substring(0, 100)}...
                   </p>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span 
+                      <span
                         className="text-xs px-2 py-1 rounded"
-                        style={{ 
+                        style={{
                           backgroundColor: categories.find(c => c.name === note.category)?.color + '20',
                           color: categories.find(c => c.name === note.category)?.color
                         }}
@@ -1337,13 +1427,13 @@ Start writing your note here...`
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center text-xs text-gray-500">
                       <Clock className="w-3 h-3 mr-1" />
                       {note.modified.toLocaleDateString()}
                     </div>
                   </div>
-                  
+
                   {note.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {note.tags.slice(0, 3).map(tag => (
