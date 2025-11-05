@@ -14,11 +14,6 @@ const nextConfig = {
     unoptimized: true
   },
 
-  // Turbopack configuration (Next.js 16+)
-  turbopack: {
-    root: process.cwd()
-  },
-
   // Exclude backup files and folders from build
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Exclude backup directories and files from being processed

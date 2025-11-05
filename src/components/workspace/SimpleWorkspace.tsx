@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { Back4AppAuthProvider } from '../../contexts/Back4AppAuthContext'
 import { autoBackupManager } from '../../lib/autoBackup'
 import { dailyAutoBackup } from '../../lib/dailyAutoBackup'
+import SpaceBackground from '../background/SpaceBackground'
 import Terminal from './Terminal'
 import PowerShell from './PowerShell'
 import Files from './Files'
@@ -226,14 +227,14 @@ export default function SimpleWorkspace() {
 
   return (
     <Back4AppAuthProvider>
-      <div className="flex h-screen bg-black text-white overflow-hidden">
+      {/* Space Background with Vortex Animation */}
+      <SpaceBackground />
+
+      <div className="flex h-screen text-white overflow-hidden relative">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition-all"
-        style={{
-          backgroundColor: isSidebarOpen ? 'var(--primary-accent)' : undefined,
-        }}
+        className="lg:hidden fixed top-4 left-4 z-50 glass glass-hover p-2 rounded-lg"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isSidebarOpen ? (
@@ -247,7 +248,11 @@ export default function SimpleWorkspace() {
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-30"
+          style={{
+            background: 'rgba(5, 8, 22, 0.8)',
+            backdropFilter: 'blur(8px)'
+          }}
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -256,20 +261,33 @@ export default function SimpleWorkspace() {
       <div
         className={`
           fixed lg:static inset-y-0 left-0 z-40
-          w-64 lg:w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0
+          w-64 lg:w-64 glass flex-shrink-0
           transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
+        style={{
+          borderRight: '1px solid var(--border-glow)',
+          background: 'var(--glass-bg)'
+        }}
       >
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b" style={{ borderColor: 'var(--border-glow)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold" style={{ color: 'var(--primary-accent)' }}>DevOps Studio</h1>
-              <p className="text-sm text-gray-400">Professional Workspace</p>
+              <h1 className="text-xl font-bold cosmic-pulse" style={{
+                background: 'var(--gradient-cosmic)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                DevOps Studio
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--stardust)' }}>
+                Cosmic Workspace ✨
+              </p>
             </div>
             <button
               onClick={logout}
-              className="text-gray-400 hover:text-red-400 text-sm p-2 rounded transition-colors"
+              className="glass glass-hover text-sm p-2 rounded-lg transition-all"
               title="Secure Logout"
             >
               🔐
@@ -285,14 +303,18 @@ export default function SimpleWorkspace() {
                 setActiveSection(item.id)
                 setIsSidebarOpen(false) // Close drawer on mobile after selection
               }}
-              className={`w-full flex items-center space-x-3 p-3 rounded-lg mb-2 transition-all duration-200 ${
+              className={`w-full flex items-center space-x-3 p-3 rounded-xl mb-2 transition-all duration-300 ${
                 activeSection === item.id
-                  ? 'text-white font-semibold shadow-lg'
-                  : 'text-gray-300 hover:bg-gray-800'
+                  ? 'text-white font-semibold glass cosmic-glow-purple float-animation'
+                  : 'text-gray-300 glass-hover'
               }`}
               style={{
-                backgroundColor: activeSection === item.id ? 'var(--primary-accent)' : undefined,
-                color: activeSection === item.id ? '#ffffff' : undefined
+                background: activeSection === item.id
+                  ? 'linear-gradient(135deg, rgba(91, 33, 182, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%)'
+                  : 'transparent',
+                border: activeSection === item.id
+                  ? '1px solid var(--border-glow)'
+                  : '1px solid transparent'
               }}
             >
               <span className="text-xl">{item.icon}</span>

@@ -3,45 +3,78 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Theme - Black Background with Neon Accents */
-  --background: #000000;
-  --foreground: #ffffff;
-  --background-secondary: #0a0a0a;
-  --background-tertiary: #1a1a1a;
-  
-  /* Neon Red Accents */
+  /* Space Theme - Deep Space Backgrounds */
+  --space-dark: #0a0e27;
+  --space-darker: #050816;
+  --space-medium: #1a1f3a;
+  --space-light: #2a2f4a;
+
+  /* Cosmic Gradients */
+  --gradient-cosmic: linear-gradient(135deg, #5b21b6 0%, #ec4899 50%, #3b82f6 100%);
+  --gradient-nebula: radial-gradient(ellipse at top, rgba(124, 58, 237, 0.3), transparent),
+                     radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.3), transparent);
+  --gradient-space: linear-gradient(180deg, var(--space-dark) 0%, var(--space-darker) 50%, var(--space-medium) 100%);
+
+  /* Nebula Colors */
+  --nebula-purple: #5b21b6;
+  --nebula-violet: #7c3aed;
+  --nebula-pink: #ec4899;
+  --nebula-rose: #f472b6;
+  --nebula-glow-purple: rgba(91, 33, 182, 0.5);
+  --nebula-glow-pink: rgba(236, 72, 153, 0.5);
+
+  /* Cosmic Accents */
+  --cosmic-blue: #3b82f6;
+  --cosmic-cyan: #06b6d4;
+  --cosmic-indigo: #6366f1;
+  --starlight: #e5e7eb;
+  --stardust: #cbd5e1;
+
+  /* Legacy Theme - Black Background with Neon Accents */
+  --background: var(--space-dark);
+  --foreground: var(--starlight);
+  --background-secondary: var(--space-darker);
+  --background-tertiary: var(--space-medium);
+
+  /* Neon Red Accents (Legacy) */
   --neon-red: #ff073a;
   --neon-red-bright: #ff1744;
   --neon-red-dark: #cc052e;
   --neon-red-glow: rgba(255, 7, 58, 0.5);
-  
+
   /* Dynamic Accent Colors - Updated by Settings */
-  --accent-primary: #ff073a;
-  --accent-secondary: #ff1744;
-  --accent-tertiary: #B8B8B8;
-  
+  --accent-primary: var(--nebula-violet);
+  --accent-secondary: var(--nebula-pink);
+  --accent-tertiary: var(--cosmic-cyan);
+
   /* Primary Colors for Components */
   --primary-accent: var(--accent-primary);
   --secondary-accent: var(--british-silver);
-  --success-accent: var(--neon-green);
-  
+  --success-accent: var(--cosmic-cyan);
+
   /* British Silver Accents - Toned Down */
   --british-silver: #8B9499;
   --british-silver-bright: #A5ACB1;
   --british-silver-dark: #6B7176;
   --british-silver-glow: rgba(139, 148, 153, 0.5);
-  
+
   /* Neon Green Accents - Toned Down */
   --neon-green: #00CC33;
   --neon-green-bright: #00E639;
   --neon-green-dark: #00A829;
   --neon-green-glow: rgba(0, 204, 51, 0.5);
-  
+
   /* UI Colors */
-  --border-color: #2a2a2a;
-  --hover-bg: #1a1a1a;
-  --text-muted: #a0a0a0;
-  --text-secondary: #e0e0e0;
+  --border-color: rgba(139, 148, 153, 0.2);
+  --border-glow: rgba(124, 58, 237, 0.3);
+  --hover-bg: rgba(124, 58, 237, 0.1);
+  --text-muted: var(--stardust);
+  --text-secondary: var(--starlight);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(26, 31, 58, 0.7);
+  --glass-border: rgba(229, 231, 235, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(5, 8, 22, 0.37);
 }
 
 /* Remove @theme inline - not compatible with Tailwind 4 */
@@ -73,15 +106,51 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neon-red);
+  background: var(--nebula-violet);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-red-bright);
+  background: var(--nebula-pink);
 }
 
-/* Neon Glow Effects */
+/* Glassmorphism Effects */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-hover:hover {
+  background: rgba(26, 31, 58, 0.85);
+  border-color: var(--border-glow);
+  box-shadow: 0 8px 32px 0 rgba(124, 58, 237, 0.3),
+              0 0 20px rgba(124, 58, 237, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Cosmic Glow Effects */
+.cosmic-glow-purple {
+  box-shadow: 0 0 10px var(--nebula-glow-purple), 0 0 20px var(--nebula-glow-purple);
+}
+
+.cosmic-glow-pink {
+  box-shadow: 0 0 10px var(--nebula-glow-pink), 0 0 20px var(--nebula-glow-pink);
+}
+
+.cosmic-border {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--space-medium), var(--space-medium)) padding-box,
+              var(--gradient-cosmic) border-box;
+}
+
+/* Legacy Neon Glow Effects */
 .neon-glow-red {
   box-shadow: 0 0 10px var(--neon-red-glow), 0 0 20px var(--neon-red-glow);
 }
@@ -99,6 +168,23 @@ body {
   text-shadow: 0 0 5px var(--neon-green-glow);
 }
 
+/* Animation Effects */
+.cosmic-pulse {
+  animation: cosmic-pulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes cosmic-pulse {
+  0% {
+    box-shadow: 0 0 5px var(--nebula-glow-purple), 0 0 10px var(--nebula-glow-purple);
+  }
+  50% {
+    box-shadow: 0 0 15px var(--nebula-glow-pink), 0 0 25px var(--nebula-glow-pink);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--cosmic-blue), 0 0 20px var(--cosmic-blue);
+  }
+}
+
 .neon-pulse {
   animation: neon-pulse 2s ease-in-out infinite alternate;
 }
@@ -112,9 +198,22 @@ body {
   }
 }
 
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 /* Selection */
 ::selection {
-  background: var(--neon-red-glow);
+  background: var(--nebula-glow-purple);
   color: white;
 }
 
