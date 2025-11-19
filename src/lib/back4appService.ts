@@ -610,6 +610,214 @@ function parseURLLinkObject(obj: Parse.Object): URLLink {
   }
 }
 
+// ==================== DOCUMENTATION ====================
+
+export interface Document {
+  id?: string
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  type: 'SOP' | 'SOW' | 'Guide' | 'Diagram' | 'Template' | 'Technical' | 'Other'
+  version: string
+  status: 'Draft' | 'Review' | 'Approved' | 'Archived'
+  lastModified: string
+  createdDate: string
+  isPinned: boolean
+  isArchived: boolean
+  author: string
+  thumbnail?: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface DocCategory {
+  id?: string
+  name: string
+  color: string
+  count: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+/**
+ * Create a new document
+ */
+export async function createDocument(doc: Document): Promise<Document> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const DocumentClass = Parse.Object.extend('Document')
+  const newDoc = new DocumentClass()
+
+  newDoc.set('title', doc.title)
+  newDoc.set('content', doc.content)
+  newDoc.set('category', doc.category)
+  newDoc.set('tags', doc.tags || [])
+  newDoc.set('type', doc.type)
+  newDoc.set('version', doc.version)
+  newDoc.set('status', doc.status)
+  newDoc.set('lastModified', doc.lastModified)
+  newDoc.set('createdDate', doc.createdDate)
+  newDoc.set('isPinned', doc.isPinned || false)
+  newDoc.set('isArchived', doc.isArchived || false)
+  newDoc.set('author', doc.author)
+  newDoc.set('thumbnail', doc.thumbnail || '')
+  newDoc.set('userId', user.id || '')
+
+  const result = await newDoc.save()
+  return parseDocumentObject(result)
+}
+
+/**
+ * Get all documents for current user
+ */
+export async function getDocuments(): Promise<Document[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const DocumentClass = Parse.Object.extend('Document')
+  const query = new Parse.Query(DocumentClass)
+  query.equalTo('userId', user.id || '')
+  query.descending('createdAt')
+
+  const results = await query.find()
+  return results.map(parseDocumentObject)
+}
+
+/**
+ * Update a document
+ */
+export async function updateDocument(id: string, updates: Partial<Document>): Promise<Document> {
+  const DocumentClass = Parse.Object.extend('Document')
+  const query = new Parse.Query(DocumentClass)
+  const doc = await query.get(id)
+
+  if (updates.title !== undefined) doc.set('title', updates.title)
+  if (updates.content !== undefined) doc.set('content', updates.content)
+  if (updates.category !== undefined) doc.set('category', updates.category)
+  if (updates.tags !== undefined) doc.set('tags', updates.tags)
+  if (updates.type !== undefined) doc.set('type', updates.type)
+  if (updates.version !== undefined) doc.set('version', updates.version)
+  if (updates.status !== undefined) doc.set('status', updates.status)
+  if (updates.lastModified !== undefined) doc.set('lastModified', updates.lastModified)
+  if (updates.isPinned !== undefined) doc.set('isPinned', updates.isPinned)
+  if (updates.isArchived !== undefined) doc.set('isArchived', updates.isArchived)
+  if (updates.author !== undefined) doc.set('author', updates.author)
+  if (updates.thumbnail !== undefined) doc.set('thumbnail', updates.thumbnail)
+
+  const result = await doc.save()
+  return parseDocumentObject(result)
+}
+
+/**
+ * Delete a document
+ */
+export async function deleteDocument(id: string): Promise<void> {
+  const DocumentClass = Parse.Object.extend('Document')
+  const query = new Parse.Query(DocumentClass)
+  const doc = await query.get(id)
+  await doc.destroy()
+}
+
+/**
+ * Helper to parse Parse document object
+ */
+function parseDocumentObject(obj: Parse.Object): Document {
+  return {
+    id: obj.id || '',
+    title: obj.get('title'),
+    content: obj.get('content'),
+    category: obj.get('category'),
+    tags: obj.get('tags') || [],
+    type: obj.get('type'),
+    version: obj.get('version'),
+    status: obj.get('status'),
+    lastModified: obj.get('lastModified'),
+    createdDate: obj.get('createdDate'),
+    isPinned: obj.get('isPinned') || false,
+    isArchived: obj.get('isArchived') || false,
+    author: obj.get('author'),
+    thumbnail: obj.get('thumbnail') || '',
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
+/**
+ * Create a new document category
+ */
+export async function createDocCategory(category: DocCategory): Promise<DocCategory> {
+  const user = Parse.User.current()
+  if (!user) throw new Error('User must be logged in')
+
+  const DocCategoryClass = Parse.Object.extend('DocCategory')
+  const newCategory = new DocCategoryClass()
+
+  newCategory.set('name', category.name)
+  newCategory.set('color', category.color)
+  newCategory.set('count', category.count || 0)
+  newCategory.set('userId', user.id || '')
+
+  const result = await newCategory.save()
+  return parseDocCategoryObject(result)
+}
+
+/**
+ * Get all document categories for current user
+ */
+export async function getDocCategories(): Promise<DocCategory[]> {
+  const user = Parse.User.current()
+  if (!user) return []
+
+  const DocCategoryClass = Parse.Object.extend('DocCategory')
+  const query = new Parse.Query(DocCategoryClass)
+  query.equalTo('userId', user.id || '')
+
+  const results = await query.find()
+  return results.map(parseDocCategoryObject)
+}
+
+/**
+ * Update a document category
+ */
+export async function updateDocCategory(id: string, updates: Partial<DocCategory>): Promise<DocCategory> {
+  const DocCategoryClass = Parse.Object.extend('DocCategory')
+  const query = new Parse.Query(DocCategoryClass)
+  const category = await query.get(id)
+
+  if (updates.name !== undefined) category.set('name', updates.name)
+  if (updates.color !== undefined) category.set('color', updates.color)
+  if (updates.count !== undefined) category.set('count', updates.count)
+
+  const result = await category.save()
+  return parseDocCategoryObject(result)
+}
+
+/**
+ * Delete a document category
+ */
+export async function deleteDocCategory(id: string): Promise<void> {
+  const DocCategoryClass = Parse.Object.extend('DocCategory')
+  const query = new Parse.Query(DocCategoryClass)
+  const category = await query.get(id)
+  await category.destroy()
+}
+
+/**
+ * Helper to parse Parse document category object
+ */
+function parseDocCategoryObject(obj: Parse.Object): DocCategory {
+  return {
+    id: obj.id || '',
+    name: obj.get('name'),
+    color: obj.get('color'),
+    count: obj.get('count') || 0,
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt
+  }
+}
+
 // ==================== FILES & PROJECTS ====================
 
 export interface FileVersion {

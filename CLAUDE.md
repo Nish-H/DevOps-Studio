@@ -10,6 +10,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **End Goal**: Marketable productivity tool for engineers and developers worldwide, featuring integrated Claude AI and multi-terminal support for enhanced daily workflows.
 
+## 🔴 CRITICAL RULE: CLOUD STORAGE MANDATORY
+
+**ALL DATA MUST BE STORED IN BACK4APP CLOUD BY DEFAULT**
+
+### Mandatory Cloud Storage Policy:
+- ✅ **REQUIRED**: All new modules MUST use Back4App cloud storage via `back4appService.ts`
+- ✅ **REQUIRED**: All existing modules MUST migrate to cloud storage (use `*Cloud.tsx` versions)
+- ❌ **FORBIDDEN**: Using localStorage as primary storage (only allowed as fallback for offline mode)
+- ✅ **REQUIRED**: All CRUD operations must call Back4App API methods
+- ✅ **REQUIRED**: Add loading states and sync indicators for cloud operations
+
+### Cloud-First Development Pattern:
+```typescript
+// ✅ CORRECT - Cloud storage with Back4App
+import * as back4app from '../../lib/back4appService';
+
+const loadData = async () => {
+  if (!isAuthenticated) return;
+  const data = await back4app.getDocuments(); // Cloud first
+  setDocuments(data);
+};
+
+// ❌ WRONG - localStorage only
+const loadData = () => {
+  const data = localStorage.getItem('data'); // Not allowed
+  setDocuments(JSON.parse(data));
+};
+```
+
+### Implementation Checklist for New Modules:
+1. Define TypeScript interface in `back4appService.ts`
+2. Implement CRUD functions (create, get, update, delete)
+3. Create `ModuleNameCloud.tsx` component using Back4App
+4. Add `useAuth()` hook and authentication checks
+5. Implement loading and syncing states
+6. Add error handling for cloud operations
+7. Use localStorage ONLY as offline fallback
+
+### Existing Modules Status:
+- ✅ **NotesCloud.tsx** - Cloud storage enabled
+- ✅ **URLLinksCloud.tsx** - Cloud storage enabled
+- ✅ **FilesCloud.tsx** - Cloud storage enabled
+- ✅ **DocumentationHubCloud.tsx** - Cloud storage enabled (NEW)
+- ⚠️ **TaskTracker.tsx** - Needs cloud migration
+- ⚠️ **PromptEngineeringCloud.tsx** - Cloud version exists, needs verification
+
+**This rule is NON-NEGOTIABLE. All user data must be cloud-backed for cross-device sync and data persistence.**
+
 ## Architecture
 
 ### Core Design Pattern

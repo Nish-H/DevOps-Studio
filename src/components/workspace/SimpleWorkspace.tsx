@@ -11,7 +11,7 @@ import PowerShell from './PowerShell'
 import Files from './Files'
 import FilesCloud from './FilesCloud'
 import FilesCloudMobile from './FilesCloudMobile'
-import DocumentationHub from './DocumentationHub'
+import DocumentationHubCloud from './DocumentationHubCloud'
 import Prod from './Prod'
 import Tools from './Tools'
 import Settings from './Settings'
@@ -341,7 +341,7 @@ export default function SimpleWorkspace() {
         ) : activeSection === 'prod' ? (
           <Prod />
         ) : activeSection === 'documentation' ? (
-          <DocumentationHub />
+          <DocumentationHubCloud />
         ) : activeSection === 'tasks' ? (
           <TaskTracker />
         ) : activeSection === 'notes' ? (
