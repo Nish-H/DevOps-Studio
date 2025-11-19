@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, Grid, List, Tag, Wrench, X, ArrowLeft, Star, FileCode, Filter } from 'lucide-react';
 import { solutionsRegistry, getCategories, searchSolutions, filterByCategory, filterByDifficulty, type SolutionMetadata } from '../solutions/registry';
 import SFTPConnectionGuide from '../solutions/SFTPConnectionGuide';
+import SSHKeyGuide from '../solutions/SSHKeyGuide';
 
 const TSXSolutions = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -40,6 +41,8 @@ const TSXSolutions = () => {
     switch (solution.component) {
       case 'SFTPConnectionGuide':
         return <SFTPConnectionGuide />;
+      case 'SSHKeyGuide':
+        return <SSHKeyGuide />;
       default:
         return (
           <div className="p-8 text-center text-gray-500">

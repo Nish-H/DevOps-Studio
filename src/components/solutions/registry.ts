@@ -29,6 +29,19 @@ export const solutionsRegistry: SolutionMetadata[] = [
     difficulty: 'Intermediate',
     component: 'SFTPConnectionGuide',
     featured: true
+  },
+  {
+    id: 'ssh-key-guide',
+    title: 'SSH Key Generation & Management Guide',
+    description: 'Complete guide for generating, managing, and using SSH keys across Windows, Linux, and macOS. Includes key types comparison, usage with GitHub/GitLab, security best practices, and comprehensive troubleshooting.',
+    category: 'Security & Authentication',
+    tags: ['SSH', 'Security', 'Authentication', 'GitHub', 'GitLab', 'Key Management', 'ED25519', 'RSA'],
+    author: 'DevOps Team',
+    version: '1.0.0',
+    lastUpdated: new Date().toISOString(),
+    difficulty: 'Beginner',
+    component: 'SSHKeyGuide',
+    featured: true
   }
   // Add more solutions here as they are created
 ];
