@@ -14,7 +14,7 @@ const SSHKeyGuide = () => {
     setTimeout(() => setCopiedCommand(null), 2000);
   };
 
-  const TabButton = ({ id, label, icon: Icon }) => (
+  const TabButton = ({ id, label, icon: Icon }: { id: string; label: string; icon: React.ComponentType<any> }) => (
     <button
       onClick={() => setActiveTab(id)}
       className={`flex items-center gap-2 px-6 py-3 font-medium transition-all ${
@@ -43,7 +43,7 @@ const SSHKeyGuide = () => {
     </div>
   );
 
-  const KeyTypeCard = ({ type, title, description, recommended, speed, security }) => (
+  const KeyTypeCard = ({ type, title, description, recommended, speed, security }: { type: string; title: string; description: string; recommended: boolean; speed: string; security: string }) => (
     <div
       onClick={() => setSelectedKeyType(type)}
       className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${

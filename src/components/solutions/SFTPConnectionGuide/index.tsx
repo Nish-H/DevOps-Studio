@@ -5,7 +5,7 @@ const SFTPConnectionGuide = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedOS, setSelectedOS] = useState('windows');
 
-  const TabButton = ({ id, label, icon: Icon }) => (
+  const TabButton = ({ id, label, icon: Icon }: { id: string; label: string; icon: React.ComponentType<any> }) => (
     <button
       onClick={() => setActiveTab(id)}
       className={`flex items-center gap-2 px-6 py-3 font-medium transition-all ${
