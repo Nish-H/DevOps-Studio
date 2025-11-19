@@ -741,7 +741,7 @@ Write-Host "Report generated successfully" -ForegroundColor Cyan`,
       <div className="p-6 border-b border-gray-800">
         {/* Version Info and Sync Status */}
         <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-          <span>DevOps Studio v0.1.2</span>
+          <span>DevOps Studio v1.2.4</span>
           <div className="flex items-center gap-3">
             {syncing ? (
               <span className="flex items-center gap-1 text-blue-400">

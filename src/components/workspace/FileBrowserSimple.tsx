@@ -207,7 +207,7 @@ Try creating a new file or folder to get started!`
       <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-            <span>DevOps Studio v0.1.2</span>
+            <span>DevOps Studio v1.2.4</span>
             <span>File Browser</span>
           </div>
           

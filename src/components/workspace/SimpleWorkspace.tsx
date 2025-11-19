@@ -22,6 +22,7 @@ import NotesCloud from './NotesCloud'
 import TaskTracker from './TaskTracker'
 import PowerShellHub from './PowerShellHub'
 import CustomSolutionsCloud from './CustomSolutionsCloud'
+import TSXSolutions from './TSXSolutions'
 import ElectronStatus from '../ElectronStatus'
 import ElectronDescription from '../ElectronDescription'
 
@@ -214,6 +215,7 @@ export default function SimpleWorkspace() {
     { id: 'pshub', name: 'PS Hub', icon: '💻' },
     { id: 'powershell', name: 'PowerShell', icon: '🔷' },
     { id: 'solutions', name: 'Custom Solutions', icon: '📜' },
+    { id: 'tsx-solutions', name: 'TSX Solutions', icon: '🔧' },
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
     { id: 'file-browser', name: 'File Browser', icon: '🗂️' },
@@ -332,6 +334,8 @@ export default function SimpleWorkspace() {
           <PowerShell />
         ) : activeSection === 'solutions' ? (
           <CustomSolutionsCloud />
+        ) : activeSection === 'tsx-solutions' ? (
+          <TSXSolutions />
         ) : activeSection === 'dev' ? (
           <FilesCloudMobile />
         ) : activeSection === 'prod' ? (

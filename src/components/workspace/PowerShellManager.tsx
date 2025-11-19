@@ -396,7 +396,7 @@ export default function PowerShellManager() {
       <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800">
           <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--primary-accent)' }}>
-            Nishen's AI Workspace v0.1.2 - PowerShell Manager
+            Nishen's AI Workspace v1.2.4 - PowerShell Manager
           </h1>
           <div className="flex space-x-2">
             <button

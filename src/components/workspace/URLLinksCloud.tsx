@@ -353,7 +353,7 @@ export default function URLLinksCloud() {
       <div className="p-4 border-b border-gray-800" style={{ backgroundColor: '#1a1625' }}>
         {/* Version Info */}
         <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-          <span>DevOps Studio v0.1.2</span>
+          <span>DevOps Studio v1.2.4</span>
           <span>Links Module</span>
         </div>
 

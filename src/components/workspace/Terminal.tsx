@@ -144,7 +144,7 @@ Processor: Intel Core i7
 Memory: 16GB RAM
 Node.js: v22.17.0
 Next.js: 14.2.5
-Workspace: Nishen's AI Workspace v0.1.2`
+Workspace: Nishen's AI Workspace v1.2.4`
         break
 
       case 'claude':
@@ -276,7 +276,7 @@ Type 'help' to see available commands.`
       <div className="p-4 border-b border-gray-800 bg-gray-900">
         {/* Version Info */}
         <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-          <span>Nishen's AI Workspace v0.1.2</span>
+          <span>Nishen's AI Workspace v1.2.4</span>
           <span>Terminal Module</span>
         </div>
         

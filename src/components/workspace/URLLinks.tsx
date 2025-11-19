@@ -271,7 +271,7 @@ export default function URLLinks() {
         <div className="p-6 bg-gray-900 text-white min-h-screen flex-1">
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">
-              DevOps Studio v0.1.2 - URL Links
+              DevOps Studio v1.2.4 - URL Links
             </h1>
             <p className="text-gray-400">
               Manage and organize your important URLs with categories and search functionality

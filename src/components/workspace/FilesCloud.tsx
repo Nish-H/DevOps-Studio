@@ -581,7 +581,7 @@ Write-Host "Starting ${filename}..." -ForegroundColor Green
           {/* Header */}
           <div className="p-4 border-b border-gray-800">
             <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
-              <span>DevOps Studio v0.1.2</span>
+              <span>DevOps Studio v1.2.4</span>
               <span>Files Cloud</span>
             </div>
 
