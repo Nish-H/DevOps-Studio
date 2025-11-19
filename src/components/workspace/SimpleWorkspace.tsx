@@ -11,7 +11,7 @@ import PowerShell from './PowerShell'
 import Files from './Files'
 import FilesCloud from './FilesCloud'
 import FilesCloudMobile from './FilesCloudMobile'
-import FileBrowserSimple from './FileBrowserSimple'
+import DocumentationHub from './DocumentationHub'
 import Prod from './Prod'
 import Tools from './Tools'
 import Settings from './Settings'
@@ -218,7 +218,7 @@ export default function SimpleWorkspace() {
     { id: 'tsx-solutions', name: 'TSX Solutions', icon: '🔧' },
     { id: 'dev', name: 'Dev', icon: '🛠️' },
     { id: 'prod', name: 'Prod', icon: '🚀' },
-    { id: 'file-browser', name: 'File Browser', icon: '🗂️' },
+    { id: 'documentation', name: 'Documentation', icon: '📚' },
     { id: 'tasks', name: 'Task Tracker', icon: '✅' },
     { id: 'notes', name: 'Notes', icon: '📝' },
     { id: 'prompts', name: 'Prompts', icon: '🧠' },
@@ -340,8 +340,8 @@ export default function SimpleWorkspace() {
           <FilesCloudMobile />
         ) : activeSection === 'prod' ? (
           <Prod />
-        ) : activeSection === 'file-browser' ? (
-          <FileBrowserSimple />
+        ) : activeSection === 'documentation' ? (
+          <DocumentationHub />
         ) : activeSection === 'tasks' ? (
           <TaskTracker />
         ) : activeSection === 'notes' ? (
